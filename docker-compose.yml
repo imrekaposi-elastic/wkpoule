@@ -1,0 +1,51 @@
+# Local dev: three containers — Postgres (upstream image), API (./backend only), frontend (./frontend only).
+# Production-shaped routing: browser → frontend nginx :8080; /api/* proxied to API service (see frontend/nginx.conf, API_HOST).
+# OpenShift: same split — see openshift/README.md and deploy.md (postgres Deployment + two app images).
+
+name: wkpoule
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: wkpoule
+      POSTGRES_PASSWORD: wkpoule
+      POSTGRES_DB: wkpoule
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wkpoule"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://wkpoule:wkpoule@db:5432/wkpoule
+      JWT_SECRET_KEY: dev-secret-change-in-production
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:8080"
+    environment:
+      API_HOST: api
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

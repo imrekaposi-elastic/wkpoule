@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wkpoule-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wkpoule-frontend
+  template:
+    metadata:
+      labels:
+        app: wkpoule-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: image-registry.openshift-image-registry.svc:5000/wkpoule-prd/wkpoule-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: API_HOST
+              value: wkpoule-api
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wkpoule-frontend
+spec:
+  selector:
+    app: wkpoule-frontend
+  ports:
+    - port: 8080
+      targetPort: 8080

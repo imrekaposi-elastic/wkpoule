@@ -1,0 +1,46 @@
+# Example: OpenShift BuildConfigs for a Git monorepo — one clone, two images via contextDir.
+# 1. Replace GIT_URI / GIT_REF with your repository (and add source secrets if private).
+# 2. oc apply -f openshift/examples/buildconfigs-git.yaml
+# 3. oc start-build wkpoule-api && oc start-build wkpoule-frontend
+#
+# ImageStream tags must exist (see openshift/imagestreams.yaml) or let BuildConfig output create them.
+
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: wkpoule-api
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/ORG/REPO.git
+      ref: main
+    contextDir: backend
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: wkpoule-api:latest
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: wkpoule-frontend
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/ORG/REPO.git
+      ref: main
+    contextDir: frontend
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: wkpoule-frontend:latest

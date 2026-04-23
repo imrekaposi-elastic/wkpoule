@@ -1,0 +1,14 @@
+# Tags appear when you push, e.g.:
+#   docker tag wkpoule-api:latest $(oc registry info)/wkpoule-prd/wkpoule-api:latest
+#   docker push $(oc registry info)/wkpoule-prd/wkpoule-api:latest
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: wkpoule-api
+spec: {}
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: wkpoule-frontend
+spec: {}

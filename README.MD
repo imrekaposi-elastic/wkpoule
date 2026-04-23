@@ -1,0 +1,26 @@
+I want to have a world cup game prediction website.
+- Only registered users can participate. Use secure login routine
+- Status of site is persistent. It should survive reboots
+- All games of world cup 2026 need to be predicted by the user.
+    - Correct result: 3 points
+    - Correct score: 8 points
+    - Correct number of goals: 1 point
+- The site should automatically translate scores to group rankings
+- per match this info is presented:
+    - date & time
+    - home team
+    - away team
+    - venue & capacity
+    - expected temperature during match in celsius
+    - A fun but irrelevent comment in the expert prediction box. It should be in the style of Donald Trump or Bill Burr and should write something about either the venue, the city, the teams or some historical match between them before
+    - Based on previous results of the teams and the current worldcup ranking, there should be an expert prediction suggestion
+- the predictions of other participants are visible by all registered users
+- There should be a ranking page of participants
+- the website and storage will be hosted on openshift
+
+## Repository layout (containers)
+
+- **`backend/`** — FastAPI API image (`Dockerfile`, context = this directory only).
+- **`frontend/`** — React SPA + nginx reverse proxy for `/api` (`Dockerfile`, context = this directory only).
+- **`docker-compose.yml`** — local stack: Postgres + API + frontend (three containers).
+- **`openshift/`** — Kustomize manifests + [`openshift/README.md`](openshift/README.md) (three runtimes, monorepo build hints).

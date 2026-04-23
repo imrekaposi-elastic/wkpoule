@@ -1,0 +1,26 @@
+# Apply: oc apply -k openshift/
+#
+# Three runtimes: postgres (pull-only image), wkpoule-api (build context backend/), wkpoule-frontend (context frontend/).
+# See openshift/README.md and openshift/examples/buildconfigs-git.yaml for monorepo builds.
+#
+# Images (build locally, push to internal registry — use your real project if not wkpoule-prd):
+#   REG=$(oc registry info --public=false)
+#   docker login -u "$(oc whoami)" -p "$(oc whoami -t)" "$REG"
+#   docker tag wkpoule-api:latest "$REG/wkpoule-prd/wkpoule-api:latest"
+#   docker tag wkpoule-frontend:latest "$REG/wkpoule-prd/wkpoule-frontend:latest"
+#   docker push "$REG/wkpoule-prd/wkpoule-api:latest"
+#   docker push "$REG/wkpoule-prd/wkpoule-frontend:latest"
+#
+# If you rename the project, set `namespace:` below and replace `wkpoule-prd` in
+# deployment-api.yaml / deployment-frontend.yaml image paths to match.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: wkpoule-prd
+resources:
+  - secret.yaml
+  - pvc-postgres.yaml
+  - imagestreams.yaml
+  - deployment-postgres.yaml
+  - deployment-api.yaml
+  - deployment-frontend.yaml
+  - route.yaml

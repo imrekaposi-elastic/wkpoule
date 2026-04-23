@@ -1,0 +1,301 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import api from "../api/client";
+import VirtualGroupStandings from "../components/VirtualGroupStandings";
+import type { Match, MyPrediction, VirtualGroupTable } from "../types";
+
+function predictionsByMatchId(mine: MyPrediction[]) {
+  const map: Record<number, { home: number; away: number }> = {};
+  for (const p of mine) {
+    map[p.match_id] = { home: p.home_score, away: p.away_score };
+  }
+  return map;
+}
+
+const STAGE_KEYS: { value: string; labelKey: string }[] = [
+  { value: "", labelKey: "matches.allStages" },
+  { value: "group", labelKey: "matches.groupStage" },
+  { value: "round_of_32", labelKey: "matches.roundOf32" },
+  { value: "round_of_16", labelKey: "matches.roundOf16" },
+  { value: "quarter_final", labelKey: "matches.quarterFinals" },
+  { value: "semi_final", labelKey: "matches.semiFinals" },
+  { value: "third_place", labelKey: "matches.thirdPlace" },
+  { value: "final", labelKey: "matches.final" },
+];
+
+const GROUPS = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
+
+const LOCALE_MAP: Record<string, string> = {
+  en: "en-US",
+  nl: "nl-NL",
+  pt: "pt-BR",
+  de: "de-DE",
+  he: "he-IL",
+};
+
+export default function Matches() {
+  const { t, i18n } = useTranslation();
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [myPredByMatchId, setMyPredByMatchId] = useState<
+    Record<number, { home: number; away: number }>
+  >({});
+  const [virtualGroup, setVirtualGroup] = useState<VirtualGroupTable | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [stage, setStage] = useState("");
+  const [group, setGroup] = useState("");
+  const [search, setSearch] = useState("");
+
+  const locale = LOCALE_MAP[i18n.language] || "en-US";
+
+  useEffect(() => {
+    const params: Record<string, string> = { predicted_teams: "true" };
+    if (stage) params.stage = stage;
+    if (group) params.group = group;
+
+    const loadMatches = api.get<Match[]>("/matches", { params });
+    const loadMine = api
+      .get<MyPrediction[]>("/predictions/mine")
+      .catch(() => ({ data: [] as MyPrediction[] }));
+
+    const showVirtualTable = !!group && (!stage || stage === "group");
+
+    if (showVirtualTable) {
+      setLoading(true);
+      Promise.all([
+        loadMatches,
+        loadMine,
+        api.get<VirtualGroupTable[]>("/predictions/virtual-groups", {
+          params: { _t: Date.now() },
+        }),
+      ])
+        .then(([mr, mineRes, vr]) => {
+          setMatches(mr.data);
+          setMyPredByMatchId(predictionsByMatchId(mineRes.data));
+          const gl = group.trim().toUpperCase();
+          const v =
+            vr.data.find((x) => x.group_letter === gl) ??
+            vr.data.find((x) => x.group_letter?.toUpperCase() === gl);
+          setVirtualGroup(v ?? null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setVirtualGroup(null);
+      setLoading(true);
+      Promise.all([loadMatches, loadMine])
+        .then(([mr, mineRes]) => {
+          setMatches(mr.data);
+          setMyPredByMatchId(predictionsByMatchId(mineRes.data));
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [stage, group]);
+
+  const filtered = matches.filter((m) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (
+      m.home_team?.name.toLowerCase().includes(q) ||
+      m.away_team?.name.toLowerCase().includes(q) ||
+      m.home_team?.fifa_code.toLowerCase().includes(q) ||
+      m.away_team?.fifa_code.toLowerCase().includes(q) ||
+      m.venue.name.toLowerCase().includes(q) ||
+      m.venue.city.toLowerCase().includes(q)
+    );
+  });
+
+  const grouped: Record<string, Match[]> = {};
+  for (const m of filtered) {
+    const dateKey = new Date(m.kickoff_utc).toLocaleDateString(locale, {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    (grouped[dateKey] ||= []).push(m);
+  }
+
+  const statusLabel = (s: string) => t(`matches.${s}`, s);
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">{t("matches.title")}</h1>
+
+      <div className="flex flex-wrap gap-3 mb-6">
+        <select
+          value={stage}
+          onChange={(e) => {
+            setStage(e.target.value);
+            if (e.target.value !== "group") setGroup("");
+          }}
+          className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-pitch-600 outline-none"
+        >
+          {STAGE_KEYS.map((s) => (
+            <option key={s.value} value={s.value}>
+              {t(s.labelKey)}
+            </option>
+          ))}
+        </select>
+
+        {(stage === "" || stage === "group") && (
+          <select
+            value={group}
+            onChange={(e) => setGroup(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-pitch-600 outline-none"
+          >
+            <option value="">{t("matches.allGroups")}</option>
+            {GROUPS.filter(Boolean).map((g) => (
+              <option key={g} value={g}>
+                {t("matches.group", { letter: g })}
+              </option>
+            ))}
+          </select>
+        )}
+
+        <input
+          type="text"
+          placeholder={t("matches.searchPlaceholder")}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 min-w-[200px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pitch-600 outline-none"
+        />
+      </div>
+
+      {(stage === "" || stage === "group") && !group && (
+        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          {t("matches.selectGroupForVirtual")}
+        </div>
+      )}
+
+      {group && (!stage || stage === "group") && virtualGroup && (
+        <div className="mb-8">
+          <VirtualGroupStandings virtualGroup={virtualGroup} groupLetter={group} />
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pitch-600" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <p className="text-gray-500 py-10 text-center">{t("matches.noMatches")}</p>
+      ) : (
+        Object.entries(grouped).map(([date, dayMatches]) => (
+          <div key={date} className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-700 mb-3 sticky top-0 bg-gray-50 py-2">
+              {date}
+            </h2>
+            <div className="space-y-3">
+              {dayMatches.map((m) => {
+                const myTip = myPredByMatchId[m.id];
+                return (
+                <Link
+                  key={m.id}
+                  to={`/matches/${m.match_number}`}
+                  className="block bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-6 flex-1">
+                      <div className="text-xs text-gray-400 w-20">
+                        <div className="font-medium text-gray-600">#{m.match_number}</div>
+                        <div>
+                          {m.group_letter
+                            ? t("matches.group", { letter: m.group_letter })
+                            : t(
+                                `matches.${m.stage}`,
+                                m.stage.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+                              )}
+                        </div>
+                      </div>
+
+                      <div className="text-sm text-gray-500 w-16">
+                        {new Date(m.kickoff_utc).toLocaleTimeString(locale, {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
+
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="flex items-center gap-2 w-40 justify-end">
+                          <div className="text-right">
+                            <span className="font-medium text-sm block">
+                              {m.home_team?.name || t("matches.tbd")}
+                            </span>
+                            {m.bracket_home_slot && (
+                              <span className="text-[11px] text-gray-500 font-mono">{m.bracket_home_slot}</span>
+                            )}
+                          </div>
+                          {m.home_team && (
+                            <img src={m.home_team.flag_url} alt="" className="w-7 h-5 object-cover rounded-sm" />
+                          )}
+                        </div>
+
+                        <div className="w-24 shrink-0 text-center">
+                          {m.status === "completed" ? (
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span className="font-bold text-lg leading-tight">
+                                {m.home_score} - {m.away_score}
+                              </span>
+                              {myTip && (
+                                <span className="text-xs text-pitch-700 font-medium leading-tight">
+                                  {t("matches.yourTip")}: {myTip.home}–{myTip.away}
+                                </span>
+                              )}
+                            </div>
+                          ) : myTip ? (
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span className="font-semibold text-lg text-pitch-700 leading-tight">
+                                {myTip.home} – {myTip.away}
+                              </span>
+                              <span className="text-[10px] text-gray-500 leading-tight">
+                                {t("matches.yourTip")}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 text-sm">{t("matches.vs")}</span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 w-40">
+                          {m.away_team && (
+                            <img src={m.away_team.flag_url} alt="" className="w-7 h-5 object-cover rounded-sm" />
+                          )}
+                          <div>
+                            <span className="font-medium text-sm block">
+                              {m.away_team?.name || t("matches.tbd")}
+                            </span>
+                            {m.bracket_away_slot && (
+                              <span className="text-[11px] text-gray-500 font-mono">{m.bracket_away_slot}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right text-xs text-gray-400 hidden md:block">
+                      <div>{m.venue.name}</div>
+                      <div>{m.venue.city}</div>
+                    </div>
+
+                    <span
+                      className={`ml-4 inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                        m.status === "completed"
+                          ? "bg-green-100 text-green-700"
+                          : m.status === "in_progress"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-blue-100 text-blue-700"
+                      }`}
+                    >
+                      {statusLabel(m.status)}
+                    </span>
+                  </div>
+                </Link>
+              );
+              })}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
