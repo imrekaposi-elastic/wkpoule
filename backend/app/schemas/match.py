@@ -53,12 +53,14 @@ class VenueDetailOut(BaseModel):
     review_nl: str | None = None
     review_pt: str | None = None
     review_de: str | None = None
+    review_he: str | None = None
     expected_temp_celsius: float | None = None
     city_attractiveness: int | None = None
     accessibility_en: str | None = None
     accessibility_nl: str | None = None
     accessibility_pt: str | None = None
     accessibility_de: str | None = None
+    accessibility_he: str | None = None
     matches: list[VenueScheduledMatchOut] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}

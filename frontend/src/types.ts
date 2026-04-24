@@ -213,12 +213,14 @@ export interface VenueDetail {
   review_nl: string | null;
   review_pt: string | null;
   review_de: string | null;
+  review_he: string | null;
   expected_temp_celsius: number | null;
   city_attractiveness: number | null;
   accessibility_en: string | null;
   accessibility_nl: string | null;
   accessibility_pt: string | null;
   accessibility_de: string | null;
+  accessibility_he: string | null;
   matches: VenueScheduledMatch[];
 }
 

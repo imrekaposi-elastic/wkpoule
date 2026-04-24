@@ -228,6 +228,9 @@
     "user": "Gebruiker",
     "prediction": "Voorspelling",
     "noPredictions": "Nog geen voorspellingen voor deze wedstrijd.",
+    "predictionProgressTip": "Er zijn veel wedstrijden — je hoeft niet alles in één keer in te vullen. Vul gerust een paar voorspellingen in; een volgende keer ga je verder waar je gebleven was.",
+    "predictionTipAcknowledge": "Begrepen, niet meer tonen",
+    "scoresRequired": "Vul thuis- en uitscore in voordat je opslaat.",
     "you": "(jij)"
   },
   "subgroups": {

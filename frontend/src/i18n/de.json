@@ -228,6 +228,9 @@
     "user": "Benutzer",
     "prediction": "Tipp",
     "noPredictions": "Noch keine Tipps für dieses Spiel.",
+    "predictionProgressTip": "Es sind sehr viele Spiele — du musst nicht alles auf einmal tippen. Tippe nur die, die du möchtest; beim nächsten Mal machst du nahtlos weiter.",
+    "predictionTipAcknowledge": "Verstanden, nicht mehr anzeigen",
+    "scoresRequired": "Bitte Heim- und Auswärtstore eintragen, bevor du speicherst.",
     "you": "(du)"
   },
   "subgroups": {

@@ -14,6 +14,25 @@ const LOCALE_MAP: Record<string, string> = {
   he: "he-IL",
 };
 
+const PREDICTION_TIP_STORAGE_KEY = "wkpoule_prediction_progress_tip_dismissed";
+
+type ScoreInput = number | "";
+
+function readPredictionTipDismissed(): boolean {
+  try {
+    return localStorage.getItem(PREDICTION_TIP_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function parseScoreField(raw: string): ScoreInput {
+  if (raw === "") return "";
+  const n = Number(raw);
+  if (Number.isNaN(n)) return "";
+  return Math.min(20, Math.max(0, Math.trunc(n)));
+}
+
 export default function MatchDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -21,8 +40,9 @@ export default function MatchDetail() {
   const { t, i18n } = useTranslation();
   const [match, setMatch] = useState<Match | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
-  const [homeScore, setHomeScore] = useState(0);
-  const [awayScore, setAwayScore] = useState(0);
+  const [homeScore, setHomeScore] = useState<ScoreInput>("");
+  const [awayScore, setAwayScore] = useState<ScoreInput>("");
+  const [predictionTipDismissed, setPredictionTipDismissed] = useState(readPredictionTipDismissed);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -58,8 +78,8 @@ export default function MatchDetail() {
     if (!id) return;
     let cancelled = false;
     setLoading(true);
-    setHomeScore(0);
-    setAwayScore(0);
+    setHomeScore("");
+    setAwayScore("");
     setVirtualStandings(null);
 
     const applyPredScores = (rows: Prediction[]) => {
@@ -67,6 +87,9 @@ export default function MatchDetail() {
       if (myPred) {
         setHomeScore(myPred.home_score);
         setAwayScore(myPred.away_score);
+      } else {
+        setHomeScore("");
+        setAwayScore("");
       }
     };
 
@@ -97,8 +120,8 @@ export default function MatchDetail() {
         } catch {
           if (!cancelled) {
             setPredictions([]);
-            setHomeScore(0);
-            setAwayScore(0);
+            setHomeScore("");
+            setAwayScore("");
           }
         }
       } catch {
@@ -129,6 +152,10 @@ export default function MatchDetail() {
     setMessage("");
     try {
       if (!match) return;
+      if (homeScore === "" || awayScore === "") {
+        setMessage(t("matchDetail.scoresRequired"));
+        return;
+      }
       await api.put(`/predictions/${match.id}`, {
         home_score: homeScore,
         away_score: awayScore,
@@ -177,6 +204,9 @@ export default function MatchDetail() {
   const canEditPrediction =
     match.status === "upcoming" && match.prediction_editable;
   const myPredRow = predictions.find((p) => p.user_id === user?.id);
+
+  const successMessages = [t("matchDetail.saved"), t("matchDetail.savedAllComplete")];
+  const isSuccessMessage = message !== "" && successMessages.includes(message);
 
   const commentText = (() => {
     if (!match.fun_comment) return null;
@@ -363,6 +393,28 @@ export default function MatchDetail() {
           </h3>
           {canEditPrediction ? (
             <form onSubmit={handleSubmit}>
+              {!predictionTipDismissed && (
+                <div className="mb-4 rounded-lg border border-sky-200 bg-sky-50 px-3 py-3 text-sm text-sky-950">
+                  <p className="mb-3 leading-relaxed">{t("matchDetail.predictionProgressTip")}</p>
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 rounded border-gray-300 text-pitch-600 focus:ring-pitch-500"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          try {
+                            localStorage.setItem(PREDICTION_TIP_STORAGE_KEY, "1");
+                          } catch {
+                            /* ignore */
+                          }
+                          setPredictionTipDismissed(true);
+                        }
+                      }}
+                    />
+                    <span>{t("matchDetail.predictionTipAcknowledge")}</span>
+                  </label>
+                </div>
+              )}
               <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-4 mb-4 w-full max-w-full min-w-0">
                 <div className="text-center min-w-0">
                   <label className="block text-sm text-gray-600 mb-1 truncate">
@@ -372,8 +424,8 @@ export default function MatchDetail() {
                     type="number"
                     min={0}
                     max={20}
-                    value={homeScore}
-                    onChange={(e) => setHomeScore(Number(e.target.value))}
+                    value={homeScore === "" ? "" : homeScore}
+                    onChange={(e) => setHomeScore(parseScoreField(e.target.value))}
                     className="w-full max-w-[5.5rem] mx-auto sm:w-20 text-center text-2xl font-bold border border-gray-300 rounded-lg py-2 focus:ring-2 focus:ring-pitch-600 outline-none"
                     inputMode="numeric"
                   />
@@ -387,8 +439,8 @@ export default function MatchDetail() {
                     type="number"
                     min={0}
                     max={20}
-                    value={awayScore}
-                    onChange={(e) => setAwayScore(Number(e.target.value))}
+                    value={awayScore === "" ? "" : awayScore}
+                    onChange={(e) => setAwayScore(parseScoreField(e.target.value))}
                     className="w-full max-w-[5.5rem] mx-auto sm:w-20 text-center text-2xl font-bold border border-gray-300 rounded-lg py-2 focus:ring-2 focus:ring-pitch-600 outline-none"
                     inputMode="numeric"
                   />
@@ -396,7 +448,7 @@ export default function MatchDetail() {
               </div>
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || homeScore === "" || awayScore === ""}
                 className="w-full bg-pitch-600 hover:bg-pitch-700 text-white py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50"
               >
                 {saving ? t("matchDetail.saving") : t("matchDetail.savePrediction")}
@@ -404,7 +456,7 @@ export default function MatchDetail() {
               {message && (
                 <p
                   className={`mt-2 text-sm text-center ${
-                    message === t("matchDetail.saved") ? "text-green-600" : "text-red-600"
+                    isSuccessMessage ? "text-green-600" : "text-red-600"
                   }`}
                 >
                   {message}

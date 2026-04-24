@@ -228,6 +228,9 @@
     "user": "User",
     "prediction": "Prediction",
     "noPredictions": "No predictions yet for this match.",
+    "predictionProgressTip": "There are many matches — you don't need to predict them all at once. Enter only the tips you want; next time you can pick up where you left off.",
+    "predictionTipAcknowledge": "Got it, don't show this again",
+    "scoresRequired": "Enter both home and away scores before saving.",
     "you": "(you)"
   },
   "subgroups": {
