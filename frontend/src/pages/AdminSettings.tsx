@@ -177,7 +177,7 @@ export default function AdminSettings() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-8">
       <h1 className="text-2xl sm:text-3xl font-bold text-pitch-900 mb-2">
         {t("adminSettings.title")}
       </h1>
@@ -197,11 +197,11 @@ export default function AdminSettings() {
 
       <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
         <div className="overflow-x-auto overscroll-x-contain">
-          <table className="w-full text-sm min-w-[56rem]">
+          <table className="w-full text-sm min-w-[64rem]">
             <thead>
               <tr className="text-left text-gray-500 border-b bg-gray-50">
-                <th className="py-3 px-4 font-medium">{t("adminSettings.colUser")}</th>
-                <th className="py-3 px-4 font-medium">{t("adminSettings.colEmail")}</th>
+                <th className="py-3 px-4 font-medium w-[14rem]">{t("adminSettings.colUser")}</th>
+                <th className="py-3 px-4 font-medium min-w-[18rem]">{t("adminSettings.colEmail")}</th>
                 <th className="py-3 px-4 font-medium">{t("adminSettings.colLanguage")}</th>
                 <th className="py-3 px-4 font-medium">{t("adminSettings.colRole")}</th>
                 <th className="py-3 px-4 font-medium">{t("adminSettings.colJoined")}</th>
@@ -226,7 +226,7 @@ export default function AdminSettings() {
                 return (
                   <Fragment key={u.id}>
                     <tr className="border-b last:border-0 hover:bg-gray-50/80">
-                      <td className="py-3 px-4 font-medium text-gray-900">
+                      <td className="py-3 px-4 font-medium text-gray-900 break-words">
                         {u.username}
                         {isSelf && (
                           <span className="ml-2 text-xs font-normal text-pitch-600">
@@ -234,7 +234,7 @@ export default function AdminSettings() {
                           </span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-gray-700">{u.email}</td>
+                      <td className="py-3 px-4 text-gray-700 break-all">{u.email}</td>
                       <td className="py-3 px-4 text-gray-600 font-mono text-xs uppercase">
                         {u.preferred_language}
                       </td>
