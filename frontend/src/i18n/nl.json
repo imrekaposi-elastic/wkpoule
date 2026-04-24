@@ -1,6 +1,6 @@
 {
   "navbar": {
-    "brand": "WK Poule 2026",
+    "brand": "Worldcup 2026 game",
     "dashboard": "Dashboard",
     "matches": "Wedstrijden",
     "groups": "Poules",
@@ -51,12 +51,13 @@
   },
   "adminSettings": {
     "title": "Admin · Instellingen",
-    "intro": "Alle geregistreerde accounts. Promoveer of degradeer admins (er moet minstens één admin blijven). Verwijderen wist ook alle voorspellingen van die gebruiker.",
+    "intro": "Alle geregistreerde accounts. Promoveer of degradeer admins (er moet minstens één admin blijven). Stel voor elke gebruiker een nieuw wachtwoord in in de browser—er wordt geen e-mail verstuurd. Verwijderen wist ook alle voorspellingen van die gebruiker.",
     "colUser": "Gebruiker",
     "colEmail": "E-mail",
     "colRole": "Rol",
     "colJoined": "Aangemeld",
     "colRoleActions": "Toegang",
+    "colResetPassword": "Wachtwoord",
     "colActions": "Verwijderen",
     "roleAdmin": "Admin",
     "rolePlayer": "Speler",
@@ -74,23 +75,43 @@
     "promoted": "{{username}} is nu beheerder.",
     "demoted": "Beheerdersrechten ingetrokken voor {{username}}.",
     "roleUpdateFailed": "Rol kon niet worden gewijzigd.",
-    "cannotDemoteLastAdmin": "Er moet minstens één beheerder zijn."
+    "cannotDemoteLastAdmin": "Er moet minstens één beheerder zijn.",
+    "resetPasswordOpen": "Wachtwoord instellen",
+    "resetPasswordClose": "Annuleren",
+    "resetPasswordApply": "Opslaan",
+    "resetPasswordSaving": "Opslaan…",
+    "resetPasswordHint": "Het nieuwe wachtwoord gelijk actief. Er wordt geen e-mail verstuurd—geef het wachtwoord desnoods op een andere manier door.",
+    "resetPasswordSuccess": "Wachtwoord bijgewerkt voor {{username}}.",
+    "resetPasswordFailed": "Wachtwoord kon niet worden gewijzigd.",
+    "passwordTooShort": "Wachtwoord moet minstens 8 tekens zijn.",
+    "selfPasswordNote": "Als dit jouw account is, gebruik het nieuwe wachtwoord bij de volgende keer inloggen."
   },
   "login": {
-    "title": "WK Poule 2026",
-    "subtitle": "Log in om je WK-voorspellingen te doen",
+    "title": "Worldcup 2026 game",
+    "subtitle": "Log in om je voorspellingen voor het WK te doen",
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
     "usernamePlaceholder": "Vul je gebruikersnaam in",
     "passwordPlaceholder": "Vul je wachtwoord in",
     "submit": "Inloggen",
     "submitting": "Bezig met inloggen...",
+    "forgotPassword": "Wachtwoord vergeten?",
     "noAccount": "Nog geen account?",
     "register": "Registreer hier",
     "failed": "Inloggen mislukt"
   },
+  "forgotPassword": {
+    "title": "Wachtwoord opnieuw instellen",
+    "subtitle": "Vul je gebruikersnaam en het e-mailadres van je account in. Als die bij elkaar horen, kun je een nieuw wachtwoord kiezen (er wordt geen e-mail verstuurd).",
+    "newPassword": "Nieuw wachtwoord",
+    "submit": "Nieuw wachtwoord opslaan",
+    "submitting": "Opslaan…",
+    "success": "Je wachtwoord is bijgewerkt. Je kunt nu inloggen.",
+    "failed": "Wachtwoord kon niet worden gewijzigd.",
+    "backToLogin": "Terug naar inloggen"
+  },
   "register": {
-    "title": "Doe mee met WK Poule",
+    "title": "Doe mee met Worldcup 2026 game",
     "subtitle": "Maak een account aan en begin met voorspellen",
     "username": "Gebruikersnaam",
     "email": "E-mail",
@@ -292,7 +313,7 @@
     "you": "(jij)"
   },
   "venues": {
-    "title": "WK Stadions",
+    "title": "WK-stadions",
     "yearBuilt": "Bouwjaar",
     "capacity": "Capaciteit",
     "rating": "Algemene beoordeling",

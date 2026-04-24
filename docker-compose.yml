@@ -36,6 +36,8 @@ services:
     volumes:
       - ./backend:/app
 
+  # Static files come from the image (npm run build in Dockerfile). After changing /frontend/src,
+  # run: docker compose up -d --build frontend
   frontend:
     build:
       context: ./frontend

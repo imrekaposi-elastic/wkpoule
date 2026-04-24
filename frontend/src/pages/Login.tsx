@@ -83,15 +83,25 @@ export default function Login() {
             {loading ? t("login.submitting") : t("login.submit")}
           </button>
 
-          <p className="text-center text-sm text-gray-600">
-            {t("login.noAccount")}{" "}
-            <Link
-              to="/register"
-              className="text-pitch-600 hover:text-pitch-700 font-medium"
-            >
-              {t("login.register")}
-            </Link>
-          </p>
+          <div className="text-center text-sm text-gray-600 pt-2 border-t border-gray-200 space-y-3">
+            <p>
+              {t("login.noAccount")}{" "}
+              <Link
+                to="/register"
+                className="text-pitch-600 hover:text-pitch-700 font-medium"
+              >
+                {t("login.register")}
+              </Link>
+            </p>
+            <p>
+              <Link
+                to="/forgot-password"
+                className="text-pitch-600 hover:text-pitch-700 font-medium underline-offset-2 hover:underline"
+              >
+                {t("login.forgotPassword")}
+              </Link>
+            </p>
+          </div>
         </form>
       </div>
     </div>

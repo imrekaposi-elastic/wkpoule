@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.auth import get_admin_user
+from app.auth import get_admin_user, hash_password
 from app.database import get_db
 from app.models.prediction import Prediction
 from app.models.subgroup import Subgroup, SubgroupMember
 from app.models.user import User
 from app.schemas.admin import (
+    AdminPasswordResetIn,
     AdminSubgroupMemberOut,
     AdminSubgroupOut,
     AdminUserOut,
@@ -48,6 +49,23 @@ def update_user_role(
             )
 
     target.is_admin = body.is_admin
+    db.commit()
+    db.refresh(target)
+    return target
+
+
+@router.post("/users/{user_id}/password", response_model=AdminUserOut)
+def admin_reset_user_password(
+    user_id: int,
+    body: AdminPasswordResetIn,
+    _admin: User = Depends(get_admin_user),
+    db: Session = Depends(get_db),
+):
+    target = db.query(User).filter(User.id == user_id).first()
+    if target is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    target.password_hash = hash_password(body.new_password)
     db.commit()
     db.refresh(target)
     return target

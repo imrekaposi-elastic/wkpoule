@@ -1,6 +1,6 @@
 {
   "navbar": {
-    "brand": "WK Poule 2026",
+    "brand": "Worldcup 2026 game",
     "dashboard": "Übersicht",
     "matches": "Spiele",
     "groups": "Poules",
@@ -51,12 +51,13 @@
   },
   "adminSettings": {
     "title": "Admin · Einstellungen",
-    "intro": "Alle registrierten Konten. Admins befördern oder herabstufen (mindestens ein Admin muss bleiben). Beim Löschen werden auch alle Tipps dieses Nutzers entfernt.",
+    "intro": "Alle registrierten Konten. Admins befördern oder herabstufen (mindestens ein Admin muss bleiben). Neues Passwort im Browser setzen—es wird keine E-Mail verschickt. Beim Löschen werden auch alle Tipps dieses Nutzers entfernt.",
     "colUser": "Benutzer",
     "colEmail": "E-Mail",
     "colRole": "Rolle",
     "colJoined": "Registriert",
     "colRoleActions": "Zugriff",
+    "colResetPassword": "Passwort",
     "colActions": "Löschen",
     "roleAdmin": "Admin",
     "rolePlayer": "Spieler",
@@ -74,10 +75,19 @@
     "promoted": "{{username}} ist jetzt Administrator.",
     "demoted": "Administratorrechte für {{username}} entzogen.",
     "roleUpdateFailed": "Rolle konnte nicht geändert werden.",
-    "cannotDemoteLastAdmin": "Mindestens ein Administrator ist erforderlich."
+    "cannotDemoteLastAdmin": "Mindestens ein Administrator ist erforderlich.",
+    "resetPasswordOpen": "Passwort setzen",
+    "resetPasswordClose": "Abbrechen",
+    "resetPasswordApply": "Passwort speichern",
+    "resetPasswordSaving": "Speichern…",
+    "resetPasswordHint": "Das neue Passwort gilt sofort. Es wird keine E-Mail verschickt—teile es bei Bedarf auf anderem Weg mit.",
+    "resetPasswordSuccess": "Passwort für {{username}} wurde geändert.",
+    "resetPasswordFailed": "Passwort konnte nicht geändert werden.",
+    "passwordTooShort": "Passwort muss mindestens 8 Zeichen haben.",
+    "selfPasswordNote": "Wenn das dein Konto ist, melde dich beim nächsten Mal mit dem neuen Passwort an."
   },
   "login": {
-    "title": "WK Poule 2026",
+    "title": "Worldcup 2026 game",
     "subtitle": "Melde dich an, um deine WM-Tipps abzugeben",
     "username": "Benutzername",
     "password": "Passwort",
@@ -85,12 +95,23 @@
     "passwordPlaceholder": "Passwort eingeben",
     "submit": "Anmelden",
     "submitting": "Anmeldung läuft...",
+    "forgotPassword": "Passwort vergessen?",
     "noAccount": "Noch kein Konto?",
     "register": "Hier registrieren",
     "failed": "Anmeldung fehlgeschlagen"
   },
+  "forgotPassword": {
+    "title": "Passwort zurücksetzen",
+    "subtitle": "Gib deinen Benutzernamen und die E-Mail deines Kontos ein. Wenn beides zusammenpasst, kannst du ein neues Passwort setzen (es wird keine E-Mail verschickt).",
+    "newPassword": "Neues Passwort",
+    "submit": "Neues Passwort speichern",
+    "submitting": "Speichern…",
+    "success": "Dein Passwort wurde geändert. Du kannst dich jetzt anmelden.",
+    "failed": "Passwort konnte nicht zurückgesetzt werden.",
+    "backToLogin": "Zur Anmeldung"
+  },
   "register": {
-    "title": "WK Poule beitreten",
+    "title": "Worldcup 2026 game beitreten",
     "subtitle": "Erstelle dein Konto und fange an zu tippen",
     "username": "Benutzername",
     "email": "E-Mail",

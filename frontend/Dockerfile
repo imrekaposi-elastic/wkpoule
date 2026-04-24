@@ -12,6 +12,9 @@ RUN npm run build
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/templates/default.conf.template
+# OpenShift arbitrary UID + root group: allow writing conf.d/cache/run when not using emptyDir (e.g. plain docker).
+RUN chgrp -R 0 /var/cache/nginx /var/run /etc/nginx/conf.d \
+    && chmod -R g=u /var/cache/nginx /var/run /etc/nginx/conf.d
 ENV API_HOST=api
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]

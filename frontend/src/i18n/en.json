@@ -1,6 +1,6 @@
 {
   "navbar": {
-    "brand": "WK Poule 2026",
+    "brand": "Worldcup 2026 game",
     "dashboard": "Dashboard",
     "matches": "Matches",
     "groups": "Poules",
@@ -51,12 +51,13 @@
   },
   "adminSettings": {
     "title": "Admin · Settings",
-    "intro": "All registered accounts. Promote or demote admins (at least one admin must remain). Deleting a user removes their predictions from the pool.",
+    "intro": "All registered accounts. Promote or demote admins (at least one admin must remain). Set a new sign-in password for any user in the browser—nothing is sent by email. Deleting a user removes their predictions from the pool.",
     "colUser": "User",
     "colEmail": "Email",
     "colRole": "Role",
     "colJoined": "Joined",
     "colRoleActions": "Access",
+    "colResetPassword": "Password",
     "colActions": "Delete",
     "roleAdmin": "Admin",
     "rolePlayer": "Player",
@@ -74,10 +75,19 @@
     "promoted": "{{username}} is now an administrator.",
     "demoted": "Administrator access removed for {{username}}.",
     "roleUpdateFailed": "Could not update role.",
-    "cannotDemoteLastAdmin": "There must be at least one administrator."
+    "cannotDemoteLastAdmin": "There must be at least one administrator.",
+    "resetPasswordOpen": "Set password",
+    "resetPasswordClose": "Cancel",
+    "resetPasswordApply": "Save password",
+    "resetPasswordSaving": "Saving…",
+    "resetPasswordHint": "The new password applies immediately. No email is sent—tell the user the password out of band if they need it.",
+    "resetPasswordSuccess": "Password updated for {{username}}.",
+    "resetPasswordFailed": "Could not update password.",
+    "passwordTooShort": "Password must be at least 8 characters.",
+    "selfPasswordNote": "If this is you, use the new password the next time you sign in."
   },
   "login": {
-    "title": "WK Poule 2026",
+    "title": "Worldcup 2026 game",
     "subtitle": "Sign in to make your World Cup predictions",
     "username": "Username",
     "password": "Password",
@@ -85,12 +95,23 @@
     "passwordPlaceholder": "Enter your password",
     "submit": "Sign In",
     "submitting": "Signing in...",
+    "forgotPassword": "Forgot password?",
     "noAccount": "Don't have an account?",
     "register": "Register here",
     "failed": "Login failed"
   },
+  "forgotPassword": {
+    "title": "Reset password",
+    "subtitle": "Enter your username and the email on your account. If they match, you can set a new password (no email is sent).",
+    "newPassword": "New password",
+    "submit": "Save new password",
+    "submitting": "Saving…",
+    "success": "Your password was updated. You can sign in now.",
+    "failed": "Could not reset password.",
+    "backToLogin": "Back to sign in"
+  },
   "register": {
-    "title": "Join WK Poule",
+    "title": "Join Worldcup 2026 game",
     "subtitle": "Create your account and start predicting",
     "username": "Username",
     "email": "Email",

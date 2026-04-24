@@ -6,6 +6,7 @@ import AdminSettings from "./pages/AdminSettings";
 import AdminSubgroups from "./pages/AdminSubgroups";
 import Dashboard from "./pages/Dashboard";
 import Groups from "./pages/Groups";
+import ForgotPassword from "./pages/ForgotPassword";
 import Login from "./pages/Login";
 import MatchDetail from "./pages/MatchDetail";
 import Matches from "./pages/Matches";
@@ -47,6 +48,7 @@ export default function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />
           <Route
             path="/"

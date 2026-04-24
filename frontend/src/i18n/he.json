@@ -1,6 +1,6 @@
 {
   "navbar": {
-    "brand": "WK פולה 2026",
+    "brand": "Worldcup 2026 game",
     "dashboard": "לוח בקרה",
     "matches": "משחקים",
     "groups": "Poules",
@@ -51,7 +51,7 @@
   },
   "adminSettings": {
     "title": "ניהול · הגדרות",
-    "intro": "כל החשבונות הרשומים. ניתן להעלות או להוריד מנהלים (חייב להישאר לפחות מנהל אחד). מחיקת משתמש מוחקת גם את כל ניבוייו.",
+    "intro": "כל החשבונות הרשומים. ניתן להעלות או להוריד מנהלים (חייב להישאר לפחות מנהל אחד). אפשר להגדיר סיסמה חדשה בדפדפן—לא נשלח דוא״ל. מחיקת משתמש מוחקת גם את כל ניבוייו.",
     "colUser": "משתמש",
     "colEmail": "דוא״ל",
     "colRole": "תפקיד",
@@ -74,10 +74,19 @@
     "promoted": "{{username}} הוא כעת מנהל.",
     "demoted": "הורדו הרשאות המנהל מ־{{username}}.",
     "roleUpdateFailed": "לא ניתן היה לעדכן את התפקיד.",
-    "cannotDemoteLastAdmin": "חייב להישאר לפחות מנהל אחד."
+    "cannotDemoteLastAdmin": "חייב להישאר לפחות מנהל אחד.",
+    "resetPasswordOpen": "הגדרת סיסמה",
+    "resetPasswordClose": "ביטול",
+    "resetPasswordApply": "שמירת סיסמה",
+    "resetPasswordSaving": "שומר…",
+    "resetPasswordHint": "הסיסמה החדשה נכנסת לתוקף מיד. לא נשלח דוא״ל—מסר את הסיסמה בערוץ אחר במידת הצורך.",
+    "resetPasswordSuccess": "הסיסמה עודכנה עבור {{username}}.",
+    "resetPasswordFailed": "לא ניתן היה לעדכן את הסיסמה.",
+    "passwordTooShort": "הסיסמה חייבת להכיל לפחות 8 תווים.",
+    "selfPasswordNote": "אם זה אתה, השתמש בסיסמה החדשה בכניסה הבאה."
   },
   "login": {
-    "title": "WK פולה 2026",
+    "title": "Worldcup 2026 game",
     "subtitle": "היכנס כדי להזין תחזיות למונדיאל",
     "username": "שם משתמש",
     "password": "סיסמה",
@@ -85,12 +94,23 @@
     "passwordPlaceholder": "הזן סיסמה",
     "submit": "כניסה",
     "submitting": "מתחבר…",
+    "forgotPassword": "שכחת סיסמה?",
     "noAccount": "אין לך חשבון?",
     "register": "הרשם כאן",
     "failed": "הכניסה נכשלה"
   },
+  "forgotPassword": {
+    "title": "איפוס סיסמה",
+    "subtitle": "הזן את שם המשתמש ואת כתובת הדוא״ל של החשבון. אם הם תואמים, תוכל לבחור סיסמה חדשה (לא נשלח דוא״ל).",
+    "newPassword": "סיסמה חדשה",
+    "submit": "שמירת סיסמה חדשה",
+    "submitting": "שומר…",
+    "success": "הסיסמה עודכנה. אפשר להתחבר עכשיו.",
+    "failed": "לא ניתן היה לאפס את הסיסמה.",
+    "backToLogin": "חזרה לכניסה"
+  },
   "register": {
-    "title": "הצטרף ל-WK פולה",
+    "title": "הצטרפות ל-Worldcup 2026 game",
     "subtitle": "צור חשבון והתחל לנבא",
     "username": "שם משתמש",
     "email": "דוא\"ל",

@@ -15,6 +15,7 @@ from app.schemas.auth import (
     LoginRequest,
     RefreshRequest,
     RegisterRequest,
+    SelfServicePasswordResetIn,
     TokenResponse,
     UserResponse,
 )
@@ -38,6 +39,23 @@ def register(body: RegisterRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
     return user
+
+
+@router.post("/reset-password", status_code=status.HTTP_204_NO_CONTENT)
+def self_service_reset_password(
+    body: SelfServicePasswordResetIn,
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.username == body.username).first()
+    email_norm = body.email.strip().lower()
+    if user is None or (user.email or "").strip().lower() != email_norm:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid username or email",
+        )
+    user.password_hash = hash_password(body.new_password)
+    db.commit()
+    return None
 
 
 @router.post("/login", response_model=TokenResponse)

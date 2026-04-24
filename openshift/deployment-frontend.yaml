@@ -12,6 +12,15 @@ spec:
       labels:
         app: wkpoule-frontend
     spec:
+      # Nginx entrypoint writes generated config to conf.d; nginx needs writable cache/run dirs.
+      # OpenShift runs as arbitrary UID — emptyDir mounts avoid read-only root / permission errors.
+      volumes:
+        - name: nginx-conf-d
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
       containers:
         - name: frontend
           image: image-registry.openshift-image-registry.svc:5000/wkpoule-prd/wkpoule-frontend:latest
@@ -21,6 +30,13 @@ spec:
           env:
             - name: API_HOST
               value: wkpoule-api
+          volumeMounts:
+            - name: nginx-conf-d
+              mountPath: /etc/nginx/conf.d
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
           readinessProbe:
             httpGet:
               path: /

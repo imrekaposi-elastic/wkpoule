@@ -19,12 +19,12 @@ def send_subgroup_invite_email(
 
     link = f"{settings.public_app_url.rstrip('/')}/subgroups"
     body = (
-        f"You were invited by {inviter_username} to join the WK Poule subgroup «{subgroup_name}».\n\n"
+        f"You were invited by {inviter_username} to join the Worldcup 2026 game subgroup «{subgroup_name}».\n\n"
         f"Open the app and sign in with this email address, then go to Subgroup to accept the invitation:\n"
         f"{link}\n"
     )
     msg = EmailMessage()
-    msg["Subject"] = f"Invitation: {subgroup_name} (WK Poule)"
+    msg["Subject"] = f"Invitation: {subgroup_name} (Worldcup 2026 game)"
     msg["From"] = settings.smtp_from
     msg["To"] = to_email
     msg.set_content(body)

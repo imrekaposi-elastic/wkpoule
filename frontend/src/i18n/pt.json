@@ -1,6 +1,6 @@
 {
   "navbar": {
-    "brand": "WK Poule 2026",
+    "brand": "Worldcup 2026 game",
     "dashboard": "Painel",
     "matches": "Jogos",
     "groups": "Poules",
@@ -51,7 +51,7 @@
   },
   "adminSettings": {
     "title": "Admin · Configurações",
-    "intro": "Todas as contas registradas. Promova ou rebaixe admins (deve restar pelo menos um). Excluir um usuário remove também os palpites dele.",
+    "intro": "Todas as contas registradas. Promova ou rebaixe admins (deve restar pelo menos um). Defina uma nova senha no navegador—nenhum e-mail é enviado. Excluir um usuário remove também os palpites dele.",
     "colUser": "Usuário",
     "colEmail": "E-mail",
     "colRole": "Função",
@@ -74,10 +74,19 @@
     "promoted": "{{username}} agora é administrador.",
     "demoted": "Acesso de administrador revogado para {{username}}.",
     "roleUpdateFailed": "Não foi possível alterar a função.",
-    "cannotDemoteLastAdmin": "É necessário pelo menos um administrador."
+    "cannotDemoteLastAdmin": "É necessário pelo menos um administrador.",
+    "resetPasswordOpen": "Definir senha",
+    "resetPasswordClose": "Cancelar",
+    "resetPasswordApply": "Salvar senha",
+    "resetPasswordSaving": "Salvando…",
+    "resetPasswordHint": "A nova senha vale na hora. Nenhum e-mail é enviado—repasse a senha por outro canal se precisar.",
+    "resetPasswordSuccess": "Senha atualizada para {{username}}.",
+    "resetPasswordFailed": "Não foi possível atualizar a senha.",
+    "passwordTooShort": "A senha deve ter pelo menos 8 caracteres.",
+    "selfPasswordNote": "Se for você, use a nova senha na próxima vez que entrar."
   },
   "login": {
-    "title": "WK Poule 2026",
+    "title": "Worldcup 2026 game",
     "subtitle": "Entre para fazer suas previsões da Copa do Mundo",
     "username": "Usuário",
     "password": "Senha",
@@ -85,12 +94,23 @@
     "passwordPlaceholder": "Digite sua senha",
     "submit": "Entrar",
     "submitting": "Entrando...",
+    "forgotPassword": "Esqueceu a senha?",
     "noAccount": "Não tem uma conta?",
     "register": "Cadastre-se aqui",
     "failed": "Falha no login"
   },
+  "forgotPassword": {
+    "title": "Redefinir senha",
+    "subtitle": "Informe seu usuário e o e-mail da conta. Se coincidirem, você pode definir uma nova senha (nenhum e-mail é enviado).",
+    "newPassword": "Nova senha",
+    "submit": "Salvar nova senha",
+    "submitting": "Salvando…",
+    "success": "Sua senha foi atualizada. Você já pode entrar.",
+    "failed": "Não foi possível redefinir a senha.",
+    "backToLogin": "Voltar ao login"
+  },
   "register": {
-    "title": "Junte-se ao WK Poule",
+    "title": "Entre no Worldcup 2026 game",
     "subtitle": "Crie sua conta e comece a prever",
     "username": "Usuário",
     "email": "E-mail",
