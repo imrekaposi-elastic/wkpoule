@@ -187,8 +187,8 @@ export default function MatchDetail() {
 
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-        <div className="bg-pitch-800 text-white px-4 sm:px-6 py-3 sm:py-4">
+      <div className="bg-white rounded-xl shadow-lg mb-6">
+        <div className="bg-pitch-800 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-t-xl">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm">
             <span>
               {t("matchDetail.match", { number: match.match_number })} &middot;{" "}
@@ -210,13 +210,13 @@ export default function MatchDetail() {
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="flex items-center justify-center gap-8 mb-6">
-            <div className="text-center flex-1">
+        <div className="p-4 sm:p-6 rounded-b-xl">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-5 sm:gap-6 md:gap-8 mb-6 w-full max-w-full min-w-0">
+            <div className="text-center flex-1 min-w-0 sm:min-w-[7rem] px-1 order-1">
               {match.home_team ? (
                 <>
                   <img src={match.home_team.flag_url} alt="" className="w-16 h-11 object-cover rounded mx-auto mb-2" />
-                  <h2 className="font-bold text-lg">{match.home_team.name}</h2>
+                  <h2 className="font-bold text-base sm:text-lg break-words">{match.home_team.name}</h2>
                   {match.bracket_home_slot && (
                     <p className="text-xs font-mono text-gray-600 mb-1">{match.bracket_home_slot}</p>
                   )}
@@ -234,7 +234,7 @@ export default function MatchDetail() {
               )}
             </div>
 
-            <div className="text-center order-2 sm:order-none py-2 sm:py-0 w-full sm:w-auto">
+            <div className="text-center order-2 py-1 sm:py-0 w-full max-w-full sm:w-auto shrink-0">
               {match.status === "completed" ? (
                 <div className="text-3xl sm:text-4xl font-bold tabular-nums">
                   {match.home_score} - {match.away_score}
@@ -263,11 +263,11 @@ export default function MatchDetail() {
               </p>
             </div>
 
-            <div className="text-center flex-1 w-full min-w-0 order-3 sm:order-none">
+            <div className="text-center flex-1 min-w-0 sm:min-w-[7rem] px-1 order-3 w-full max-w-full">
               {match.away_team ? (
                 <>
                   <img src={match.away_team.flag_url} alt="" className="w-16 h-11 object-cover rounded mx-auto mb-2" />
-                  <h2 className="font-bold text-lg">{match.away_team.name}</h2>
+                  <h2 className="font-bold text-base sm:text-lg break-words">{match.away_team.name}</h2>
                   {match.bracket_away_slot && (
                     <p className="text-xs font-mono text-gray-600 mb-1">{match.bracket_away_slot}</p>
                   )}
@@ -357,15 +357,15 @@ export default function MatchDetail() {
           )}
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 min-w-0">
           <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
             {t("matchDetail.yourPrediction")}
           </h3>
           {canEditPrediction ? (
             <form onSubmit={handleSubmit}>
-              <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
-                <div className="text-center">
-                  <label className="block text-sm text-gray-600 mb-1">
+              <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-4 mb-4 w-full max-w-full min-w-0">
+                <div className="text-center min-w-0">
+                  <label className="block text-sm text-gray-600 mb-1 truncate">
                     {match.home_team?.fifa_code || t("matchDetail.home")}
                   </label>
                   <input
@@ -374,12 +374,13 @@ export default function MatchDetail() {
                     max={20}
                     value={homeScore}
                     onChange={(e) => setHomeScore(Number(e.target.value))}
-                    className="w-20 text-center text-2xl font-bold border border-gray-300 rounded-lg py-2 focus:ring-2 focus:ring-pitch-600 outline-none"
+                    className="w-full max-w-[5.5rem] mx-auto sm:w-20 text-center text-2xl font-bold border border-gray-300 rounded-lg py-2 focus:ring-2 focus:ring-pitch-600 outline-none"
+                    inputMode="numeric"
                   />
                 </div>
-                <span className="text-gray-400 text-xl mt-6">-</span>
-                <div className="text-center">
-                  <label className="block text-sm text-gray-600 mb-1">
+                <span className="text-gray-400 text-xl pb-2 sm:pb-0 sm:mt-6 self-center sm:self-auto">-</span>
+                <div className="text-center min-w-0">
+                  <label className="block text-sm text-gray-600 mb-1 truncate">
                     {match.away_team?.fifa_code || t("matchDetail.away")}
                   </label>
                   <input
@@ -388,7 +389,8 @@ export default function MatchDetail() {
                     max={20}
                     value={awayScore}
                     onChange={(e) => setAwayScore(Number(e.target.value))}
-                    className="w-20 text-center text-2xl font-bold border border-gray-300 rounded-lg py-2 focus:ring-2 focus:ring-pitch-600 outline-none"
+                    className="w-full max-w-[5.5rem] mx-auto sm:w-20 text-center text-2xl font-bold border border-gray-300 rounded-lg py-2 focus:ring-2 focus:ring-pitch-600 outline-none"
+                    inputMode="numeric"
                   />
                 </div>
               </div>
@@ -413,10 +415,10 @@ export default function MatchDetail() {
             <div className="text-center py-2 space-y-3">
               <p className="text-gray-500">{t("matchDetail.lockedBeforeKickoff")}</p>
               {myPredRow ? (
-                <div className="flex items-center justify-center gap-4 text-2xl font-bold font-mono text-gray-800">
-                  <span>{myPredRow.home_score}</span>
+                <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-2xl font-bold font-mono text-gray-800 w-full max-w-full">
+                  <span className="tabular-nums">{myPredRow.home_score}</span>
                   <span className="text-gray-400">-</span>
-                  <span>{myPredRow.away_score}</span>
+                  <span className="tabular-nums">{myPredRow.away_score}</span>
                 </div>
               ) : (
                 <p className="text-sm text-gray-400">{t("matchDetail.noPredictionBeforeLock")}</p>
@@ -435,8 +437,8 @@ export default function MatchDetail() {
         {predictions.length === 0 ? (
           <p className="text-gray-500 text-center py-4">{t("matchDetail.noPredictions")}</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto overscroll-x-contain -mx-1">
+            <table className="w-full text-sm min-w-[20rem]">
               <thead>
                 <tr className="text-left text-gray-500 border-b">
                   <th className="pb-2 font-medium">{t("matchDetail.user")}</th>
