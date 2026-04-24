@@ -36,14 +36,7 @@ def generate_expert_prediction(
     home_goals = _to_goals(home_xg)
     away_goals = _to_goals(away_xg)
 
-    if home_goals > away_goals:
-        outcome = "Home Win"
-    elif away_goals > home_goals:
-        outcome = "Away Win"
-    else:
-        outcome = "Draw"
-
-    label = f"Expert suggests: {home_goals}-{away_goals} ({outcome})"
+    label = f"{home_goals}-{away_goals}"
     return ExpertPrediction(home_goals=home_goals, away_goals=away_goals, label=label)
 
 

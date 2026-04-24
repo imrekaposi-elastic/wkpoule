@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import { localizedTeamName, localizedVenueCountry } from "../i18n/teamNames";
 import type { VenueDetail, VenueScheduledMatch } from "../types";
 
 function Stars({ count, max = 5 }: { count: number; max?: number }) {
@@ -51,8 +52,12 @@ function VenueMatchRow({
   locale: string;
   t: (key: string, opts?: Record<string, string | number>) => string;
 }) {
-  const home = m.home_team_name ?? t("venues.tbd");
-  const away = m.away_team_name ?? t("venues.tbd");
+  const home = m.home_team_name
+    ? localizedTeamName(m.home_team_code, m.home_team_name, locale)
+    : t("venues.tbd");
+  const away = m.away_team_name
+    ? localizedTeamName(m.away_team_code, m.away_team_name, locale)
+    : t("venues.tbd");
   const stage = t(`venues.stages.${m.stage}`, { defaultValue: m.stage.replace(/_/g, " ") });
   const groupHint =
     m.stage === "group" && m.group_letter
@@ -135,7 +140,7 @@ export default function Venues() {
                 <div>
                   <h2 className="text-lg font-bold text-gray-900">{v.name}</h2>
                   <p className="text-sm text-gray-500">
-                    {v.city}, {v.country}
+                    {v.city}, {localizedVenueCountry(v.country, i18n.language)}
                   </p>
                 </div>
                 {v.rating && <Stars count={v.rating} />}

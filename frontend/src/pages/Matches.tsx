@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
+import { localizedTeam } from "../i18n/teamNames";
 import type { Match, MyPrediction, VirtualGroupTable } from "../types";
 
 function predictionsByMatchId(mine: MyPrediction[]) {
@@ -94,9 +95,13 @@ export default function Matches() {
   const filtered = matches.filter((m) => {
     if (!search) return true;
     const q = search.toLowerCase();
+    const homeName = localizedTeam(m.home_team, i18n.language).toLowerCase();
+    const awayName = localizedTeam(m.away_team, i18n.language).toLowerCase();
     return (
       m.home_team?.name.toLowerCase().includes(q) ||
       m.away_team?.name.toLowerCase().includes(q) ||
+      homeName.includes(q) ||
+      awayName.includes(q) ||
       m.home_team?.fifa_code.toLowerCase().includes(q) ||
       m.away_team?.fifa_code.toLowerCase().includes(q) ||
       m.venue.name.toLowerCase().includes(q) ||
@@ -234,7 +239,7 @@ export default function Matches() {
                       <div className="min-w-0 flex flex-col items-end text-right gap-0.5">
                         <div className="flex items-center gap-2 justify-end">
                           <span className="font-medium text-sm leading-snug line-clamp-2 break-words">
-                            {m.home_team?.name || t("matches.tbd")}
+                            {m.home_team ? localizedTeam(m.home_team, i18n.language) : t("matches.tbd")}
                           </span>
                           {m.home_team && (
                             <img src={m.home_team.flag_url} alt="" className="w-7 h-5 object-cover rounded-sm shrink-0" />
@@ -275,7 +280,7 @@ export default function Matches() {
                             <img src={m.away_team.flag_url} alt="" className="w-7 h-5 object-cover rounded-sm shrink-0" />
                           )}
                           <span className="font-medium text-sm leading-snug line-clamp-2 break-words">
-                            {m.away_team?.name || t("matches.tbd")}
+                            {m.away_team ? localizedTeam(m.away_team, i18n.language) : t("matches.tbd")}
                           </span>
                         </div>
                         {m.bracket_away_slot && (

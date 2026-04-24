@@ -35,6 +35,8 @@ class VenueScheduledMatchOut(BaseModel):
     kickoff_utc: datetime
     home_team_name: str | None = None
     away_team_name: str | None = None
+    home_team_code: str | None = None
+    away_team_code: str | None = None
     attractiveness_stars: int = Field(ge=1, le=5)
 
 

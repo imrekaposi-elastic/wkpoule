@@ -17,6 +17,8 @@ def _scheduled_match_row(m: Match) -> VenueScheduledMatchOut:
     stars = compute_attractiveness_stars(m)
     hn = m.home_team.name if m.home_team else None
     an = m.away_team.name if m.away_team else None
+    hc = m.home_team.fifa_code if m.home_team else None
+    ac = m.away_team.fifa_code if m.away_team else None
     return VenueScheduledMatchOut(
         match_id=m.id,
         match_number=m.match_number,
@@ -25,6 +27,8 @@ def _scheduled_match_row(m: Match) -> VenueScheduledMatchOut:
         kickoff_utc=m.kickoff_utc,
         home_team_name=hn,
         away_team_name=an,
+        home_team_code=hc,
+        away_team_code=ac,
         attractiveness_stars=stars,
     )
 

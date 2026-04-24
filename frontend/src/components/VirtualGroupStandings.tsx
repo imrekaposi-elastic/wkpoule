@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { localizedTeamName } from "../i18n/teamNames";
 import type { VirtualGroupTable } from "../types";
 
 export function virtualRowClass(
@@ -22,7 +23,7 @@ type Props = {
 
 /** Predicted group table from user's tips — same UI on Matches + Match detail */
 export default function VirtualGroupStandings({ virtualGroup, groupLetter }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
@@ -56,7 +57,9 @@ export default function VirtualGroupStandings({ virtualGroup, groupLetter }: Pro
                 <td className="py-2.5 px-3 font-medium">
                   <span className="text-gray-600 mr-2 text-xs">{i + 1}</span>
                   {s.fifa_code}{" "}
-                  <span className="text-gray-600 text-xs hidden sm:inline">{s.team_name}</span>
+                  <span className="text-gray-600 text-xs hidden sm:inline">
+                    {localizedTeamName(s.fifa_code, s.team_name, i18n.language)}
+                  </span>
                 </td>
                 <td className="py-2.5 px-1.5 text-center">{s.played}</td>
                 <td className="py-2.5 px-1.5 text-center">{s.won}</td>

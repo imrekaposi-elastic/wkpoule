@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import { localizedTeamName } from "../i18n/teamNames";
 import type { GroupTable } from "../types";
 
 export default function Groups() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [groups, setGroups] = useState<GroupTable[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,7 +74,7 @@ export default function Groups() {
                         </span>
                         {s.fifa_code}{" "}
                         <span className="text-gray-500 text-xs hidden sm:inline">
-                          {s.team_name}
+                          {localizedTeamName(s.fifa_code, s.team_name, i18n.language)}
                         </span>
                       </td>
                       <td className="py-2.5 px-1.5 text-center">{s.played}</td>

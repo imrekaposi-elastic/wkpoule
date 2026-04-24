@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import { localizedTeam } from "../i18n/teamNames";
 import type { Match } from "../types";
 
 type Draft = { home: number; away: number; status: string };
@@ -17,7 +18,7 @@ const STAGE_FILTER: { value: string; labelKey: string }[] = [
 ];
 
 export default function AdminScores() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [matches, setMatches] = useState<Match[]>([]);
   const [drafts, setDrafts] = useState<Record<number, Draft>>({});
   const [loading, setLoading] = useState(true);
@@ -56,16 +57,20 @@ export default function AdminScores() {
       if (statusFilter && m.status !== statusFilter) return false;
       if (!search.trim()) return true;
       const q = search.toLowerCase();
+      const homeName = localizedTeam(m.home_team, i18n.language).toLowerCase();
+      const awayName = localizedTeam(m.away_team, i18n.language).toLowerCase();
       return (
         String(m.match_number).includes(q) ||
         m.home_team?.name.toLowerCase().includes(q) ||
         m.away_team?.name.toLowerCase().includes(q) ||
+        homeName.includes(q) ||
+        awayName.includes(q) ||
         m.home_team?.fifa_code.toLowerCase().includes(q) ||
         m.away_team?.fifa_code.toLowerCase().includes(q) ||
         m.venue.name.toLowerCase().includes(q)
       );
     });
-  }, [matches, stage, statusFilter, search]);
+  }, [matches, stage, statusFilter, search, i18n.language]);
 
   const sorted = useMemo(
     () => [...filtered].sort((a, b) => a.match_number - b.match_number),

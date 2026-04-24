@@ -145,6 +145,8 @@ export interface MyPrediction {
   match_number: number;
   home_team: string | null;
   away_team: string | null;
+  home_team_code?: string | null;
+  away_team_code?: string | null;
   home_score: number;
   away_score: number;
   points: number | null;
@@ -195,6 +197,8 @@ export interface VenueScheduledMatch {
   kickoff_utc: string;
   home_team_name: string | null;
   away_team_name: string | null;
+  home_team_code?: string | null;
+  away_team_code?: string | null;
   attractiveness_stars: number;
 }
 

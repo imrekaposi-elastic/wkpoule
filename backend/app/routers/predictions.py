@@ -126,6 +126,8 @@ def my_predictions(
                 match_number=p.match.match_number,
                 home_team=p.match.home_team.name if p.match.home_team else None,
                 away_team=p.match.away_team.name if p.match.away_team else None,
+                home_team_code=p.match.home_team.fifa_code if p.match.home_team else None,
+                away_team_code=p.match.away_team.fifa_code if p.match.away_team else None,
                 home_score=p.home_score,
                 away_score=p.away_score,
                 points=pts,

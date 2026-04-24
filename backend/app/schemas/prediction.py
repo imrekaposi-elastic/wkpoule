@@ -27,6 +27,8 @@ class MyPredictionOut(BaseModel):
     match_number: int
     home_team: str | None
     away_team: str | None
+    home_team_code: str | None = None
+    away_team_code: str | None = None
     home_score: int
     away_score: int
     points: int | None = None

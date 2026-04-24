@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { localizedTeamName } from "../i18n/teamNames";
 import type {
   Match,
   MyPrediction,
@@ -337,7 +338,13 @@ export default function Dashboard() {
                   <tr key={p.match_id} className="border-b last:border-0">
                     <td className="py-2.5">{p.match_number}</td>
                     <td className="py-2.5">
-                      {p.home_team || t("dashboard.tbd")} vs {p.away_team || t("dashboard.tbd")}
+                      {p.home_team
+                        ? localizedTeamName(p.home_team_code, p.home_team, i18n.language)
+                        : t("dashboard.tbd")}{" "}
+                      vs{" "}
+                      {p.away_team
+                        ? localizedTeamName(p.away_team_code, p.away_team, i18n.language)
+                        : t("dashboard.tbd")}
                     </td>
                     <td className="py-2.5 font-mono">
                       {p.home_score} - {p.away_score}

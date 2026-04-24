@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
+import { localizedTeam } from "../i18n/teamNames";
 import type { Match, MyPrediction, Prediction, VirtualGroupTable } from "../types";
 
 const LOCALE_MAP: Record<string, string> = {
@@ -210,6 +211,11 @@ export default function MatchDetail() {
 
   const commentText = (() => {
     if (!match.fun_comment) return null;
+    if (i18n.language === "he") {
+      const home = match.home_team ? localizedTeam(match.home_team, i18n.language) : t("matches.tbd");
+      const away = match.away_team ? localizedTeam(match.away_team, i18n.language) : t("matches.tbd");
+      return `${home} נגד ${away}: המומחה צופה משחק מסקרן שבו הדירוג, המומנטום והאווירה באצטדיון יכולים להשפיע על כל מהלך.`;
+    }
     const fc = match.fun_comment as any;
     const langField = `comment_text_${i18n.language}`;
     return fc[langField] || fc.comment_text;
@@ -246,7 +252,9 @@ export default function MatchDetail() {
               {match.home_team ? (
                 <>
                   <img src={match.home_team.flag_url} alt="" className="w-16 h-11 object-cover rounded mx-auto mb-2" />
-                  <h2 className="font-bold text-base sm:text-lg break-words">{match.home_team.name}</h2>
+                  <h2 className="font-bold text-base sm:text-lg break-words">
+                    {localizedTeam(match.home_team, i18n.language)}
+                  </h2>
                   {match.bracket_home_slot && (
                     <p className="text-xs font-mono text-gray-600 mb-1">{match.bracket_home_slot}</p>
                   )}
@@ -297,7 +305,9 @@ export default function MatchDetail() {
               {match.away_team ? (
                 <>
                   <img src={match.away_team.flag_url} alt="" className="w-16 h-11 object-cover rounded mx-auto mb-2" />
-                  <h2 className="font-bold text-base sm:text-lg break-words">{match.away_team.name}</h2>
+                  <h2 className="font-bold text-base sm:text-lg break-words">
+                    {localizedTeam(match.away_team, i18n.language)}
+                  </h2>
                   {match.bracket_away_slot && (
                     <p className="text-xs font-mono text-gray-600 mb-1">{match.bracket_away_slot}</p>
                   )}
@@ -343,22 +353,6 @@ export default function MatchDetail() {
         </div>
       </div>
 
-      {match.stage === "group" && match.group_letter && (
-        <div className="mb-6">
-          {virtualLoading && (
-            <div className="flex justify-center py-8 bg-white rounded-xl shadow border border-gray-100">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pitch-600" />
-            </div>
-          )}
-          {!virtualLoading && virtualStandings && (
-            <VirtualGroupStandings
-              virtualGroup={virtualStandings}
-              groupLetter={match.group_letter}
-            />
-          )}
-        </div>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-6">
           {match.expert_prediction && (
@@ -367,7 +361,7 @@ export default function MatchDetail() {
                 {t("matchDetail.expertPrediction")}
               </h3>
               <p className="text-lg font-semibold text-pitch-700">
-                {match.expert_prediction.label}
+                {match.expert_prediction.home_goals}-{match.expert_prediction.away_goals}
               </p>
             </div>
           )}
@@ -481,6 +475,22 @@ export default function MatchDetail() {
           )}
         </div>
       </div>
+
+      {match.stage === "group" && match.group_letter && (
+        <div className="mt-6">
+          {virtualLoading && (
+            <div className="flex justify-center py-8 bg-white rounded-xl shadow border border-gray-100">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pitch-600" />
+            </div>
+          )}
+          {!virtualLoading && virtualStandings && (
+            <VirtualGroupStandings
+              virtualGroup={virtualStandings}
+              groupLetter={match.group_letter}
+            />
+          )}
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-md p-6 mt-6">
         <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
