@@ -99,8 +99,44 @@ flowchart LR
 Tekton’s **git-clone** task (or equivalent) needs credentials for **private** repositories.
 
 - **HTTPS:** Create a **Secret** in the pipeline namespace with basic auth or a token (e.g. GitHub PAT, GitLab deploy token) scoped to **read** the repository. Wire it to the git-clone task per your task’s documentation (`basic-auth` type or `kubernetes.io/basic-auth` with annotations as required).
-- **SSH:** Store a deploy key or bot SSH private key in a **Secret** and mount it for SSH-based clone.
+- **SSH:** Store a deploy key or bot SSH private key in a **Secret** and mount it for SSH-based clone (see below).
 - Prefer **read-only** tokens, rotate them on a schedule, and avoid sharing personal user passwords.
+
+### Git over SSH (deploy key + `BuildConfig`)
+
+Use an **SSH URL** (`git@github.com:ORG/REPO.git` or `git@gitlab.com:GROUP/REPO.git`), not HTTPS, when you authenticate with a key.
+
+1. **Create a key pair** used only for this repo (deploy key), e.g.  
+   `ssh-keygen -t ed25519 -f wkpoule-git -N ""`  
+   Never commit the **private** key to Git.
+
+2. **Register the public key** on your host:
+   - **GitHub:** Repo → *Settings* → *Deploy keys* → add `wkpoule-git.pub`, read-only.
+   - **GitLab:** Repo → *Settings* → *Repository* → *Deploy keys*.
+
+3. **Record the host SSH fingerprint** (avoids clone failures in the build pod):
+   ```bash
+   ssh-keyscan github.com > known_hosts
+   ```
+   (Use `gitlab.com` or your self-hosted Gitea host if applicable.)
+
+4. **Create the Secret** in the same OpenShift project where builds run (replace namespace if needed):
+   ```bash
+   oc project wkpoule-prd
+   oc create secret generic wkpoule-git-ssh \
+     --from-file=ssh-privatekey=wkpoule-git \
+     --from-file=ssh-knownhosts=known_hosts \
+     --type=kubernetes.io/ssh-auth
+   ```
+
+5. **Let builder pods use the secret** (recommended on OpenShift):
+   ```bash
+   oc secrets link builder wkpoule-git-ssh
+   ```
+
+6. **Point your BuildConfigs** at the SSH URL and secret — see [`openshift/examples/buildconfigs-git-ssh.yaml`](openshift/examples/buildconfigs-git-ssh.yaml): set `spec.source.git.uri` to your `git@…` URL, `ref` to your branch, and `spec.source.sourceSecret.name: wkpoule-git-ssh`.
+
+**Tekton:** Mount the same Secret (or a copy) into the **git-clone** task’s `ssh-directory` workspace per your task’s docs; use the SSH form of the repo URL in the task parameters.
 
 **Optional automation:** Trigger a pipeline on every push using OpenShift Pipelines **Triggers** (EventListener, TriggerBinding, TriggerTemplate) and a **webhook** configured in your Git hosting provider. Alternatively, run pipelines manually or on a schedule.
 
@@ -124,6 +160,46 @@ The “local” image repository on OpenShift is the **cluster integrated regist
 `image-registry.openshift-image-registry.svc:5000/<namespace>/<imagestream-name>:<tag>`
 
 This project’s [`openshift/imagestreams.yaml`](openshift/imagestreams.yaml) defines **ImageStreams** `wkpoule-api` and `wkpoule-frontend`. Your pipeline should push tags that those deployments already reference (e.g. `latest`), or you change deployments to match the tags you push.
+
+### Images only (BuildConfigs — do not use `oc new-app` for the app)
+
+If you already deploy **runtime** objects from [`openshift/`](openshift/) (`Deployment`, `Service`, `Route`, Postgres, secrets), you only need OpenShift to **build and push** the two app images into those ImageStreams. **`oc new-app`** would create *extra* Deployments/Services you do not want.
+
+1. **Apply ImageStreams** (if not already applied with kustomize):
+   ```bash
+   oc apply -f openshift/imagestreams.yaml
+   ```
+
+2. **Create BuildConfigs** from the examples (edit Git `uri` / `ref`, and `sourceSecret` if the repo is private):
+   - HTTPS: [`openshift/examples/buildconfigs-git.yaml`](openshift/examples/buildconfigs-git.yaml)
+   - SSH: [`openshift/examples/buildconfigs-git-ssh.yaml`](openshift/examples/buildconfigs-git-ssh.yaml)
+
+   ```bash
+   oc apply -f openshift/examples/buildconfigs-git-ssh.yaml   # or buildconfigs-git.yaml
+   ```
+
+3. **Start builds** and wait for success (outputs go to `wkpoule-api:latest` and `wkpoule-frontend:latest` as in the YAML):
+
+   ```bash
+   oc start-build wkpoule-api --follow
+   oc start-build wkpoule-frontend --follow
+   ```
+
+4. **Apply the rest of the stack** if you have not yet (Postgres, Deployments, Route, secrets):
+
+   ```bash
+   oc apply -k openshift/
+   ```
+
+   Order is flexible: Deployments may sit in `ImagePullBackOff` until step 3 completes; that is normal.
+
+5. **Roll out** so pods pull the new digest (see **§7 — Deploy / rollout** below):
+
+   ```bash
+   oc rollout restart deployment/wkpoule-api deployment/wkpoule-frontend
+   ```
+
+For later code changes, re-run **`oc start-build`** for the image(s) you changed, then **`oc rollout restart`** again.
 
 ### Service account and permissions
 
@@ -154,7 +230,9 @@ Implementation options (no YAML required in this doc):
 
 **Route and DNS:** [`openshift/route.yaml`](openshift/route.yaml) exposes the **frontend** service with TLS edge termination. The example host is `wc2026.apps.cloud.kaposi.net`; change `spec.host` to match your cluster’s apps domain and ensure DNS resolves to your cluster ingress.
 
-**What to do in practice:** After the pipeline finishes and images are pushed, Kubernetes still runs the **old** pods until something triggers a new pull. Run `oc rollout restart deployment/wkpoule-api -n wkpoule-prd` and the same for `wkpoule-frontend`, or use **Workloads → Deployments → … → Restart** in the console. Because `imagePullPolicy` is `Always`, new pods fetch the updated `latest` digest. If your Route host is custom, ask your DNS admin for a CNAME (or equivalent) to the cluster’s ingress, or use the default `*.apps` hostname the cluster gives you and update `route.yaml` to match before applying.
+**Public URL in the API:** Set **`PUBLIC_APP_URL`** in [`openshift/secret.yaml`](openshift/secret.yaml) to the same URL users open in the browser, with **`https://`** (e.g. `https://wc2026.apps.cloud.kaposi.net`). The API uses it for subgroup invite links and automatically adds it to **CORS** when `CORS_ORIGINS` is empty. The normal setup (browser → Route → nginx → same host `/api/…` → API) is **same-origin**, so CORS rarely blocks; `PUBLIC_APP_URL` still keeps emails and any cross-origin tools correct. Override **`CORS_ORIGINS`** only if you need extra origins (comma-separated).
+
+**What to do in practice:** After the pipeline finishes and images are pushed, Kubernetes still runs the **old** pods until something triggers a new pull. Run `oc rollout restart deployment/wkpoule-api -n wkpoule-prd` and the same for `wkpoule-frontend`, or use **Workloads → Deployments → … → Restart** in the console. Because `imagePullPolicy` is `Always`, new pods fetch the updated `latest` digest. If your Route host is custom, ask your DNS admin for a CNAME (or equivalent) to the cluster’s ingress, or use the default `*.apps` hostname the cluster gives you and update `route.yaml` to match before applying. After changing the Route host, update **`PUBLIC_APP_URL`** (and re-apply the Secret / restart the API deployment) so it stays in sync.
 
 ---
 

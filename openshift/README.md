@@ -18,7 +18,9 @@ So: **two app images**, no “fat” image; the browser only hits the Route host
 
 ## Building images from this monorepo
 
-From repo root:
+**Images only (recommended with this repo’s YAML):** use **BuildConfigs** that output to `wkpoule-api:latest` and `wkpoule-frontend:latest`. Do **not** use `oc new-app` for the API/frontend if you already apply [`deployment-api.yaml`](deployment-api.yaml) / [`deployment-frontend.yaml`](deployment-frontend.yaml) — `new-app` would duplicate Deployments. Step-by-step: [`deploy.md`](../deploy.md) §6, subsection *Images only*.
+
+From your laptop (push to registry manually):
 
 ```bash
 make build-all
@@ -31,7 +33,7 @@ docker build -t wkpoule-api:latest -f backend/Dockerfile backend
 docker build -t wkpoule-frontend:latest -f frontend/Dockerfile frontend
 ```
 
-On OpenShift, use **Git `contextDir`** (see [`examples/buildconfigs-git.yaml`](examples/buildconfigs-git.yaml)) or a Tekton pipeline that clones once and runs two `docker build` / `buildah` steps with `backend` and `frontend` as contexts. Details: [`deploy.md`](../deploy.md).
+On OpenShift, use **Git `contextDir`** — [`examples/buildconfigs-git.yaml`](examples/buildconfigs-git.yaml) (HTTPS) or [`examples/buildconfigs-git-ssh.yaml`](examples/buildconfigs-git-ssh.yaml) with a `kubernetes.io/ssh-auth` Secret — or Tekton with an SSH workspace. Full SSH steps: [`deploy.md`](../deploy.md) §4.
 
 ## Apply manifests
 
@@ -40,3 +42,5 @@ oc apply -k openshift/
 ```
 
 Adjust `namespace` in [`kustomization.yaml`](kustomization.yaml) and image stream paths in the Deployments if your project name is not `wkpoule-prd`.
+
+**Public hostname:** Set [`route.yaml`](route.yaml) `spec.host` and the same URL (with `https://`) as **`PUBLIC_APP_URL`** in [`secret.yaml`](secret.yaml) so invite links and CORS stay aligned — see [`deploy.md`](../deploy.md) §7.

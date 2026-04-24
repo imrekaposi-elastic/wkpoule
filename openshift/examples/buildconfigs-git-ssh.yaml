@@ -1,0 +1,52 @@
+# BuildConfigs — images only (outputs to wkpoule-api / wkpoule-frontend ImageStreams). No Deployments.
+# Do not use oc new-app; apply openshift/deployment-*.yaml from kustomize instead.
+#
+# Prerequisite: create Secret wkpoule-git-ssh (type kubernetes.io/ssh-auth) — see deploy.md §4.
+# Replace git@github.com:ORG/REPO.git and ref with your repo; apply ImageStreams first if needed.
+#
+#   oc apply -f openshift/examples/buildconfigs-git-ssh.yaml
+#   oc start-build wkpoule-api && oc start-build wkpoule-frontend
+
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: wkpoule-api
+spec:
+  source:
+    type: Git
+    git:
+      uri: git@github.com:imrekaposi-elastic/wkpoule.git
+      ref: main
+    contextDir: backend
+    sourceSecret:
+      name: wkpoule-git-ssh
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: wkpoule-api:latest
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: wkpoule-frontend
+spec:
+  source:
+    type: Git
+    git:
+      uri: git@github.com:imrekaposi-elastic/wkpoule.git
+      ref: main
+    contextDir: frontend
+    sourceSecret:
+      name: wkpoule-git-ssh
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: wkpoule-frontend:latest

@@ -1,4 +1,5 @@
-# Example: OpenShift BuildConfigs for a Git monorepo — one clone, two images via contextDir.
+# Example: OpenShift BuildConfigs — images only (push to ImageStreams; use openshift/*.yaml for Deployments).
+# Do not use oc new-app here; it would create duplicate workloads.
 # 1. Replace GIT_URI / GIT_REF with your repository (and add source secrets if private).
 # 2. oc apply -f openshift/examples/buildconfigs-git.yaml
 # 3. oc start-build wkpoule-api && oc start-build wkpoule-frontend

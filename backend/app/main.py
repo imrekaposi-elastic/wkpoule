@@ -5,12 +5,24 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import app.models  # noqa: F401 — register all models with SQLAlchemy mapper
+from app.config import get_settings
 from app.database import Base, engine
 from app.db_schema import ensure_schema
 from app.routers import admin, auth, matches, predictions, rankings, subgroups, venues
 from app.services.score_poller import start_polling, stop_polling
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
+
+
+def _cors_allow_origins() -> list[str]:
+    s = get_settings()
+    if s.cors_origins.strip():
+        return [x.strip() for x in s.cors_origins.split(",") if x.strip()]
+    origins = ["http://localhost:5173", "http://localhost:3000"]
+    pub = s.public_app_url.rstrip("/")
+    if pub and pub not in origins:
+        origins.append(pub)
+    return origins
 
 
 @asynccontextmanager
@@ -31,7 +43,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=_cors_allow_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
