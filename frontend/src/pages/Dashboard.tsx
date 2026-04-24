@@ -100,12 +100,12 @@ export default function Dashboard() {
     );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 break-words">
         {t("dashboard.welcome", { name: user?.username })}
       </h1>
 
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {/* Rank Card */}
         <div className="bg-white rounded-xl shadow-md p-6">
           <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
@@ -197,7 +197,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div className="bg-white rounded-xl shadow-md p-6">
           <div className="flex items-start justify-between gap-3 mb-4">
             <h2 className="text-lg font-semibold text-pitch-900">
@@ -230,7 +230,8 @@ export default function Dashboard() {
                       {t("dashboard.openSubgroup")}
                     </Link>
                   </div>
-                  <table className="w-full text-sm">
+                  <div className="overflow-x-auto overscroll-x-contain">
+                  <table className="w-full text-sm min-w-[16rem]">
                     <thead>
                       <tr className="text-left text-gray-500 border-b bg-gray-50">
                         <th className="py-1.5 px-2 font-medium w-8">{t("rankings.rank")}</th>
@@ -264,6 +265,7 @@ export default function Dashboard() {
                       ))}
                     </tbody>
                   </table>
+                  </div>
                 </div>
               ))}
             </div>
@@ -319,8 +321,8 @@ export default function Dashboard() {
             </Link>
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto overscroll-x-contain">
+            <table className="w-full text-sm min-w-[28rem]">
               <thead>
                 <tr className="text-left text-gray-500 border-b">
                   <th className="pb-2 font-medium">#</th>

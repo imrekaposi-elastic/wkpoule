@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -17,10 +19,12 @@ from app.schemas.auth import (
     RegisterRequest,
     SelfServicePasswordResetIn,
     TokenResponse,
+    UserLanguageIn,
     UserResponse,
 )
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -34,6 +38,7 @@ def register(body: RegisterRequest, db: Session = Depends(get_db)):
         username=body.username,
         email=body.email,
         password_hash=hash_password(body.password),
+        preferred_language=body.preferred_language,
     )
     db.add(user)
     db.commit()
@@ -81,3 +86,17 @@ def refresh(body: RefreshRequest):
 @router.get("/me", response_model=UserResponse)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.patch("/me/language", response_model=UserResponse)
+def update_preferred_language(
+    body: UserLanguageIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if user.preferred_language != body.language:
+        user.preferred_language = body.language
+        db.commit()
+        db.refresh(user)
+        logger.info("user_language user_id=%s language=%s", user.id, body.language)
+    return user

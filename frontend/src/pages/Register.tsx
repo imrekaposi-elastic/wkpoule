@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
   const { user, register } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +24,9 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      await register(username, email, password);
+      const allowed = new Set(["en", "nl", "pt", "de", "he"]);
+      const pref = allowed.has(i18n.language) ? i18n.language : "en";
+      await register(username, email, password, pref);
     } catch (err: any) {
       setError(err.response?.data?.detail || t("register.failed"));
     } finally {

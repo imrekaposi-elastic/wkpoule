@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import app.models  # noqa: F401 — register all models with SQLAlchemy mapper
 from app.config import get_settings
 from app.database import Base, engine
-from app.db_schema import ensure_schema
+from app.db_schema import ensure_admin_access, ensure_schema
 from app.routers import admin, auth, matches, predictions, rankings, subgroups, venues
 from app.services.score_poller import start_polling, stop_polling
 
@@ -29,6 +29,7 @@ def _cors_allow_origins() -> list[str]:
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     ensure_schema()
+    ensure_admin_access()
     start_polling()
     yield
     stop_polling()

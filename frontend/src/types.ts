@@ -3,6 +3,7 @@ export interface User {
   username: string;
   email: string;
   is_admin: boolean;
+  preferred_language: string;
 }
 
 /** GET /admin/users */
@@ -11,6 +12,7 @@ export interface AdminUserRow {
   username: string;
   email: string;
   is_admin: boolean;
+  preferred_language: string;
   created_at: string;
 }
 
@@ -184,6 +186,18 @@ export interface VirtualGroupTable extends GroupTable {
   third_place_qualifies: boolean | null;
 }
 
+/** GET /venues — scheduled row with heuristic hype score */
+export interface VenueScheduledMatch {
+  match_id: number;
+  match_number: number;
+  stage: string;
+  group_letter: string | null;
+  kickoff_utc: string;
+  home_team_name: string | null;
+  away_team_name: string | null;
+  attractiveness_stars: number;
+}
+
 export interface VenueDetail {
   id: number;
   name: string;
@@ -205,6 +219,7 @@ export interface VenueDetail {
   accessibility_nl: string | null;
   accessibility_pt: string | null;
   accessibility_de: string | null;
+  matches: VenueScheduledMatch[];
 }
 
 export interface TokenResponse {

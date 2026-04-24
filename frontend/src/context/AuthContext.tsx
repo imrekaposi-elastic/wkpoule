@@ -2,10 +2,12 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import api from "../api/client";
+import i18n from "../i18n/i18n";
 import type { User } from "../types";
 
 interface AuthState {
@@ -15,7 +17,8 @@ interface AuthState {
   register: (
     username: string,
     email: string,
-    password: string
+    password: string,
+    preferredLanguage?: string
   ) => Promise<void>;
   logout: () => void;
   /** Reload /auth/me (e.g. after admin role change). */
@@ -34,6 +37,8 @@ const AuthContext = createContext<AuthState>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const userRef = useRef<User | null>(null);
+  userRef.current = user;
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -51,6 +56,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  useEffect(() => {
+    const onLang = (lng: string) => {
+      const u = userRef.current;
+      if (!u || lng === u.preferred_language) return;
+      api
+        .patch<User>("/auth/me/language", { language: lng })
+        .then((r) => setUser(r.data))
+        .catch(() => {});
+    };
+    i18n.on("languageChanged", onLang);
+    return () => i18n.off("languageChanged", onLang);
+  }, []);
+
+  useEffect(() => {
+    if (!user?.preferred_language) return;
+    const resolved = i18n.resolvedLanguage ?? i18n.language;
+    if (resolved !== user.preferred_language) {
+      void i18n.changeLanguage(user.preferred_language);
+    }
+  }, [user?.id, user?.preferred_language]);
+
   const login = async (username: string, password: string) => {
     const { data } = await api.post("/auth/login", { username, password });
     localStorage.setItem("access_token", data.access_token);
@@ -62,9 +88,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (
     username: string,
     email: string,
-    password: string
+    password: string,
+    preferredLanguage = "en"
   ) => {
-    await api.post("/auth/register", { username, email, password });
+    await api.post("/auth/register", {
+      username,
+      email,
+      password,
+      preferred_language: preferredLanguage,
+    });
     await login(username, password);
   };
 

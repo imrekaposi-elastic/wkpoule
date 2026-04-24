@@ -192,7 +192,7 @@ export default function SubgroupDetail() {
     { en: "en-US", nl: "nl-NL", pt: "pt-BR", de: "de-DE", he: "he-IL" }[i18n.language] || "en-US";
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="mb-4">
         <Link to="/subgroups" className="text-sm text-pitch-700 hover:underline">
           {t("subgroups.backToList")}
@@ -201,7 +201,7 @@ export default function SubgroupDetail() {
 
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-pitch-900">{detail.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-pitch-900 break-words">{detail.name}</h1>
           <p className="text-sm text-gray-600 mt-1">
             {detail.my_role === "admin" ? t("subgroups.roleAdmin") : t("subgroups.roleMember")}
           </p>
@@ -263,68 +263,70 @@ export default function SubgroupDetail() {
       <section className="mb-8">
         <h2 className="text-lg font-semibold text-pitch-800 mb-3">{t("subgroups.rankingsTitle")}</h2>
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-pitch-800 text-white">
-                <th className="text-left py-3 px-4 font-medium w-16">{t("rankings.rank")}</th>
-                <th className="text-left py-3 px-4 font-medium">{t("rankings.player")}</th>
-                <th className="py-3 px-4 font-medium text-center">{t("rankings.predictions")}</th>
-                <th className="py-3 px-4 font-medium text-center">{t("rankings.points")}</th>
-                {detail.my_role === "admin" && (
-                  <th className="text-right py-3 px-4 font-medium w-28">
-                    {t("subgroups.memberActions")}
-                  </th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {detail.rankings.map((r) => {
-                const memberMeta = detail.members.find((m) => m.user_id === r.user_id);
-                const canRemove =
-                  detail.my_role === "admin" &&
-                  memberMeta?.role === "member" &&
-                  r.user_id !== user?.id;
-                return (
-                  <tr
-                    key={r.user_id}
-                    className={`border-b last:border-0 ${
-                      r.user_id === user?.id ? "bg-green-50 font-semibold" : "hover:bg-gray-50"
-                    }`}
-                  >
-                    <td className="py-3 px-4 text-gray-700">{r.rank}</td>
-                    <td className="py-3 px-4">
-                      {r.username}
-                      {r.user_id === user?.id && (
-                        <span className="ml-1 text-xs text-pitch-600">{t("rankings.you")}</span>
-                      )}
-                      {memberMeta?.role === "admin" && (
-                        <span className="ml-2 text-xs text-amber-800">({t("subgroups.roleAdmin")})</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-center">{r.predictions_made}</td>
-                    <td className="py-3 px-4 text-center font-bold text-pitch-700">
-                      {r.total_points}
-                    </td>
-                    {detail.my_role === "admin" && (
-                      <td className="py-3 px-4 text-right">
-                        {canRemove ? (
-                          <button
-                            type="button"
-                            onClick={() => onRemoveMember(r.user_id, r.username)}
-                            className="text-xs text-red-600 hover:text-red-800 font-medium"
-                          >
-                            {t("subgroups.removeMember")}
-                          </button>
-                        ) : (
-                          <span className="text-gray-300">—</span>
+          <div className="overflow-x-auto overscroll-x-contain">
+            <table className="w-full text-sm min-w-[36rem]">
+              <thead>
+                <tr className="bg-pitch-800 text-white">
+                  <th className="text-left py-3 px-4 font-medium w-16">{t("rankings.rank")}</th>
+                  <th className="text-left py-3 px-4 font-medium">{t("rankings.player")}</th>
+                  <th className="py-3 px-4 font-medium text-center">{t("rankings.predictions")}</th>
+                  <th className="py-3 px-4 font-medium text-center">{t("rankings.points")}</th>
+                  {detail.my_role === "admin" && (
+                    <th className="text-right py-3 px-4 font-medium w-28">
+                      {t("subgroups.memberActions")}
+                    </th>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {detail.rankings.map((r) => {
+                  const memberMeta = detail.members.find((m) => m.user_id === r.user_id);
+                  const canRemove =
+                    detail.my_role === "admin" &&
+                    memberMeta?.role === "member" &&
+                    r.user_id !== user?.id;
+                  return (
+                    <tr
+                      key={r.user_id}
+                      className={`border-b last:border-0 ${
+                        r.user_id === user?.id ? "bg-green-50 font-semibold" : "hover:bg-gray-50"
+                      }`}
+                    >
+                      <td className="py-3 px-4 text-gray-700">{r.rank}</td>
+                      <td className="py-3 px-4">
+                        {r.username}
+                        {r.user_id === user?.id && (
+                          <span className="ml-1 text-xs text-pitch-600">{t("rankings.you")}</span>
+                        )}
+                        {memberMeta?.role === "admin" && (
+                          <span className="ml-2 text-xs text-amber-800">({t("subgroups.roleAdmin")})</span>
                         )}
                       </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      <td className="py-3 px-4 text-center">{r.predictions_made}</td>
+                      <td className="py-3 px-4 text-center font-bold text-pitch-700">
+                        {r.total_points}
+                      </td>
+                      {detail.my_role === "admin" && (
+                        <td className="py-3 px-4 text-right">
+                          {canRemove ? (
+                            <button
+                              type="button"
+                              onClick={() => onRemoveMember(r.user_id, r.username)}
+                              className="text-xs text-red-600 hover:text-red-800 font-medium"
+                            >
+                              {t("subgroups.removeMember")}
+                            </button>
+                          ) : (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
           {detail.rankings.length === 0 && (
             <p className="text-gray-500 text-center py-6 text-sm">{t("subgroups.noMembers")}</p>
           )}
@@ -362,18 +364,18 @@ export default function SubgroupDetail() {
           ))}
           <div ref={chatEndRef} />
         </div>
-        <form onSubmit={onSendMessage} className="flex gap-2">
+        <form onSubmit={onSendMessage} className="flex flex-col sm:flex-row gap-2">
           <textarea
             value={msgBody}
             onChange={(e) => setMsgBody(e.target.value)}
             placeholder={t("subgroups.chatPlaceholder")}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm min-h-[4rem]"
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm min-h-[4rem] w-full min-w-0"
             maxLength={2000}
           />
           <button
             type="submit"
             disabled={!msgBody.trim()}
-            className="self-end bg-pitch-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+            className="sm:self-end shrink-0 bg-pitch-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 touch-manipulation min-h-[44px]"
           >
             {t("subgroups.send")}
           </button>

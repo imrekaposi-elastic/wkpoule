@@ -30,6 +30,8 @@ services:
     environment:
       DATABASE_URL: postgresql://wkpoule:wkpoule@db:5432/wkpoule
       JWT_SECRET_KEY: dev-secret-change-in-production
+      # Dev recovery: if set, API startup resets user `admin` to this password (remove in production).
+      # WKPOULE_BOOTSTRAP_ADMIN_PASSWORD: admin123
     depends_on:
       db:
         condition: service_healthy

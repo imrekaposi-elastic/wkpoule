@@ -25,6 +25,19 @@ class VenueOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class VenueScheduledMatchOut(BaseModel):
+    """Match row for the venues schedule (no auth-specific prediction fill-ins)."""
+
+    match_id: int
+    match_number: int
+    stage: str
+    group_letter: str | None = None
+    kickoff_utc: datetime
+    home_team_name: str | None = None
+    away_team_name: str | None = None
+    attractiveness_stars: int = Field(ge=1, le=5)
+
+
 class VenueDetailOut(BaseModel):
     id: int
     name: str
@@ -46,6 +59,7 @@ class VenueDetailOut(BaseModel):
     accessibility_nl: str | None = None
     accessibility_pt: str | None = None
     accessibility_de: str | None = None
+    matches: list[VenueScheduledMatchOut] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
 

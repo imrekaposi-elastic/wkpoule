@@ -186,10 +186,10 @@ export default function MatchDetail() {
   })();
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-        <div className="bg-pitch-800 text-white px-6 py-4">
-          <div className="flex items-center justify-between text-sm">
+        <div className="bg-pitch-800 text-white px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm">
             <span>
               {t("matchDetail.match", { number: match.match_number })} &middot;{" "}
               {match.group_letter
@@ -234,13 +234,13 @@ export default function MatchDetail() {
               )}
             </div>
 
-            <div className="text-center">
+            <div className="text-center order-2 sm:order-none py-2 sm:py-0 w-full sm:w-auto">
               {match.status === "completed" ? (
-                <div className="text-4xl font-bold">
+                <div className="text-3xl sm:text-4xl font-bold tabular-nums">
                   {match.home_score} - {match.away_score}
                 </div>
               ) : (
-                <div className="text-2xl font-light text-gray-400">{t("matches.vs")}</div>
+                <div className="text-xl sm:text-2xl font-light text-gray-400">{t("matches.vs")}</div>
               )}
               {(match.bracket_home_slot || match.bracket_away_slot) &&
                 match.match_number >= 73 && (
@@ -263,7 +263,7 @@ export default function MatchDetail() {
               </p>
             </div>
 
-            <div className="text-center flex-1">
+            <div className="text-center flex-1 w-full min-w-0 order-3 sm:order-none">
               {match.away_team ? (
                 <>
                   <img src={match.away_team.flag_url} alt="" className="w-16 h-11 object-cover rounded mx-auto mb-2" />
@@ -286,7 +286,7 @@ export default function MatchDetail() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm border-t pt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-sm border-t pt-4">
             <div>
               <span className="text-gray-500 block">{t("matchDetail.venue")}</span>
               <span className="font-medium">{match.venue.name}</span>
@@ -329,7 +329,7 @@ export default function MatchDetail() {
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-6">
           {match.expert_prediction && (
             <div className="bg-white rounded-xl shadow-md p-6">
@@ -363,7 +363,7 @@ export default function MatchDetail() {
           </h3>
           {canEditPrediction ? (
             <form onSubmit={handleSubmit}>
-              <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
                 <div className="text-center">
                   <label className="block text-sm text-gray-600 mb-1">
                     {match.home_team?.fifa_code || t("matchDetail.home")}

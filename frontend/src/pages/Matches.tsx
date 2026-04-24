@@ -118,10 +118,10 @@ export default function Matches() {
   const statusLabel = (s: string) => t(`matches.${s}`, s);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">{t("matches.title")}</h1>
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6">{t("matches.title")}</h1>
 
-      <div className="flex flex-wrap gap-3 mb-6">
+      <div className="flex flex-wrap gap-2 sm:gap-3 mb-6">
         <select
           value={stage}
           onChange={(e) => {
@@ -182,7 +182,7 @@ export default function Matches() {
       ) : (
         Object.entries(grouped).map(([date, dayMatches]) => (
           <div key={date} className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-700 mb-3 sticky top-0 bg-gray-50 py-2">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-700 mb-3 sticky top-14 z-10 bg-gray-50/95 backdrop-blur-sm py-2 -mx-1 px-1 border-b border-gray-100 sm:border-0 sm:top-0">
               {date}
             </h2>
             <div className="space-y-3">
@@ -192,102 +192,101 @@ export default function Matches() {
                 <Link
                   key={m.id}
                   to={`/matches/${m.match_number}`}
-                  className="block bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4"
+                  className="block bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-3 sm:p-4 touch-manipulation"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6 flex-1">
-                      <div className="text-xs text-gray-400 w-20">
-                        <div className="font-medium text-gray-600">#{m.match_number}</div>
-                        <div>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500 min-w-0">
+                        <span className="font-semibold text-gray-700 whitespace-nowrap">
+                          #{m.match_number}
+                        </span>
+                        <span className="text-gray-400 hidden sm:inline">·</span>
+                        <span className="truncate max-w-[12rem] sm:max-w-none">
                           {m.group_letter
                             ? t("matches.group", { letter: m.group_letter })
                             : t(
                                 `matches.${m.stage}`,
                                 m.stage.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
                               )}
-                        </div>
+                        </span>
+                        <span className="text-gray-400">·</span>
+                        <span className="tabular-nums whitespace-nowrap">
+                          {new Date(m.kickoff_utc).toLocaleTimeString(locale, {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
                       </div>
+                      <span
+                        className={`shrink-0 inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          m.status === "completed"
+                            ? "bg-green-100 text-green-700"
+                            : m.status === "in_progress"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-blue-100 text-blue-700"
+                        }`}
+                      >
+                        {statusLabel(m.status)}
+                      </span>
+                    </div>
 
-                      <div className="text-sm text-gray-500 w-16">
-                        {new Date(m.kickoff_utc).toLocaleTimeString(locale, {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </div>
-
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="flex items-center gap-2 w-40 justify-end">
-                          <div className="text-right">
-                            <span className="font-medium text-sm block">
-                              {m.home_team?.name || t("matches.tbd")}
-                            </span>
-                            {m.bracket_home_slot && (
-                              <span className="text-[11px] text-gray-500 font-mono">{m.bracket_home_slot}</span>
-                            )}
-                          </div>
+                    <div className="grid grid-cols-[1fr_auto_1fr] gap-x-2 gap-y-1 items-center w-full min-w-0">
+                      <div className="min-w-0 flex flex-col items-end text-right gap-0.5">
+                        <div className="flex items-center gap-2 justify-end">
+                          <span className="font-medium text-sm leading-snug line-clamp-2 break-words">
+                            {m.home_team?.name || t("matches.tbd")}
+                          </span>
                           {m.home_team && (
-                            <img src={m.home_team.flag_url} alt="" className="w-7 h-5 object-cover rounded-sm" />
+                            <img src={m.home_team.flag_url} alt="" className="w-7 h-5 object-cover rounded-sm shrink-0" />
                           )}
                         </div>
+                        {m.bracket_home_slot && (
+                          <span className="text-[11px] text-gray-500 font-mono">{m.bracket_home_slot}</span>
+                        )}
+                      </div>
 
-                        <div className="w-24 shrink-0 text-center">
-                          {m.status === "completed" ? (
-                            <div className="flex flex-col items-center gap-0.5">
-                              <span className="font-bold text-lg leading-tight">
-                                {m.home_score} - {m.away_score}
-                              </span>
-                              {myTip && (
-                                <span className="text-xs text-pitch-700 font-medium leading-tight">
-                                  {t("matches.yourTip")}: {myTip.home}–{myTip.away}
-                                </span>
-                              )}
-                            </div>
-                          ) : myTip ? (
-                            <div className="flex flex-col items-center gap-0.5">
-                              <span className="font-semibold text-lg text-pitch-700 leading-tight">
-                                {myTip.home} – {myTip.away}
-                              </span>
-                              <span className="text-[10px] text-gray-500 leading-tight">
-                                {t("matches.yourTip")}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-gray-400 text-sm">{t("matches.vs")}</span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2 w-40">
-                          {m.away_team && (
-                            <img src={m.away_team.flag_url} alt="" className="w-7 h-5 object-cover rounded-sm" />
-                          )}
-                          <div>
-                            <span className="font-medium text-sm block">
-                              {m.away_team?.name || t("matches.tbd")}
+                      <div className="shrink-0 px-1 text-center w-[4.5rem] sm:w-28">
+                        {m.status === "completed" ? (
+                          <div className="flex flex-col items-center gap-0.5">
+                            <span className="font-bold text-base sm:text-lg leading-tight tabular-nums">
+                              {m.home_score} - {m.away_score}
                             </span>
-                            {m.bracket_away_slot && (
-                              <span className="text-[11px] text-gray-500 font-mono">{m.bracket_away_slot}</span>
+                            {myTip && (
+                              <span className="text-[10px] sm:text-xs text-pitch-700 font-medium leading-tight">
+                                {t("matches.yourTip")}: {myTip.home}–{myTip.away}
+                              </span>
                             )}
                           </div>
+                        ) : myTip ? (
+                          <div className="flex flex-col items-center gap-0.5">
+                            <span className="font-semibold text-base sm:text-lg text-pitch-700 leading-tight tabular-nums">
+                              {myTip.home} – {myTip.away}
+                            </span>
+                            <span className="text-[10px] text-gray-500 leading-tight">{t("matches.yourTip")}</span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-sm">{t("matches.vs")}</span>
+                        )}
+                      </div>
+
+                      <div className="min-w-0 flex flex-col items-start text-left gap-0.5">
+                        <div className="flex items-center gap-2">
+                          {m.away_team && (
+                            <img src={m.away_team.flag_url} alt="" className="w-7 h-5 object-cover rounded-sm shrink-0" />
+                          )}
+                          <span className="font-medium text-sm leading-snug line-clamp-2 break-words">
+                            {m.away_team?.name || t("matches.tbd")}
+                          </span>
                         </div>
+                        {m.bracket_away_slot && (
+                          <span className="text-[11px] text-gray-500 font-mono">{m.bracket_away_slot}</span>
+                        )}
                       </div>
                     </div>
 
-                    <div className="text-right text-xs text-gray-400 hidden md:block">
-                      <div>{m.venue.name}</div>
-                      <div>{m.venue.city}</div>
+                    <div className="text-xs text-gray-400 truncate">
+                      {m.venue.name} · {m.venue.city}
                     </div>
-
-                    <span
-                      className={`ml-4 inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                        m.status === "completed"
-                          ? "bg-green-100 text-green-700"
-                          : m.status === "in_progress"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-blue-100 text-blue-700"
-                      }`}
-                    >
-                      {statusLabel(m.status)}
-                    </span>
                   </div>
                 </Link>
               );

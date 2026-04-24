@@ -177,8 +177,8 @@ export default function AdminSettings() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-pitch-900 mb-2">
+    <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold text-pitch-900 mb-2">
         {t("adminSettings.title")}
       </h1>
       <p className="text-sm text-gray-600 mb-6">{t("adminSettings.intro")}</p>
@@ -196,12 +196,13 @@ export default function AdminSettings() {
       )}
 
       <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto overscroll-x-contain">
+          <table className="w-full text-sm min-w-[56rem]">
             <thead>
               <tr className="text-left text-gray-500 border-b bg-gray-50">
                 <th className="py-3 px-4 font-medium">{t("adminSettings.colUser")}</th>
                 <th className="py-3 px-4 font-medium">{t("adminSettings.colEmail")}</th>
+                <th className="py-3 px-4 font-medium">{t("adminSettings.colLanguage")}</th>
                 <th className="py-3 px-4 font-medium">{t("adminSettings.colRole")}</th>
                 <th className="py-3 px-4 font-medium">{t("adminSettings.colJoined")}</th>
                 <th className="py-3 px-4 font-medium text-right">
@@ -234,6 +235,9 @@ export default function AdminSettings() {
                         )}
                       </td>
                       <td className="py-3 px-4 text-gray-700">{u.email}</td>
+                      <td className="py-3 px-4 text-gray-600 font-mono text-xs uppercase">
+                        {u.preferred_language}
+                      </td>
                       <td className="py-3 px-4">
                         {u.is_admin ? (
                           <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-900">
@@ -308,7 +312,7 @@ export default function AdminSettings() {
                     </tr>
                     {passwordResetFor === u.id && (
                       <tr className="border-b bg-gray-50/90">
-                        <td colSpan={7} className="py-4 px-4">
+                        <td colSpan={8} className="py-4 px-4">
                           <p className="text-xs text-gray-600 mb-3 max-w-xl">
                             {t("adminSettings.resetPasswordHint")}
                           </p>

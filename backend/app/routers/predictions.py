@@ -7,8 +7,10 @@ from app.models.match import Match
 from app.models.prediction import Prediction
 from app.models.user import User
 from app.schemas.prediction import MyPredictionOut, PredictionOut, PredictionRequest
+from app.schemas.prediction_milestone import PredictionMilestoneOut
 from app.schemas.ranking import VirtualGroupTable
 from app.services.prediction_lock import match_accepts_prediction_updates
+from app.services.prediction_milestones import list_milestones_for_user, record_new_milestones
 from app.services.scoring import calculate_points
 from app.services.virtual_standings import (
     best_third_place_team_ids,
@@ -17,6 +19,15 @@ from app.services.virtual_standings import (
 )
 
 router = APIRouter()
+
+
+@router.get("/milestones", response_model=list[PredictionMilestoneOut])
+def my_prediction_milestones(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Phases for which this user has submitted a tip for every match (group → finals)."""
+    return list_milestones_for_user(db, user.id)
 
 
 @router.put("/{match_id}", response_model=PredictionOut)
@@ -55,6 +66,7 @@ def upsert_prediction(
         db.add(pred)
     db.commit()
     db.refresh(pred)
+    record_new_milestones(db, user.id)
 
     return PredictionOut(
         id=pred.id,

@@ -13,7 +13,9 @@
     "adminSubmenuSubgroups": "Untergruppen",
     "logout": "Abmelden",
     "help": "Hilfe",
-    "about": "Über"
+    "about": "Über",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen"
   },
   "helpAbout": {
     "title": "Über",
@@ -54,6 +56,7 @@
     "intro": "Alle registrierten Konten. Admins befördern oder herabstufen (mindestens ein Admin muss bleiben). Neues Passwort im Browser setzen—es wird keine E-Mail verschickt. Beim Löschen werden auch alle Tipps dieses Nutzers entfernt.",
     "colUser": "Benutzer",
     "colEmail": "E-Mail",
+    "colLanguage": "UI-Sprache",
     "colRole": "Rolle",
     "colJoined": "Registriert",
     "colRoleActions": "Zugriff",
@@ -320,7 +323,23 @@
     "expectedTemp": "Erwartete Temperatur",
     "cityAttractiveness": "Attraktivität der Stadt",
     "accessibility": "Erreichbarkeit",
-    "review": "Stadionbewertung"
+    "review": "Stadionbewertung",
+    "schedule": "Spiele in diesem Stadion",
+    "kickoff": "Anstoß",
+    "fixtureHype": "Spiel-Highlight-Faktor",
+    "noMatches": "In diesem Stadion sind keine Spiele angesetzt.",
+    "matchNumber": "Spiel {{n}}",
+    "tbd": "Offen",
+    "groupLetter": "Gruppe {{letter}}",
+    "stages": {
+      "group": "Gruppenphase",
+      "round_of_32": "Achtelfinale (32 Teams)",
+      "round_of_16": "Achtelfinale",
+      "quarter_final": "Viertelfinale",
+      "semi_final": "Halbfinale",
+      "third_place": "Spiel um Platz 3",
+      "final": "Finale"
+    }
   },
   "common": {
     "loading": "Laden...",

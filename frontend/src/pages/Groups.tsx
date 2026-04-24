@@ -23,9 +23,9 @@ export default function Groups() {
     );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-pitch-900">{t("groups.title")}</h1>
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <header className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-pitch-900">{t("groups.title")}</h1>
         <p className="mt-3 max-w-3xl text-sm text-gray-600 leading-relaxed border-l-4 border-pitch-500 pl-4">
           {t("groups.subtitle")}
         </p>
@@ -41,7 +41,7 @@ export default function Groups() {
               <h2 className="font-bold text-lg">{t("groups.group", { letter: g.group_letter })}</h2>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm min-w-[28rem]">
                 <thead>
                   <tr className="text-gray-500 border-b bg-gray-50">
                     <th className="text-left py-2 px-3 font-medium">{t("groups.team")}</th>

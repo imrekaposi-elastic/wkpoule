@@ -1,10 +1,15 @@
+from typing import Literal
+
 from pydantic import BaseModel, EmailStr, Field
+
+SupportedLanguage = Literal["en", "nl", "pt", "de", "he"]
 
 
 class RegisterRequest(BaseModel):
     username: str = Field(min_length=3, max_length=50)
     email: EmailStr
     password: str = Field(min_length=6, max_length=128)
+    preferred_language: SupportedLanguage = "en"
 
 
 class LoginRequest(BaseModel):
@@ -35,5 +40,10 @@ class UserResponse(BaseModel):
     username: str
     email: str
     is_admin: bool
+    preferred_language: str
 
     model_config = {"from_attributes": True}
+
+
+class UserLanguageIn(BaseModel):
+    language: SupportedLanguage

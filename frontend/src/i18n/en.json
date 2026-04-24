@@ -13,7 +13,9 @@
     "adminSubmenuSubgroups": "Subgroups",
     "logout": "Logout",
     "help": "Help",
-    "about": "About"
+    "about": "About",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "helpAbout": {
     "title": "About",
@@ -54,6 +56,7 @@
     "intro": "All registered accounts. Promote or demote admins (at least one admin must remain). Set a new sign-in password for any user in the browser—nothing is sent by email. Deleting a user removes their predictions from the pool.",
     "colUser": "User",
     "colEmail": "Email",
+    "colLanguage": "UI lang",
     "colRole": "Role",
     "colJoined": "Joined",
     "colRoleActions": "Access",
@@ -320,7 +323,23 @@
     "expectedTemp": "Expected Temperature",
     "cityAttractiveness": "City Attractiveness",
     "accessibility": "Getting Around",
-    "review": "Venue Review"
+    "review": "Venue Review",
+    "schedule": "Matches at this stadium",
+    "kickoff": "Kickoff",
+    "fixtureHype": "Fixture hype",
+    "noMatches": "No matches scheduled at this venue.",
+    "matchNumber": "Match {{n}}",
+    "tbd": "TBD",
+    "groupLetter": "Group {{letter}}",
+    "stages": {
+      "group": "Group stage",
+      "round_of_32": "Round of 32",
+      "round_of_16": "Round of 16",
+      "quarter_final": "Quarter-final",
+      "semi_final": "Semi-final",
+      "third_place": "Third place",
+      "final": "Final"
+    }
   },
   "common": {
     "loading": "Loading...",

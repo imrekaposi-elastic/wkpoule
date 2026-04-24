@@ -25,11 +25,12 @@ export default function Rankings() {
     );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">{t("rankings.title")}</h1>
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">{t("rankings.title")}</h1>
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto overscroll-x-contain -mx-px">
+        <table className="w-full text-sm min-w-[36rem]">
           <thead>
             <tr className="bg-pitch-800 text-white">
               <th className="text-left py-3 px-4 font-medium w-16">{t("rankings.rank")}</th>
@@ -87,6 +88,7 @@ export default function Rankings() {
             ))}
           </tbody>
         </table>
+        </div>
 
         {rankings.length === 0 && (
           <p className="text-gray-500 text-center py-8">{t("rankings.noRankings")}</p>
@@ -95,7 +97,7 @@ export default function Rankings() {
 
       <div className="mt-6 bg-white rounded-xl shadow-md p-6">
         <h2 className="font-semibold mb-3">{t("rankings.scoringSystem")}</h2>
-        <div className="grid grid-cols-3 gap-4 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
           <div className="text-center p-3 bg-gray-50 rounded-lg">
             <div className="text-2xl font-bold text-pitch-700">3</div>
             <div className="text-gray-600">{t("rankings.correctResult")}</div>

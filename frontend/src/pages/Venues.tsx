@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
-import type { VenueDetail } from "../types";
+import type { VenueDetail, VenueScheduledMatch } from "../types";
 
 function Stars({ count, max = 5 }: { count: number; max?: number }) {
   return (
-    <span className="inline-flex gap-0.5">
+    <span className="inline-flex gap-0.5" aria-hidden>
       {Array.from({ length: max }, (_, i) => (
         <svg
           key={i}
@@ -24,6 +24,70 @@ function localized(v: VenueDetail, field: "review" | "accessibility", lang: stri
   const langField = `${field}_${lang}` as keyof VenueDetail;
   const fallback = `${field}_en` as keyof VenueDetail;
   return (v[langField] as string) || (v[fallback] as string) || "";
+}
+
+function formatKickoff(iso: string, locale: string): string {
+  try {
+    const d = new Date(iso);
+    return new Intl.DateTimeFormat(locale, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZoneName: "short",
+    }).format(d);
+  } catch {
+    return iso;
+  }
+}
+
+function VenueMatchRow({
+  m,
+  locale,
+  t,
+}: {
+  m: VenueScheduledMatch;
+  locale: string;
+  t: (key: string, opts?: Record<string, string | number>) => string;
+}) {
+  const home = m.home_team_name ?? t("venues.tbd");
+  const away = m.away_team_name ?? t("venues.tbd");
+  const stage = t(`venues.stages.${m.stage}`, { defaultValue: m.stage.replace(/_/g, " ") });
+  const groupHint =
+    m.stage === "group" && m.group_letter
+      ? ` · ${t("venues.groupLetter", { letter: m.group_letter })}`
+      : "";
+
+  return (
+    <li className="border-b border-gray-100 last:border-0 py-3 first:pt-0">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="text-xs text-gray-500 mb-0.5">
+            {t("venues.matchNumber", { n: m.match_number })}
+            <span className="text-gray-400">
+              {" "}
+              · {stage}
+              {groupHint}
+            </span>
+          </div>
+          <div className="text-sm font-medium text-gray-900">
+            {home} <span className="text-gray-400 font-normal">{t("common.vs")}</span> {away}
+          </div>
+          <div className="text-xs text-gray-500 mt-1">
+            <span className="font-medium text-gray-600">{t("venues.kickoff")}:</span>{" "}
+            {formatKickoff(m.kickoff_utc, locale)}
+          </div>
+        </div>
+        <div className="shrink-0 text-right">
+          <div className="text-[10px] uppercase tracking-wide text-gray-400 mb-0.5">
+            {t("venues.fixtureHype")}
+          </div>
+          <Stars count={m.attractiveness_stars} />
+        </div>
+      </div>
+    </li>
+  );
 }
 
 export default function Venues() {
@@ -46,10 +110,10 @@ export default function Venues() {
     );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">{t("venues.title")}</h1>
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">{t("venues.title")}</h1>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {venues.map((v) => (
           <div
             key={v.id}
@@ -66,7 +130,7 @@ export default function Venues() {
               </div>
             )}
 
-            <div className="p-5 flex-1 flex flex-col">
+            <div className="p-5 flex-1 flex flex-col min-h-0">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <h2 className="text-lg font-bold text-gray-900">{v.name}</h2>
@@ -92,6 +156,21 @@ export default function Venues() {
                     {v.expected_temp_celsius !== null ? `${v.expected_temp_celsius}°C` : "—"}
                   </div>
                 </div>
+              </div>
+
+              <div className="mb-4 border border-gray-100 rounded-lg bg-gray-50/50 flex flex-col max-h-80 min-h-0">
+                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide px-3 pt-3 pb-2 border-b border-gray-100 bg-white/60">
+                  {t("venues.schedule")}
+                </h3>
+                {v.matches?.length ? (
+                  <ul className="px-3 overflow-y-auto flex-1">
+                    {v.matches.map((m) => (
+                      <VenueMatchRow key={m.match_id} m={m} locale={i18n.language} t={t} />
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-500 px-3 py-4">{t("venues.noMatches")}</p>
+                )}
               </div>
 
               {v.city_attractiveness && (

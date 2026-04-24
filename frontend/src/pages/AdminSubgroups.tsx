@@ -57,8 +57,8 @@ export default function AdminSubgroups() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-pitch-900 mb-2">{t("adminSubgroups.title")}</h1>
+    <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold text-pitch-900 mb-2">{t("adminSubgroups.title")}</h1>
       <p className="text-sm text-gray-600 mb-6">{t("adminSubgroups.intro")}</p>
 
       {banner && (

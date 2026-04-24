@@ -13,7 +13,9 @@
     "adminSubmenuSubgroups": "תת-קבוצות",
     "logout": "יציאה",
     "help": "עזרה",
-    "about": "אודות"
+    "about": "אודות",
+    "openMenu": "פתיחת תפריט",
+    "closeMenu": "סגירת תפריט"
   },
   "helpAbout": {
     "title": "אודות",
@@ -54,6 +56,7 @@
     "intro": "כל החשבונות הרשומים. ניתן להעלות או להוריד מנהלים (חייב להישאר לפחות מנהל אחד). אפשר להגדיר סיסמה חדשה בדפדפן—לא נשלח דוא״ל. מחיקת משתמש מוחקת גם את כל ניבוייו.",
     "colUser": "משתמש",
     "colEmail": "דוא״ל",
+    "colLanguage": "שפת ממשק",
     "colRole": "תפקיד",
     "colJoined": "הצטרף",
     "colRoleActions": "גישה",
@@ -319,7 +322,23 @@
     "expectedTemp": "טמפרטורה צפויה",
     "cityAttractiveness": "חוויית העיר",
     "accessibility": "תחבורה והגעה",
-    "review": "סקירת האצטדיון"
+    "review": "סקירת האצטדיון",
+    "schedule": "משחקים באצטדיון זה",
+    "kickoff": "פתיחה",
+    "fixtureHype": "רמת עניין במשחק",
+    "noMatches": "אין משחקים מתוכננים באצטדיון זה.",
+    "matchNumber": "משחק {{n}}",
+    "tbd": "טרם נקבע",
+    "groupLetter": "בית {{letter}}",
+    "stages": {
+      "group": "בתים",
+      "round_of_32": "שלב 32 הקבוצות",
+      "round_of_16": "שמינית גמר",
+      "quarter_final": "רבע גמר",
+      "semi_final": "חצי גמר",
+      "third_place": "משחק על המקום השלישי",
+      "final": "גמר"
+    }
   },
   "common": {
     "loading": "טוען…",

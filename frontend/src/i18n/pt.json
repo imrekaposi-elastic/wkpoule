@@ -13,7 +13,9 @@
     "adminSubmenuSubgroups": "Subgrupos",
     "logout": "Sair",
     "help": "Ajuda",
-    "about": "Sobre"
+    "about": "Sobre",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu"
   },
   "helpAbout": {
     "title": "Sobre",
@@ -54,6 +56,7 @@
     "intro": "Todas as contas registradas. Promova ou rebaixe admins (deve restar pelo menos um). Defina uma nova senha no navegador—nenhum e-mail é enviado. Excluir um usuário remove também os palpites dele.",
     "colUser": "Usuário",
     "colEmail": "E-mail",
+    "colLanguage": "Idioma UI",
     "colRole": "Função",
     "colJoined": "Cadastro",
     "colRoleActions": "Acesso",
@@ -319,7 +322,23 @@
     "expectedTemp": "Temperatura esperada",
     "cityAttractiveness": "Atratividade da cidade",
     "accessibility": "Como se locomover",
-    "review": "Avaliação do estádio"
+    "review": "Avaliação do estádio",
+    "schedule": "Jogos neste estádio",
+    "kickoff": "Início",
+    "fixtureHype": "Expectativa do jogo",
+    "noMatches": "Nenhum jogo agendado neste estádio.",
+    "matchNumber": "Jogo {{n}}",
+    "tbd": "A definir",
+    "groupLetter": "Grupo {{letter}}",
+    "stages": {
+      "group": "Fase de grupos",
+      "round_of_32": "Oitavas (32 equipas)",
+      "round_of_16": "Oitavas de final",
+      "quarter_final": "Quartos de final",
+      "semi_final": "Meias-finais",
+      "third_place": "Terceiro lugar",
+      "final": "Final"
+    }
   },
   "common": {
     "loading": "Carregando...",

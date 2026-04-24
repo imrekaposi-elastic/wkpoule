@@ -33,7 +33,7 @@ export default function VirtualGroupStandings({ virtualGroup, groupLetter }: Pro
       </div>
       <p className="text-sm text-gray-600 px-4 pt-3">{t("matches.virtualHint")}</p>
       <div className="overflow-x-auto px-2 pb-2">
-        <table className="w-full text-sm mt-2">
+        <table className="w-full text-sm min-w-[32rem] mt-2">
           <thead>
             <tr className="text-gray-500 border-b bg-gray-50">
               <th className="text-left py-2 px-3 font-medium">{t("groups.team")}</th>

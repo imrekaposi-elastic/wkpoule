@@ -1,8 +1,16 @@
 """Lightweight schema patches for existing DBs (create_all does not add new columns)."""
 
-from sqlalchemy import inspect, text
+import logging
 
-from app.database import engine
+from sqlalchemy import inspect, text
+from sqlalchemy.orm import Session
+
+from app.auth import hash_password
+from app.config import get_settings
+from app.database import SessionLocal, engine
+from app.models.user import User
+
+logger = logging.getLogger(__name__)
 
 
 def ensure_schema() -> None:
@@ -11,12 +19,25 @@ def ensure_schema() -> None:
         if dialect == "postgresql":
             conn.execute(
                 text(
+                    "ALTER TABLE users "
+                    "ADD COLUMN IF NOT EXISTS preferred_language VARCHAR(10) NOT NULL DEFAULT 'en'"
+                )
+            )
+            conn.execute(
+                text(
                     "ALTER TABLE subgroup_members "
                     "ADD COLUMN IF NOT EXISTS last_read_message_id INTEGER"
                 )
             )
         elif dialect == "sqlite":
             insp = inspect(engine)
+            user_cols = {c["name"] for c in insp.get_columns("users")}
+            if "preferred_language" not in user_cols:
+                conn.execute(
+                    text(
+                        "ALTER TABLE users ADD COLUMN preferred_language VARCHAR(10) NOT NULL DEFAULT 'en'"
+                    )
+                )
             cols = {c["name"] for c in insp.get_columns("subgroup_members")}
             if "last_read_message_id" not in cols:
                 conn.execute(
@@ -42,3 +63,62 @@ def ensure_schema() -> None:
                 """
             )
         )
+
+
+def ensure_admin_account(db: Session) -> None:
+    """If no administrator exists, promote or create ``admin`` (seed skips when data already exists)."""
+    n_admins = db.query(User).filter(User.is_admin.is_(True)).count()
+    if n_admins > 0:
+        return
+    row = db.query(User).filter(User.username == "admin").first()
+    if row:
+        row.is_admin = True
+        db.commit()
+        logger.warning(
+            "No administrator was configured; promoted existing user 'admin' to administrator."
+        )
+        return
+    db.add(
+        User(
+            username="admin",
+            email="admin@wkpoule.com",
+            password_hash=hash_password("admin123"),
+            is_admin=True,
+        )
+    )
+    db.commit()
+    logger.warning(
+        "No administrator was configured; created default user admin / admin123 — change the password after login."
+    )
+
+
+def apply_bootstrap_admin_password(db: Session) -> None:
+    """When WKPOULE_BOOTSTRAP_ADMIN_PASSWORD is set, force-reset the ``admin`` login (local/dev recovery)."""
+    pwd = (get_settings().bootstrap_admin_password or "").strip()
+    if not pwd:
+        return
+    row = db.query(User).filter(User.username == "admin").first()
+    if row is None:
+        db.add(
+            User(
+                username="admin",
+                email="admin@wkpoule.com",
+                password_hash=hash_password(pwd),
+                is_admin=True,
+            )
+        )
+    else:
+        row.password_hash = hash_password(pwd)
+        row.is_admin = True
+    db.commit()
+    logger.warning("WKPOULE_BOOTSTRAP_ADMIN_PASSWORD applied: admin password was reset at startup.")
+
+
+def ensure_admin_access() -> None:
+    """Run after migrations: guarantee an admin exists; optional env-based password reset."""
+    db = SessionLocal()
+    try:
+        ensure_admin_account(db)
+        apply_bootstrap_admin_password(db)
+    finally:
+        db.close()

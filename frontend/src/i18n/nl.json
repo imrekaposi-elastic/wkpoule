@@ -13,7 +13,9 @@
     "adminSubmenuSubgroups": "Subgroepen",
     "logout": "Uitloggen",
     "help": "Help",
-    "about": "Info"
+    "about": "Info",
+    "openMenu": "Menu openen",
+    "closeMenu": "Menu sluiten"
   },
   "helpAbout": {
     "title": "Info",
@@ -54,6 +56,7 @@
     "intro": "Alle geregistreerde accounts. Promoveer of degradeer admins (er moet minstens één admin blijven). Stel voor elke gebruiker een nieuw wachtwoord in in de browser—er wordt geen e-mail verstuurd. Verwijderen wist ook alle voorspellingen van die gebruiker.",
     "colUser": "Gebruiker",
     "colEmail": "E-mail",
+    "colLanguage": "Taal UI",
     "colRole": "Rol",
     "colJoined": "Aangemeld",
     "colRoleActions": "Toegang",
@@ -320,7 +323,23 @@
     "expectedTemp": "Verwachte temperatuur",
     "cityAttractiveness": "Aantrekkelijkheid stad",
     "accessibility": "Bereikbaarheid",
-    "review": "Stadionrecensie"
+    "review": "Stadionrecensie",
+    "schedule": "Wedstrijden in dit stadion",
+    "kickoff": "Aftrap",
+    "fixtureHype": "Wedstrijd-hype",
+    "noMatches": "Geen wedstrijden in dit stadion.",
+    "matchNumber": "Wedstrijd {{n}}",
+    "tbd": "N.n.b.",
+    "groupLetter": "Groep {{letter}}",
+    "stages": {
+      "group": "Groepsfase",
+      "round_of_32": "Ronde van 32",
+      "round_of_16": "Achtste finales",
+      "quarter_final": "Kwartfinales",
+      "semi_final": "Halve finales",
+      "third_place": "Troostfinale",
+      "final": "Finale"
+    }
   },
   "common": {
     "loading": "Laden...",

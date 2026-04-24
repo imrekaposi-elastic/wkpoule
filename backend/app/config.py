@@ -1,5 +1,7 @@
-from pydantic_settings import BaseSettings
 from functools import lru_cache
+
+from pydantic import AliasChoices, Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -24,6 +26,11 @@ class Settings(BaseSettings):
     public_app_url: str = "http://localhost:3000"
     # Optional comma-separated extra origins (e.g. alternate domains). If empty, CORS uses localhost dev URLs + public_app_url.
     cors_origins: str = ""
+    # If set, on startup the `admin` user's password is set to this value (and they stay admin). Dev/local recovery only.
+    bootstrap_admin_password: str = Field(
+        default="",
+        validation_alias=AliasChoices("WKPOULE_BOOTSTRAP_ADMIN_PASSWORD", "bootstrap_admin_password"),
+    )
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

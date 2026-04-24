@@ -120,8 +120,8 @@ export default function AdminScores() {
   const statusLabel = (s: string) => t(`matches.${s}`, s);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">{t("adminScores.title")}</h1>
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-2">{t("adminScores.title")}</h1>
       <p className="text-gray-600 mb-6 max-w-3xl">{t("adminScores.intro")}</p>
 
       {banner && (
@@ -181,8 +181,8 @@ export default function AdminScores() {
       ) : sorted.length === 0 ? (
         <p className="text-gray-500 py-10 text-center">{t("matches.noMatches")}</p>
       ) : (
-        <div className="bg-white rounded-xl shadow overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="bg-white rounded-xl shadow overflow-x-auto overscroll-x-contain">
+          <table className="w-full text-sm min-w-[44rem]">
             <thead>
               <tr className="text-left text-gray-500 border-b bg-gray-50">
                 <th className="py-3 px-3 font-medium w-16">#</th>

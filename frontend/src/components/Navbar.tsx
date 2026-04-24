@@ -14,7 +14,28 @@ const NAV_ITEMS = [
   { to: "/groups", labelKey: "navbar.groups" },
   { to: "/subgroups", labelKey: "navbar.subgroups" },
   { to: "/venues", labelKey: "navbar.venues" },
-];
+] as const;
+
+function navItemActive(pathname: string, to: string): boolean {
+  if (to === "/subgroups") return pathname.startsWith("/subgroups");
+  return pathname === to;
+}
+
+function IconMenu(props: { className?: string }) {
+  return (
+    <svg className={props.className} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  );
+}
+
+function IconClose(props: { className?: string }) {
+  return (
+    <svg className={props.className} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  );
+}
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -23,6 +44,7 @@ export default function Navbar() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [pendingSubgroupInvites, setPendingSubgroupInvites] = useState(0);
   const [subgroupChatUnread, setSubgroupChatUnread] = useState(0);
   const helpWrapRef = useRef<HTMLDivElement>(null);
@@ -52,7 +74,17 @@ export default function Navbar() {
 
   useEffect(() => {
     setAdminOpen(false);
+    setMobileOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileOpen]);
 
   useEffect(() => {
     if (!user) {
@@ -89,123 +121,131 @@ export default function Navbar() {
     };
   }, [user]);
 
+  const desktopLinkClass = (to: string) => {
+    const base =
+      to === "/subgroups"
+        ? location.pathname.startsWith("/subgroups")
+        : location.pathname === to;
+    return `px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
+      base ? "bg-pitch-900 text-white" : "text-green-100 hover:bg-pitch-700"
+    }`;
+  };
+
   return (
     <>
-      <nav className="bg-pitch-800 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2 font-bold text-xl">
-              <span className="text-2xl">⚽</span>
-              <span>{t("navbar.brand")}</span>
+      <nav className="bg-pitch-800 text-white shadow-lg sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="flex items-center justify-between gap-2 h-14 sm:h-16">
+            <Link
+              to="/"
+              className="flex items-center gap-2 font-bold text-lg sm:text-xl shrink-0 min-w-0"
+              onClick={() => setMobileOpen(false)}
+            >
+              <span className="text-2xl shrink-0" aria-hidden>
+                ⚽
+              </span>
+              <span className="truncate">{t("navbar.brand")}</span>
             </Link>
 
             {user && (
-              <div className="flex items-center gap-1">
-                {NAV_ITEMS.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
-                      item.to === "/subgroups"
-                        ? location.pathname.startsWith("/subgroups")
-                          ? "bg-pitch-900 text-white"
-                          : "text-green-100 hover:bg-pitch-700"
-                        : location.pathname === item.to
-                          ? "bg-pitch-900 text-white"
-                          : "text-green-100 hover:bg-pitch-700"
-                    }`}
-                  >
-                    {t(item.labelKey)}
-                    {item.to === "/subgroups" && pendingSubgroupInvites > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-400 text-black text-[10px] font-bold">
-                        {pendingSubgroupInvites > 9 ? "9+" : pendingSubgroupInvites}
-                      </span>
-                    )}
-                    {item.to === "/subgroups" && subgroupChatUnread > 0 && (
-                      <span
-                        className={`absolute min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-sky-500 text-white text-[10px] font-bold ${
-                          pendingSubgroupInvites > 0
-                            ? "-top-0.5 -left-0.5"
-                            : "-top-0.5 -right-0.5"
-                        }`}
-                      >
-                        {subgroupChatUnread > 9 ? "9+" : subgroupChatUnread}
-                      </span>
-                    )}
-                  </Link>
-                ))}
-                {user.is_admin && (
-                  <div className="relative" ref={adminWrapRef}>
-                    <button
-                      type="button"
-                      onClick={() => setAdminOpen((o) => !o)}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${
-                        location.pathname.startsWith("/admin")
-                          ? "bg-amber-500 text-black"
-                          : "text-amber-200 hover:bg-pitch-700"
-                      }`}
-                      aria-expanded={adminOpen}
-                      aria-haspopup="true"
+              <div className="hidden lg:flex items-center justify-center flex-1 min-w-0 px-2">
+                <div className="flex items-center gap-0.5 flex-wrap justify-center">
+                  {NAV_ITEMS.map((item) => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      className={desktopLinkClass(item.to)}
                     >
-                      {t("navbar.admin")}
-                      <span className="text-xs opacity-80" aria-hidden>
-                        ▾
-                      </span>
-                    </button>
-                    {adminOpen && (
-                      <div
-                        className="absolute left-0 mt-1 py-1 min-w-[12rem] bg-white text-gray-900 rounded-md shadow-lg z-50 border border-gray-100"
-                        role="menu"
+                      {t(item.labelKey)}
+                      {item.to === "/subgroups" && pendingSubgroupInvites > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-400 text-black text-[10px] font-bold">
+                          {pendingSubgroupInvites > 9 ? "9+" : pendingSubgroupInvites}
+                        </span>
+                      )}
+                      {item.to === "/subgroups" && subgroupChatUnread > 0 && (
+                        <span
+                          className={`absolute min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-sky-500 text-white text-[10px] font-bold ${
+                            pendingSubgroupInvites > 0 ? "-top-0.5 -left-0.5" : "-top-0.5 -right-0.5"
+                          }`}
+                        >
+                          {subgroupChatUnread > 9 ? "9+" : subgroupChatUnread}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+                  {user.is_admin && (
+                    <div className="relative" ref={adminWrapRef}>
+                      <button
+                        type="button"
+                        onClick={() => setAdminOpen((o) => !o)}
+                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${
+                          location.pathname.startsWith("/admin")
+                            ? "bg-amber-500 text-black"
+                            : "text-amber-200 hover:bg-pitch-700"
+                        }`}
+                        aria-expanded={adminOpen}
+                        aria-haspopup="true"
                       >
-                        <NavLink
-                          to="/admin/scores"
-                          role="menuitem"
-                          onClick={() => setAdminOpen(false)}
-                          className={({ isActive }) =>
-                            `block px-4 py-2 text-sm hover:bg-gray-100 ${
-                              isActive ? "bg-amber-50 font-medium text-amber-900" : ""
-                            }`
-                          }
+                        {t("navbar.admin")}
+                        <span className="text-xs opacity-80" aria-hidden>
+                          ▾
+                        </span>
+                      </button>
+                      {adminOpen && (
+                        <div
+                          className="absolute left-0 mt-1 py-1 min-w-[12rem] bg-white text-gray-900 rounded-md shadow-lg z-50 border border-gray-100"
+                          role="menu"
                         >
-                          {t("navbar.adminSubmenuScores")}
-                        </NavLink>
-                        <NavLink
-                          to="/admin/settings"
-                          role="menuitem"
-                          onClick={() => setAdminOpen(false)}
-                          className={({ isActive }) =>
-                            `block px-4 py-2 text-sm hover:bg-gray-100 ${
-                              isActive ? "bg-amber-50 font-medium text-amber-900" : ""
-                            }`
-                          }
-                        >
-                          {t("navbar.adminSubmenuSettings")}
-                        </NavLink>
-                        <NavLink
-                          to="/admin/subgroups"
-                          role="menuitem"
-                          onClick={() => setAdminOpen(false)}
-                          className={({ isActive }) =>
-                            `block px-4 py-2 text-sm hover:bg-gray-100 ${
-                              isActive ? "bg-amber-50 font-medium text-amber-900" : ""
-                            }`
-                          }
-                        >
-                          {t("navbar.adminSubmenuSubgroups")}
-                        </NavLink>
-                      </div>
-                    )}
-                  </div>
-                )}
+                          <NavLink
+                            to="/admin/scores"
+                            role="menuitem"
+                            onClick={() => setAdminOpen(false)}
+                            className={({ isActive }) =>
+                              `block px-4 py-2 text-sm hover:bg-gray-100 ${
+                                isActive ? "bg-amber-50 font-medium text-amber-900" : ""
+                              }`
+                            }
+                          >
+                            {t("navbar.adminSubmenuScores")}
+                          </NavLink>
+                          <NavLink
+                            to="/admin/settings"
+                            role="menuitem"
+                            onClick={() => setAdminOpen(false)}
+                            className={({ isActive }) =>
+                              `block px-4 py-2 text-sm hover:bg-gray-100 ${
+                                isActive ? "bg-amber-50 font-medium text-amber-900" : ""
+                              }`
+                            }
+                          >
+                            {t("navbar.adminSubmenuSettings")}
+                          </NavLink>
+                          <NavLink
+                            to="/admin/subgroups"
+                            role="menuitem"
+                            onClick={() => setAdminOpen(false)}
+                            className={({ isActive }) =>
+                              `block px-4 py-2 text-sm hover:bg-gray-100 ${
+                                isActive ? "bg-amber-50 font-medium text-amber-900" : ""
+                              }`
+                            }
+                          >
+                            {t("navbar.adminSubmenuSubgroups")}
+                          </NavLink>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               <div className="relative" ref={helpWrapRef}>
                 <button
                   type="button"
                   onClick={() => setHelpOpen((o) => !o)}
-                  className="px-3 py-2 rounded-md text-sm font-medium text-green-100 hover:bg-pitch-700 transition-colors"
+                  className="px-2 sm:px-3 py-2 rounded-md text-sm font-medium text-green-100 hover:bg-pitch-700 transition-colors"
                   aria-expanded={helpOpen}
                   aria-haspopup="true"
                 >
@@ -233,24 +273,148 @@ export default function Navbar() {
               <LanguageSwitcher />
               {user && (
                 <>
-                  <span className="text-sm text-green-200">
-                    {user.username}
-                    {user.is_admin && (
-                      <span className="ml-1 text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded-full">
-                        {t("navbar.admin")}
-                      </span>
-                    )}
-                  </span>
+                  <div className="hidden lg:flex items-center gap-2 ml-1">
+                    <span className="text-sm text-green-200 max-w-[10rem] truncate">
+                      {user.username}
+                      {user.is_admin && (
+                        <span className="ml-1 text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                          {t("navbar.admin")}
+                        </span>
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={logout}
+                      className="text-sm bg-pitch-900 hover:bg-red-700 px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
+                    >
+                      {t("navbar.logout")}
+                    </button>
+                  </div>
                   <button
-                    onClick={logout}
-                    className="text-sm bg-pitch-900 hover:bg-red-700 px-3 py-1.5 rounded-md transition-colors"
+                    type="button"
+                    className="lg:hidden inline-flex items-center justify-center rounded-md p-2 text-green-100 hover:bg-pitch-700 touch-manipulation"
+                    aria-expanded={mobileOpen}
+                    aria-controls="mobile-nav-menu"
+                    onClick={() => setMobileOpen((o) => !o)}
                   >
-                    {t("navbar.logout")}
+                    <span className="sr-only">
+                      {mobileOpen ? t("navbar.closeMenu") : t("navbar.openMenu")}
+                    </span>
+                    {mobileOpen ? <IconClose className="w-6 h-6" /> : <IconMenu className="w-6 h-6" />}
                   </button>
                 </>
               )}
             </div>
           </div>
+
+          {user && mobileOpen && (
+            <div
+              id="mobile-nav-menu"
+              className="lg:hidden border-t border-pitch-900/60 bg-pitch-900 max-h-[min(75vh,calc(100dvh-3.5rem))] overflow-y-auto overscroll-y-contain pb-[max(1rem,env(safe-area-inset-bottom))]"
+            >
+              <div className="py-2 px-1 space-y-0.5">
+                {NAV_ITEMS.map((item) => {
+                  const active = navItemActive(location.pathname, item.to);
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => setMobileOpen(false)}
+                      className={`flex items-center justify-between gap-2 rounded-md px-3 py-3 text-sm font-medium touch-manipulation min-h-[44px] ${
+                        active ? "bg-pitch-800 text-white" : "text-green-100 hover:bg-pitch-800/80"
+                      }`}
+                    >
+                      <span>{t(item.labelKey)}</span>
+                      {item.to === "/subgroups" && (pendingSubgroupInvites > 0 || subgroupChatUnread > 0) && (
+                        <span className="flex items-center gap-1 shrink-0">
+                          {pendingSubgroupInvites > 0 && (
+                            <span className="min-w-[1.25rem] h-6 px-1.5 flex items-center justify-center rounded-full bg-amber-400 text-black text-xs font-bold">
+                              {pendingSubgroupInvites > 99 ? "99+" : pendingSubgroupInvites}
+                            </span>
+                          )}
+                          {subgroupChatUnread > 0 && (
+                            <span className="min-w-[1.25rem] h-6 px-1.5 flex items-center justify-center rounded-full bg-sky-500 text-white text-xs font-bold">
+                              {subgroupChatUnread > 99 ? "99+" : subgroupChatUnread}
+                            </span>
+                          )}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+                {user.is_admin && (
+                  <div className="pt-2 mt-2 border-t border-pitch-800">
+                    <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-200/90">
+                      {t("navbar.admin")}
+                    </p>
+                    <Link
+                      to="/admin/scores"
+                      onClick={() => setMobileOpen(false)}
+                      className={`block rounded-md px-3 py-3 text-sm font-medium touch-manipulation ${
+                        location.pathname.startsWith("/admin/scores")
+                          ? "bg-amber-500 text-black"
+                          : "text-amber-100 hover:bg-pitch-800"
+                      }`}
+                    >
+                      {t("navbar.adminSubmenuScores")}
+                    </Link>
+                    <Link
+                      to="/admin/settings"
+                      onClick={() => setMobileOpen(false)}
+                      className={`block rounded-md px-3 py-3 text-sm font-medium touch-manipulation ${
+                        location.pathname.startsWith("/admin/settings")
+                          ? "bg-amber-500 text-black"
+                          : "text-amber-100 hover:bg-pitch-800"
+                      }`}
+                    >
+                      {t("navbar.adminSubmenuSettings")}
+                    </Link>
+                    <Link
+                      to="/admin/subgroups"
+                      onClick={() => setMobileOpen(false)}
+                      className={`block rounded-md px-3 py-3 text-sm font-medium touch-manipulation ${
+                        location.pathname.startsWith("/admin/subgroups")
+                          ? "bg-amber-500 text-black"
+                          : "text-amber-100 hover:bg-pitch-800"
+                      }`}
+                    >
+                      {t("navbar.adminSubmenuSubgroups")}
+                    </Link>
+                  </div>
+                )}
+                <div className="pt-3 mt-2 border-t border-pitch-800 px-3 pb-3 space-y-3">
+                  <button
+                    type="button"
+                    className="w-full text-left text-sm text-green-100 hover:text-white py-1"
+                    onClick={() => {
+                      setAboutOpen(true);
+                      setMobileOpen(false);
+                    }}
+                  >
+                    {t("navbar.about")}
+                  </button>
+                  <div className="text-sm text-green-200">
+                    <span className="font-medium">{user.username}</span>
+                    {user.is_admin && (
+                      <span className="ml-2 text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded-full">
+                        {t("navbar.admin")}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      logout();
+                    }}
+                    className="w-full text-sm bg-pitch-800 hover:bg-red-700 border border-pitch-700 py-2.5 rounded-md transition-colors touch-manipulation"
+                  >
+                    {t("navbar.logout")}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -261,7 +425,7 @@ export default function Navbar() {
           onClick={() => setAboutOpen(false)}
         >
           <div
-            className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 text-gray-900"
+            className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 text-gray-900 max-h-[90dvh] overflow-y-auto"
             role="dialog"
             aria-labelledby="about-title"
             onClick={(e) => e.stopPropagation()}
@@ -269,13 +433,13 @@ export default function Navbar() {
             <h2 id="about-title" className="text-lg font-bold text-pitch-800 mb-3">
               {t("helpAbout.title")}
             </h2>
-            <p className="text-sm text-gray-600 mb-6 font-mono">
+            <p className="text-sm text-gray-600 mb-6 font-mono break-all">
               {t("helpAbout.versionLine", { version: APP_VERSION })}
             </p>
             <button
               type="button"
               onClick={() => setAboutOpen(false)}
-              className="text-sm bg-pitch-700 hover:bg-pitch-800 text-white px-4 py-2 rounded-md transition-colors"
+              className="text-sm bg-pitch-700 hover:bg-pitch-800 text-white px-4 py-2 rounded-md transition-colors touch-manipulation min-h-[44px] w-full sm:w-auto"
             >
               {t("helpAbout.close")}
             </button>
