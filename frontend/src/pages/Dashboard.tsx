@@ -20,6 +20,8 @@ const LOCALE_MAP: Record<string, string> = {
   he: "he-IL",
 };
 
+const TOTAL_PREDICTIONS = 104;
+
 export default function Dashboard() {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
@@ -31,6 +33,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   const locale = LOCALE_MAP[i18n.language] || "en-US";
+  const predictionsMade = myRank?.predictions_made || 0;
+  const predictionsComplete = predictionsMade >= TOTAL_PREDICTIONS;
 
   const loadSubgroupRankings = useCallback((mine: SubgroupMine[]) => {
     if (mine.length === 0) {
@@ -134,7 +138,15 @@ export default function Dashboard() {
           <div className="mt-3 space-y-1.5 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">{t("dashboard.predictionsMade")}</span>
-              <span className="font-semibold">{myRank?.predictions_made || 0}</span>
+              <span
+                className={`font-semibold text-right ${
+                  predictionsComplete ? "text-green-700" : "text-red-700"
+                }`}
+              >
+                {predictionsComplete
+                  ? t("dashboard.allPredictionsComplete")
+                  : `${predictionsMade} / ${TOTAL_PREDICTIONS}`}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">{t("dashboard.correctResults")}</span>

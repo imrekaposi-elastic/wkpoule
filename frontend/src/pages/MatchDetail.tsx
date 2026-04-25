@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import ExpertAvatar from "../components/ExpertAvatar";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
 import { localizedTeam } from "../i18n/teamNames";
 import type { Match, MyPrediction, Prediction, VirtualGroupTable } from "../types";
@@ -368,12 +369,19 @@ export default function MatchDetail() {
 
           {match.fun_comment && (
             <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
-                {t("matchDetail.expertCommentary")}
-                <span className="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full normal-case">
-                  {t(`matchDetail.styles.${match.fun_comment.style}`, match.fun_comment.style)}
-                </span>
-              </h3>
+              <div className="mb-3 flex items-center gap-3">
+                <ExpertAvatar
+                  styleKey={match.fun_comment.style}
+                  label={t(`matchDetail.styles.${match.fun_comment.style}`, match.fun_comment.style)}
+                  size="sm"
+                />
+                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                  {t("matchDetail.expertCommentary")}
+                  <span className="mt-1 block text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full normal-case w-fit">
+                    {t(`matchDetail.styles.${match.fun_comment.style}`, match.fun_comment.style)}
+                  </span>
+                </h3>
+              </div>
               <p className="text-gray-700 italic leading-relaxed">
                 "{commentText}"
               </p>

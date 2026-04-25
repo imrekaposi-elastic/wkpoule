@@ -22,6 +22,54 @@
     "versionLine": "Versão da build {{version}}",
     "close": "Fechar"
   },
+  "landing": {
+    "kicker": "Jogo de palpites da Copa 2026",
+    "heroTitle": "Palpite em todos os jogos, desafie amigos e acompanhe a Copa como especialista.",
+    "heroSubtitle": "Crie sua própria história do torneio com placares, informações dos estádios, análise de especialistas em estilo IA, subligas privadas e chat para seu grupo.",
+    "registerCta": "Criar conta",
+    "loginCta": "Entrar",
+    "previewLabel": "Ajuda de palpite",
+    "previewTitle": "Seu próximo palpite",
+    "previewHome": "Casa",
+    "previewAway": "Fora",
+    "previewExpert": "Dica do especialista",
+    "previewExpertText": "Compare sua intuição com uma sugestão de placar antes de confirmar o palpite.",
+    "featuresKicker": "Tudo em uma liga",
+    "featuresTitle": "Mais que um formulário de placar",
+    "features": {
+      "venues": {
+        "icon": "🏟️",
+        "title": "Informações dos estádios",
+        "text": "Explore estádios, cidades, condições esperadas, dicas de transporte e calendário de jogos."
+      },
+      "analysis": {
+        "icon": "🎙️",
+        "title": "Análise de especialistas",
+        "text": "Leia comentários coloridos em estilo IA antes de fazer sua escolha."
+      },
+      "helper": {
+        "icon": "📈",
+        "title": "Ajuda de palpite",
+        "text": "Use sugestões de placar baseadas no ranking como segunda opinião para cada jogo."
+      },
+      "subleague": {
+        "icon": "🏆",
+        "title": "Subligas privadas",
+        "text": "Crie uma mini-liga para amigos, família ou colegas e acompanhe seu próprio ranking."
+      },
+      "chat": {
+        "icon": "💬",
+        "title": "Chat da subliga",
+        "text": "Provoque, comemore placares exatos e mantenha a competição viva no grupo."
+      }
+    },
+    "expertsKicker": "Análise de especialistas renomados",
+    "expertsTitle": "Conheça o painel de especialistas IA",
+    "expertsText": "Um elenco divertido de comentaristas inspirados em IA dá personalidade às prévias. Os avatares são versões originais em cartoon cápsula feitas para este jogo.",
+    "aiVersion": "Versão IA",
+    "finalTitle": "Pronto para entrar na liga?",
+    "finalText": "Registre-se, faça seus primeiros palpites, convide sua subliga e curta a Copa 2026 junto."
+  },
   "adminScores": {
     "title": "Placares oficiais (plano B)",
     "intro": "Se a atualização automática falhar, informe o resultado real aqui e clique Aplicar. Esses placares valem como oficiais e os pontos de todos são recalculados (jogos marcados como finalizados).",
@@ -133,6 +181,7 @@
     "viewLeaderboard": "Ver classificação",
     "yourStats": "Suas estatísticas",
     "predictionsMade": "Previsões feitas",
+    "allPredictionsComplete": "Você completou todas as previsões!",
     "correctResults": "Resultados corretos",
     "exactScores": "Placares exatos",
     "correctGoalCounts": "Total de gols correto",

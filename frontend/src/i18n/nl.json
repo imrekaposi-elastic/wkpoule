@@ -22,6 +22,54 @@
     "versionLine": "Buildversie {{version}}",
     "close": "Sluiten"
   },
+  "landing": {
+    "kicker": "WK 2026 voorspellingsspel",
+    "heroTitle": "Voorspel elke wedstrijd, daag vrienden uit en volg het WK als een kenner.",
+    "heroSubtitle": "Maak je eigen toernooiverhaal met uitslagen, stadioninformatie, AI-achtige expertanalyse, privé-subpoules en chat voor je groep.",
+    "registerCta": "Maak een account",
+    "loginCta": "Inloggen",
+    "previewLabel": "Voorspellingshulp",
+    "previewTitle": "Je volgende keuze",
+    "previewHome": "Thuis",
+    "previewAway": "Uit",
+    "previewExpert": "Experttip",
+    "previewExpertText": "Vergelijk je gevoel met een expertscore voordat je je voorspelling vastzet.",
+    "featuresKicker": "Alles in één poule",
+    "featuresTitle": "Meer dan een scoreformulier",
+    "features": {
+      "venues": {
+        "icon": "🏟️",
+        "title": "Stadioninformatie",
+        "text": "Bekijk stadions, steden, verwachte omstandigheden, reistips en wedstrijdschema's."
+      },
+      "analysis": {
+        "icon": "🎙️",
+        "title": "Expertanalyse",
+        "text": "Lees kleurrijk AI-commentaar bij wedstrijden voordat je je keuze maakt."
+      },
+      "helper": {
+        "icon": "📈",
+        "title": "Voorspellingshulp",
+        "text": "Gebruik scorevoorstellen op basis van rankings als tweede mening voor elke wedstrijd."
+      },
+      "subleague": {
+        "icon": "🏆",
+        "title": "Privé-subpoules",
+        "text": "Maak een minicompetitie voor vrienden, familie of collega's met een eigen ranglijst."
+      },
+      "chat": {
+        "icon": "💬",
+        "title": "Subpoule-chat",
+        "text": "Plaats plagerijen, vier perfecte scores en houd de strijd levend in je groep."
+      }
+    },
+    "expertsKicker": "Analyse van bekende experts",
+    "expertsTitle": "Ontmoet het AI-expertpanel",
+    "expertsText": "Een speelse cast van AI-geïnspireerde analisten geeft wedstrijdvoorbeschouwingen extra karakter. De avatars zijn originele capsule-cartoonversies voor dit spel.",
+    "aiVersion": "AI-versie",
+    "finalTitle": "Klaar om mee te doen?",
+    "finalText": "Registreer, vul je eerste voorspellingen in, nodig je subpoule uit en beleef WK 2026 samen."
+  },
   "adminScores": {
     "title": "Officiële uitslagen (plan B)",
     "intro": "Als automatische updates falen, vul hier de echte uitslag in en klik Toepassen. Deze scores gelden als officieel en alle punten worden herberekend (voor wedstrijden op voltooid).",
@@ -134,6 +182,7 @@
     "viewLeaderboard": "Bekijk ranglijst",
     "yourStats": "Je statistieken",
     "predictionsMade": "Voorspellingen gedaan",
+    "allPredictionsComplete": "Je hebt alle voorspellingen ingevuld!",
     "correctResults": "Juiste uitslagen",
     "exactScores": "Exacte scores",
     "correctGoalCounts": "Juiste doelpuntentotaal",

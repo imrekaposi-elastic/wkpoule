@@ -7,6 +7,7 @@ import AdminSubgroups from "./pages/AdminSubgroups";
 import Dashboard from "./pages/Dashboard";
 import Groups from "./pages/Groups";
 import ForgotPassword from "./pages/ForgotPassword";
+import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import MatchDetail from "./pages/MatchDetail";
 import Matches from "./pages/Matches";
@@ -41,6 +42,17 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function HomeRoute() {
+  const { user, loading } = useAuth();
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pitch-600" />
+      </div>
+    );
+  return user ? <Dashboard /> : <LandingPage />;
+}
+
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -52,11 +64,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route
             path="/"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
+            element={<HomeRoute />}
           />
           <Route
             path="/matches"
