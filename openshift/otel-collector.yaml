@@ -30,6 +30,12 @@ spec:
         limit_percentage: 75
         spike_limit_percentage: 15
       batch: {}
+      # Enrich OTel spans for Elastic Observability / APM UIs (raw OTel ES export is not enough).
+      elasticapm: {}
+
+    connectors:
+      # Emits derived APM metrics from traces; must be an exporter on the traces pipeline.
+      elasticapm: {}
 
     exporters:
       elasticsearch/otel:
@@ -45,9 +51,17 @@ spec:
       pipelines:
         traces:
           receivers: [otlp]
+          processors: [memory_limiter, batch, elasticapm]
+          exporters: [elasticapm, elasticsearch/otel]
+        metrics:
+          receivers: [otlp]
           processors: [memory_limiter, batch]
           exporters: [elasticsearch/otel]
-        metrics:
+        metrics/apm-aggregated:
+          receivers: [elasticapm]
+          processors: []
+          exporters: [elasticsearch/otel]
+        logs:
           receivers: [otlp]
           processors: [memory_limiter, batch]
           exporters: [elasticsearch/otel]

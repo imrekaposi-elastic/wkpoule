@@ -16,3 +16,5 @@ elastic-opentelemetry
 opentelemetry-instrumentation-fastapi>=0.61b0
 # DB client spans for SQLAlchemy (queries on the sync engine created via create_engine).
 opentelemetry-instrumentation-sqlalchemy>=0.61b0
+# OTLP log export for stdlib logging (pairs with OTEL_LOGS_EXPORTER=otlp).
+opentelemetry-instrumentation-logging>=0.61b0

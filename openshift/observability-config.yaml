@@ -12,8 +12,8 @@ data:
   OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
   OTEL_TRACES_EXPORTER: otlp
   OTEL_METRICS_EXPORTER: otlp
-  OTEL_LOGS_EXPORTER: none
-  OTEL_PYTHON_DISABLED_INSTRUMENTATIONS: logging
+  OTEL_LOGS_EXPORTER: otlp
+  # OTLP logging: `configure_logging()` re-attaches the OTel handler after dictConfig (see logging_config.py).
 
   # Reference endpoints for operators/scripts and future app wiring.
   ELASTIC_APM_SERVER_URL: https://o11y.apm.ece.kaposi.net:9243

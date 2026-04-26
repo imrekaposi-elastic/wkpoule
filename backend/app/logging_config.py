@@ -78,6 +78,25 @@ class EcsJsonFormatter(logging.Formatter):
         return json.dumps(log, default=str, ensure_ascii=False)
 
 
+def _otel_logs_enabled() -> bool:
+    exp = os.getenv("OTEL_LOGS_EXPORTER", "").strip().lower()
+    return bool(exp) and exp not in ("none", "false", "off")
+
+
+def _attach_otlp_log_export_after_dictconfig() -> None:
+    """dictConfig replaces root handlers and drops the OTLP handler from bootstrap; re-attach here."""
+    if not _otel_logs_enabled():
+        return
+    try:
+        from opentelemetry.instrumentation.logging import LoggingInstrumentor
+    except ImportError:
+        return
+    inst = LoggingInstrumentor()
+    if inst.is_instrumented_by_opentelemetry:
+        inst.uninstrument()
+    inst.instrument()
+
+
 def configure_logging() -> None:
     level = os.getenv("LOG_LEVEL", "INFO").upper()
     logging.config.dictConfig(
@@ -101,9 +120,11 @@ def configure_logging() -> None:
                 "level": level,
             },
             "loggers": {
-                "uvicorn": {"handlers": ["default"], "level": level, "propagate": False},
-                "uvicorn.error": {"handlers": ["default"], "level": level, "propagate": False},
-                "uvicorn.access": {"handlers": ["default"], "level": level, "propagate": False},
+                # Propagate to root so ECS stdout + OTLP handler on root see access/error lines too.
+                "uvicorn": {"handlers": [], "level": level, "propagate": True},
+                "uvicorn.error": {"handlers": [], "level": level, "propagate": True},
+                "uvicorn.access": {"handlers": [], "level": level, "propagate": True},
             },
         }
     )
+    _attach_otlp_log_export_after_dictconfig()
