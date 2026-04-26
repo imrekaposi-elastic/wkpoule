@@ -21,6 +21,8 @@ spec:
           envFrom:
             - secretRef:
                 name: wkpoule-secrets
+            - configMapRef:
+                name: wkpoule-observability-config
           readinessProbe:
             httpGet:
               path: /api/health

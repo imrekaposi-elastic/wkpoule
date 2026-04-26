@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wkpoule-observability-config
+data:
+  # Backend EDOT / OpenTelemetry
+  SERVICE_NAME: wkpoule-api
+  LOG_LEVEL: INFO
+  OTEL_SERVICE_NAME: wkpoule-api
+  OTEL_RESOURCE_ATTRIBUTES: deployment.environment=prd,service.version=1.5.0
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://wkpoule-otel-collector:4318
+  OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+  OTEL_TRACES_EXPORTER: otlp
+  OTEL_METRICS_EXPORTER: otlp
+  OTEL_LOGS_EXPORTER: none
+  OTEL_PYTHON_DISABLED_INSTRUMENTATIONS: logging
+
+  # Reference endpoints for operators/scripts and future app wiring.
+  ELASTIC_APM_SERVER_URL: https://o11y.apm.ece.kaposi.net:9243
+  ELASTICSEARCH_URL: https://o11y.es.ece.kaposi.net:9243
+  KIBANA_URL: https://o11y.kb.ece.kaposi.net:9243
+
+  # Frontend nginx RUM proxy. Browser RUM should call /rum/ on the public app origin.
+  RUM_APM_UPSTREAM: https://o11y.apm.ece.kaposi.net:9243
+  RUM_APM_HOST: o11y.apm.ece.kaposi.net

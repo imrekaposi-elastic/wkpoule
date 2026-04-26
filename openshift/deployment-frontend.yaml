@@ -30,6 +30,9 @@ spec:
           env:
             - name: API_HOST
               value: wkpoule-api
+          envFrom:
+            - configMapRef:
+                name: wkpoule-observability-config
           volumeMounts:
             - name: nginx-conf-d
               mountPath: /etc/nginx/conf.d

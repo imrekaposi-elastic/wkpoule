@@ -18,6 +18,9 @@ kind: Kustomization
 namespace: wkpoule-prd
 resources:
   - secret.yaml
+  - observability-config.yaml
+  - observability-secret.yaml
+  - otel-collector.yaml
   - pvc-postgres.yaml
   - imagestreams.yaml
   - deployment-postgres.yaml

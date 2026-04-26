@@ -1,0 +1,52 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: wkpoule-otel
+spec:
+  mode: deployment
+  replicas: 1
+  image: docker.elastic.co/elastic-agent/elastic-agent:9.3.2
+  env:
+    - name: ELASTIC_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-observability-secrets
+          key: ELASTIC_API_KEY
+    - name: ELASTIC_ENDPOINT
+      value: https://o11y.es.ece.kaposi.net:9243
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 15
+      batch: {}
+
+    exporters:
+      elasticsearch/otel:
+        endpoints:
+          - ${env:ELASTIC_ENDPOINT}
+        api_key: ${env:ELASTIC_API_KEY}
+        mapping:
+          mode: otel
+        tls:
+          insecure_skip_verify: true
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [elasticsearch/otel]
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [elasticsearch/otel]
