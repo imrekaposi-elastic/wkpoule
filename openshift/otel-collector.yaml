@@ -5,7 +5,8 @@ metadata:
 spec:
   mode: deployment
   replicas: 1
-  image: docker.elastic.co/elastic-agent/elastic-agent:9.3.2
+  # EDOT collector image (OpenTelemetry Operator needs otelcol, not Fleet `elastic-agent`).
+  image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.3.2
   env:
     - name: ELASTIC_API_KEY
       valueFrom:

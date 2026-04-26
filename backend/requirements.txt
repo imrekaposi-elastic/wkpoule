@@ -12,3 +12,5 @@ pydantic[email]>=2.10.0
 pydantic-settings>=2.6.0
 httpx>=0.28.0
 elastic-opentelemetry
+# Required for `opentelemetry-instrument` to emit HTTP server spans from FastAPI (not bundled by default).
+opentelemetry-instrumentation-fastapi>=0.61b0
