@@ -15,10 +15,11 @@ data:
         include:
           - /pglogs/*.csv
           - /pglogs/*.log
+          # PG may rotate to postgresql-*.csv depending on log_truncate_on_rotation / log_filename.
+          - /pglogs/postgresql*.csv
+          - /pglogs/postgresql*.log
         read_from: beginning
         max_line_bytes: 1048576
-        # Pick up new CSV segments soon after rotation.
-        glob_minimum_cooldown_ms: 1000
 
     transforms:
       pg_fields:
@@ -36,12 +37,14 @@ data:
         type: elasticsearch
         inputs: [pg_fields]
         endpoints:
-          - ${ELASTICSEARCH_URL:?ELASTICSEARCH_URL_required}
+          # URL from pod env ELASTICSEARCH_URL. Do not put shell-style required-var templates in this file;
+          # Vector scans the whole config for dollar-brace patterns and will treat them as env interpolation.
+          - ${ELASTICSEARCH_URL}
         api_version: v8
         # Vector 0.41: no auth.strategy=api_key; use Authorization header (ES ApiKey format).
         request:
           headers:
-            Authorization: "ApiKey ${ELASTIC_API_KEY:?ELASTIC_API_KEY_required}"
+            Authorization: "ApiKey ${ELASTIC_API_KEY}"
         tls:
           verify_certificate: false
         # Drop file-source metadata that can break ES dynamic mappings on logs data streams.

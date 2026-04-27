@@ -34,9 +34,10 @@ spec:
             - log_disconnections=on
             - -c
             - log_min_duration_statement=1000
-            # Default log_file_mode is 0600; vector-logs runs non-root and must read CSV files on the shared volume.
+            # vector-logs runs non-root: permissions must allow group/other read. Use decimal 420 (= chmod 0644)
+            # so leading-zero stripping (YAML/K8s) cannot turn 0644 into invalid 644.
             - -c
-            - log_file_mode=0644
+            - log_file_mode=420
           ports:
             - containerPort: 5432
           env:
@@ -48,6 +49,11 @@ spec:
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
+            # Writable socket dir (library image expects /var/run/postgresql). OpenShift may still print
+            # "chmod: ... Operation not permitted": entrypoint runs `chmod 03775 ... || :` (setgid); SELinux
+            # often denies that bit on emptyDir—the failure is ignored and PostgreSQL continues.
+            - name: postgres-run
+              mountPath: /var/run/postgresql
             - name: pglogs
               mountPath: /pglogs
           readinessProbe:
@@ -113,6 +119,8 @@ spec:
           persistentVolumeClaim:
             claimName: wkpoule-postgres-pvc
         - name: pglogs
+          emptyDir: {}
+        - name: postgres-run
           emptyDir: {}
         - name: vector-config
           configMap:
