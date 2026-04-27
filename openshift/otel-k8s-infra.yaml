@@ -90,17 +90,62 @@ spec:
         insecure_skip_verify: true
         k8s_api_config:
           auth_type: serviceAccount
+        # Required when pod cpu/memory *node* utilization metrics are enabled (otherwise collector fails validation).
+        node: ${env:K8S_NODE_NAME}
         metric_groups:
           - node
           - pod
           - container
           - volume
+        # Fields used by Kibana “Top CPU/Memory per node vs limit” style panels (Elastic EDOT kubelet docs).
+        metrics:
+          k8s.pod.memory.node.utilization:
+            enabled: true
+          k8s.pod.cpu.node.utilization:
+            enabled: true
+          k8s.container.cpu_limit_utilization:
+            enabled: true
+          k8s.pod.cpu_limit_utilization:
+            enabled: true
+          k8s.container.cpu_request_utilization:
+            enabled: true
+          k8s.container.memory_limit_utilization:
+            enabled: true
+          k8s.pod.memory_limit_utilization:
+            enabled: true
+          k8s.container.memory_request_utilization:
+            enabled: true
+          k8s.node.uptime:
+            enabled: true
+          k8s.node.cpu.usage:
+            enabled: true
+          k8s.pod.cpu.usage:
+            enabled: true
+        extra_metadata_labels:
+          - container.id
 
     processors:
       memory_limiter:
         check_interval: 1s
         limit_percentage: 75
         spike_limit_percentage: 15
+      # Elastic / Inventory filters often key on deployment.environment; kubeletstats does not set it by default.
+      resource/infra:
+        attributes:
+          - action: upsert
+            key: deployment.environment
+            value: prd
+          - action: upsert
+            key: service.namespace
+            value: wkpoule-prd
+      # Adds host.* / node identity so node-level kubelet metrics correlate in Observability views.
+      resourcedetection/k8snode:
+        detectors: [k8snode]
+        k8snode:
+          auth_type: serviceAccount
+          node_from_env_var: K8S_NODE_NAME
+        timeout: 5s
+        override: false
       batch: {}
 
     exporters:
@@ -114,5 +159,5 @@ spec:
       pipelines:
         metrics:
           receivers: [kubeletstats]
-          processors: [memory_limiter, batch]
+          processors: [memory_limiter, resource/infra, resourcedetection/k8snode, batch]
           exporters: [otlp_http]

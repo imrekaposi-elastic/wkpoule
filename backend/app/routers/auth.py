@@ -68,6 +68,17 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == body.username).first()
     if not user or not verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    logger.info(
+        "%s has logged on successfully",
+        user.username,
+        extra={
+            "event.action": "user_login",
+            "event.category": "authentication",
+            "event.outcome": "success",
+            "user.name": user.username,
+            "user.id": user.id,
+        },
+    )
     return TokenResponse(
         access_token=create_access_token(user.username),
         refresh_token=create_refresh_token(user.username),
@@ -75,8 +86,22 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/refresh", response_model=TokenResponse)
-def refresh(body: RefreshRequest):
+def refresh(body: RefreshRequest, db: Session = Depends(get_db)):
     username = _decode_token(body.refresh_token, "refresh")
+    user = db.query(User).filter(User.username == username).first()
+    extra = {
+        "event.action": "session_refresh",
+        "event.category": "authentication",
+        "event.outcome": "success",
+        "user.name": username,
+    }
+    if user is not None:
+        extra["user.id"] = user.id
+    logger.info(
+        "%s has refreshed their session successfully",
+        username,
+        extra=extra,
+    )
     return TokenResponse(
         access_token=create_access_token(username),
         refresh_token=create_refresh_token(username),

@@ -17,6 +17,8 @@ data:
           - /pglogs/*.log
         read_from: beginning
         max_line_bytes: 1048576
+        # Pick up new CSV segments soon after rotation.
+        glob_minimum_cooldown_ms: 1000
 
     transforms:
       pg_fields:
@@ -34,9 +36,9 @@ data:
         type: elasticsearch
         inputs: [pg_fields]
         endpoints:
-          - https://o11y.es.ece.kaposi.net:9243
+          - ${ELASTICSEARCH_URL:?ELASTICSEARCH_URL_required}
         api_version: v8
-        # Vector 0.41 elasticsearch sink only supports auth.strategy basic|aws, not api_key.
+        # Vector 0.41: no auth.strategy=api_key; use Authorization header (ES ApiKey format).
         request:
           headers:
             Authorization: "ApiKey ${ELASTIC_API_KEY:?ELASTIC_API_KEY_required}"

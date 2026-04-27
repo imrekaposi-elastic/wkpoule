@@ -1,4 +1,6 @@
 # ServiceAccount + namespace Role so wkpoule-otel gateway can run k8sattributes against workloads in this project.
+# Pair with otel-collector.yaml processors.k8sattributes.filter.namespace set to this namespace; otherwise
+# the processor uses cluster-scoped watches and OpenShift returns 403 for this ServiceAccount.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -10,8 +12,13 @@ metadata:
   name: wkpoule-otel-gateway-k8sattrs
 rules:
   - apiGroups: [""]
-    resources: [pods, namespaces]
+    resources: [pods]
     verbs: [get, list, watch]
+  # Namespace is cluster-scoped; a Role may only reference a specific instance (metadata for k8sattributes).
+  - apiGroups: [""]
+    resources: [namespaces]
+    resourceNames: [wkpoule-prd]
+    verbs: [get, watch]
   - apiGroups: ["apps"]
     resources: [replicasets, deployments, daemonsets, statefulsets]
     verbs: [get, list, watch]

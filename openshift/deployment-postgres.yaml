@@ -34,6 +34,9 @@ spec:
             - log_disconnections=on
             - -c
             - log_min_duration_statement=1000
+            # Default log_file_mode is 0600; vector-logs runs non-root and must read CSV files on the shared volume.
+            - -c
+            - log_file_mode=0644
           ports:
             - containerPort: 5432
           env:
@@ -79,6 +82,11 @@ spec:
           imagePullPolicy: IfNotPresent
           args: ["--config", "/etc/vector/vector.yaml"]
           env:
+            - name: ELASTICSEARCH_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: wkpoule-observability-config
+                  key: ELASTICSEARCH_URL
             - name: ELASTIC_API_KEY
               valueFrom:
                 secretKeyRef:

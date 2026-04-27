@@ -29,9 +29,20 @@ spec:
         check_interval: 1s
         limit_percentage: 75
         spike_limit_percentage: 15
+      resource/cluster:
+        attributes:
+          - action: upsert
+            key: deployment.environment
+            value: prd
+          - action: upsert
+            key: service.namespace
+            value: wkpoule-prd
+          - action: upsert
+            key: collector.role
+            value: k8s-cluster
       batch: {}
     exporters:
-      otlphttp/gateway:
+      otlp_http/gateway:
         endpoint: http://wkpoule-otel-collector:4318
         tls:
           insecure: true
@@ -40,5 +51,5 @@ spec:
       pipelines:
         metrics:
           receivers: [k8s_cluster]
-          processors: [memory_limiter, batch]
-          exporters: [otlphttp/gateway]
+          processors: [memory_limiter, resource/cluster, batch]
+          exporters: [otlp_http/gateway]

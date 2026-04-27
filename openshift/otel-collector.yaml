@@ -32,8 +32,11 @@ spec:
           scrape_configs:
             - job_name: postgres
               scrape_interval: 30s
+              scrape_timeout: 15s
+              metrics_path: /metrics
               static_configs:
-                - targets: ["postgres:9187"]
+                # FQDN avoids ambiguous DNS in some OpenShift / multitenant setups.
+                - targets: ["postgres.wkpoule-prd.svc.cluster.local:9187"]
 
     processors:
       memory_limiter:
@@ -44,6 +47,10 @@ spec:
       k8sattributes:
         auth_type: serviceAccount
         passthrough: false
+        # Required with namespace-scoped Role (rbac-otel-gateway): without this, informers list/watch
+        # pods and replicasets cluster-wide and get 403. Must match the project namespace.
+        filter:
+          namespace: wkpoule-prd
         extract:
           metadata:
             - k8s.namespace.name
@@ -102,6 +109,24 @@ spec:
           - action: upsert
             key: deployment.environment
             value: prd
+      # Derives Elastic infra / K8s dashboard–compatible metrics from OTel kubeletstats (Kibana panels query these).
+      # See: https://www.elastic.co/docs/reference/edot-collector/config/configure-metrics-collection
+      elasticinframetrics: {}
+      # Observability inventory keys on service.name; kubeletstats only adds k8s.*. Map Deployments to the
+      # same service.name as OTLP traces / exporters (api: observability-config; frontend: wkpoule-frontend).
+      transform/kubelet_service_correlation:
+        error_mode: silent
+        metric_statements:
+          - set(resource.attributes["service.name"], "wkpoule-api") where resource.attributes["k8s.deployment.name"] == "wkpoule-api"
+          - set(resource.attributes["service.instance.id"], "wkpoule-api@wkpoule-prd/wkpoule-api") where resource.attributes["k8s.deployment.name"] == "wkpoule-api"
+          - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "wkpoule-api"
+          - set(resource.attributes["service.name"], "wkpoule-frontend") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
+          - set(resource.attributes["service.instance.id"], "wkpoule-frontend@wkpoule-prd/wkpoule-frontend") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
+          - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
+          - set(resource.attributes["service.name"], "postgresql") where resource.attributes["k8s.deployment.name"] == "postgres"
+          - set(resource.attributes["service.instance.id"], "postgresql@wkpoule-prd/postgres") where resource.attributes["k8s.deployment.name"] == "postgres"
+          - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "postgres"
+          - set(resource.attributes["db.system"], "postgresql") where resource.attributes["k8s.deployment.name"] == "postgres"
       # Enrich OTel spans for Elastic Observability / APM UIs (raw OTel ES export is not enough).
       elasticapm: {}
 
@@ -110,7 +135,7 @@ spec:
       elasticapm: {}
 
     exporters:
-      otlphttp/edot:
+      otlp_http/edot:
         endpoint: ${env:EDOT_BACKEND_OTLP_HTTP}
         tls:
           insecure: true
@@ -123,20 +148,20 @@ spec:
         traces:
           receivers: [otlp]
           processors: [memory_limiter, k8sattributes, resourcedetection/env, batch, elasticapm]
-          exporters: [elasticapm, otlphttp/edot]
+          exporters: [elasticapm, otlp_http/edot]
         metrics:
           receivers: [otlp]
-          processors: [memory_limiter, k8sattributes, resourcedetection/env, resource/otlp_metrics_env, batch]
-          exporters: [otlphttp/edot]
+          processors: [memory_limiter, k8sattributes, resourcedetection/env, resource/otlp_metrics_env, elasticinframetrics, transform/kubelet_service_correlation, batch]
+          exporters: [otlp_http/edot]
         metrics/postgres_exporter:
           receivers: [prometheus]
           processors: [memory_limiter, resource/postgres_metrics, batch]
-          exporters: [otlphttp/edot]
+          exporters: [otlp_http/edot]
         metrics/apm-aggregated:
           receivers: [elasticapm]
           processors: []
-          exporters: [otlphttp/edot]
+          exporters: [otlp_http/edot]
         logs:
           receivers: [otlp]
           processors: [memory_limiter, k8sattributes, resourcedetection/env, batch]
-          exporters: [otlphttp/edot]
+          exporters: [otlp_http/edot]
