@@ -7,7 +7,8 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 COPY . .
-ARG VITE_APM_ENVIRONMENT
+# OpenShift/Git builds often omit build-args; empty value becomes "" in the bundle and RUM sends no environment.
+ARG VITE_APM_ENVIRONMENT=prd
 ENV VITE_APM_ENVIRONMENT=$VITE_APM_ENVIRONMENT
 RUN npm run build
 

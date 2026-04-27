@@ -25,6 +25,7 @@ resources:
   - otel-k8s-infra.yaml
   - pvc-postgres.yaml
   - imagestreams.yaml
+  - postgres-vector-config.yaml
   - deployment-postgres.yaml
   - deployment-api.yaml
   - deployment-frontend.yaml

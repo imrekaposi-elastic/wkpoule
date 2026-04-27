@@ -31,8 +31,6 @@ spec:
               scrape_interval: 30s
               static_configs:
                 - targets: ["postgres:9187"]
-                  labels:
-                    service: wkpoule-postgres
 
     processors:
       memory_limiter:
@@ -40,6 +38,18 @@ spec:
         limit_percentage: 75
         spike_limit_percentage: 15
       batch: {}
+      # Correlate postgres_exporter metrics with the APM service map "postgresql" node (same env as API/RUM).
+      resource/postgres_metrics:
+        attributes:
+          - action: upsert
+            key: service.name
+            value: postgresql
+          - action: upsert
+            key: deployment.environment
+            value: prd
+          - action: upsert
+            key: service.environment
+            value: prd
       # Enrich OTel spans for Elastic Observability / APM UIs (raw OTel ES export is not enough).
       elasticapm: {}
 
@@ -64,8 +74,12 @@ spec:
           processors: [memory_limiter, batch, elasticapm]
           exporters: [elasticapm, elasticsearch/otel]
         metrics:
-          receivers: [otlp, prometheus]
+          receivers: [otlp]
           processors: [memory_limiter, batch]
+          exporters: [elasticsearch/otel]
+        metrics/postgres_exporter:
+          receivers: [prometheus]
+          processors: [memory_limiter, resource/postgres_metrics, batch]
           exporters: [elasticsearch/otel]
         metrics/apm-aggregated:
           receivers: [elasticapm]

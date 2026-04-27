@@ -13,8 +13,8 @@ if (w.__WKPOULE_RUM_INIT__) {
 
   // Same-origin proxy (nginx /rum/ → RUM_APM_*). No trailing slash: some URL joiners treat "/intake" as path-absolute.
   const serverUrl = `${window.location.origin}/rum`;
-  const environment =
-    (import.meta.env.VITE_APM_ENVIRONMENT as string | undefined) ?? "prd";
+  const rawEnv = (import.meta.env.VITE_APM_ENVIRONMENT as string | undefined)?.trim();
+  const environment = rawEnv && rawEnv.length > 0 ? rawEnv : "prd";
   const secretToken = (
     import.meta.env.VITE_ELASTIC_APM_RUM_SECRET as string | undefined
   )?.trim();
