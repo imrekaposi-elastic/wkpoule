@@ -7,6 +7,11 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 COPY . .
+# Optional RUM secretToken for Elastic APM (same value as Fleet / APM integration RUM secret).
+ARG VITE_ELASTIC_APM_RUM_SECRET
+ENV VITE_ELASTIC_APM_RUM_SECRET=$VITE_ELASTIC_APM_RUM_SECRET
+ARG VITE_APM_ENVIRONMENT
+ENV VITE_APM_ENVIRONMENT=$VITE_APM_ENVIRONMENT
 RUN npm run build
 
 FROM nginx:alpine

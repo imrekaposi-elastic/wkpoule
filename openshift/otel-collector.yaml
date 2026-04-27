@@ -23,6 +23,16 @@ spec:
             endpoint: 0.0.0.0:4317
           http:
             endpoint: 0.0.0.0:4318
+      # Postgres exporter (sidecar on Service postgres:9187) → Elasticsearch as OTel metrics.
+      prometheus:
+        config:
+          scrape_configs:
+            - job_name: postgres
+              scrape_interval: 30s
+              static_configs:
+                - targets: ["postgres:9187"]
+                  labels:
+                    service: wkpoule-postgres
 
     processors:
       memory_limiter:
@@ -54,7 +64,7 @@ spec:
           processors: [memory_limiter, batch, elasticapm]
           exporters: [elasticapm, elasticsearch/otel]
         metrics:
-          receivers: [otlp]
+          receivers: [otlp, prometheus]
           processors: [memory_limiter, batch]
           exporters: [elasticsearch/otel]
         metrics/apm-aggregated:

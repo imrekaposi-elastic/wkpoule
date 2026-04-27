@@ -16,10 +16,10 @@ data:
   # OTLP logging: `configure_logging()` re-attaches the OTel handler after dictConfig (see logging_config.py).
 
   # Reference endpoints for operators/scripts and future app wiring.
-  ELASTIC_APM_SERVER_URL: https://o11y.apm.ece.kaposi.net:9243
+  ELASTIC_APM_SERVER_URL: https://0a07eb70c1a6425b92f4246e00d43cfe.ece.kaposi.net:9243
   ELASTICSEARCH_URL: https://o11y.es.ece.kaposi.net:9243
   KIBANA_URL: https://o11y.kb.ece.kaposi.net:9243
 
-  # Frontend nginx RUM proxy. Browser RUM should call /rum/ on the public app origin.
-  RUM_APM_UPSTREAM: https://o11y.apm.ece.kaposi.net:9243
-  RUM_APM_HOST: o11y.apm.ece.kaposi.net
+  # Frontend nginx RUM proxy. Browser uses same-origin /rum/…; nginx forwards to this APM Server (Elastic Cloud policy URL).
+  RUM_APM_UPSTREAM: https://0a07eb70c1a6425b92f4246e00d43cfe.ece.kaposi.net:9243
+  RUM_APM_HOST: 0a07eb70c1a6425b92f4246e00d43cfe.ece.kaposi.net

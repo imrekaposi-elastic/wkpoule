@@ -18,6 +18,16 @@ spec:
         - name: postgres
           image: docker.io/library/postgres:16-alpine
           imagePullPolicy: IfNotPresent
+          args:
+            - postgres
+            - -c
+            - log_destination=stderr
+            - -c
+            - log_connections=on
+            - -c
+            - log_disconnections=on
+            - -c
+            - log_min_duration_statement=1000
           ports:
             - containerPort: 5432
           env:
@@ -37,6 +47,24 @@ spec:
                 - wkpoule
             initialDelaySeconds: 5
             periodSeconds: 10
+        # Prometheus-format metrics → scraped by wkpoule-otel (prometheus receiver) → Elasticsearch.
+        - name: postgres-exporter
+          image: quay.io/prometheuscommunity/postgres-exporter:v0.15.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9187
+              name: metrics
+          env:
+            - name: DATA_SOURCE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: wkpoule-secrets
+                  key: POSTGRES_EXPORTER_DSN
+          readinessProbe:
+            tcpSocket:
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 15
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
@@ -50,5 +78,9 @@ spec:
   selector:
     app: postgres
   ports:
-    - port: 5432
+    - name: postgres
+      port: 5432
       targetPort: 5432
+    - name: metrics
+      port: 9187
+      targetPort: 9187

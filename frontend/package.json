@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@elastic/apm-rum": "^5.16.0",
     "axios": "^1.7.0",
     "i18next": "^23.16.0",
     "react": "^18.3.0",

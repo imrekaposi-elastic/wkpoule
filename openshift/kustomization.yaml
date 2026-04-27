@@ -21,6 +21,8 @@ resources:
   - observability-config.yaml
   - observability-secret.yaml
   - otel-collector.yaml
+  # DaemonSet: kubeletstats (node/pod/container metrics) → gateway wkpoule-otel → Elasticsearch
+  - otel-k8s-infra.yaml
   - pvc-postgres.yaml
   - imagestreams.yaml
   - deployment-postgres.yaml
