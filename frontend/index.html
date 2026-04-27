@@ -9,7 +9,7 @@
   </head>
   <body class="bg-gray-50 text-gray-900 min-h-screen">
     <div id="root"></div>
-    <script type="module" src="/src/apm-entry.ts"></script>
+    <!-- Production build uses a single JS entry; RUM is initialized via first import in main.tsx. -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
