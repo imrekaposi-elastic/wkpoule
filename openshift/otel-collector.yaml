@@ -129,6 +129,16 @@ spec:
           - set(resource.attributes["db.system"], "postgresql") where resource.attributes["k8s.deployment.name"] == "postgres"
       # Enrich OTel spans for Elastic Observability / APM UIs (raw OTel ES export is not enough).
       elasticapm: {}
+      # Cluster collector tags logs with collector.role=k8s-cluster. K8s OTel dashboards require
+      # data_stream.dataset k8seventsreceiver.otel; a second OTLP hop can lose scope-based ES routing.
+      transform/logs_k8s_events_datastream:
+        error_mode: silent
+        log_statements:
+          - set(resource.attributes["data_stream.dataset"], "k8seventsreceiver.otel") where resource.attributes["collector.role"] == "k8s-cluster"
+          # Match Kibana kubernetes_otel filters (severity_text == "Warning"), not OTel canonical "WARN".
+          - set(log.severity_text, "Warning") where resource.attributes["collector.role"] == "k8s-cluster" and log.severity_text == "WARN"
+          - set(log.severity_text, "Warning") where resource.attributes["collector.role"] == "k8s-cluster" and log.severity_text == "warn"
+          - set(log.severity_text, "Warning") where resource.attributes["collector.role"] == "k8s-cluster" and log.severity_number >= 13 and log.severity_number <= 16 and log.severity_text != "Warning"
 
     connectors:
       # Emits derived APM metrics from traces; must be an exporter on the traces pipeline.
@@ -163,5 +173,5 @@ spec:
           exporters: [otlp_http/edot]
         logs:
           receivers: [otlp]
-          processors: [memory_limiter, k8sattributes, resourcedetection/env, batch]
+          processors: [memory_limiter, k8sattributes, resourcedetection/env, transform/logs_k8s_events_datastream, batch]
           exporters: [otlp_http/edot]

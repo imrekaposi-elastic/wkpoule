@@ -16,6 +16,7 @@ rules:
       - nodes/status
       - pods
       - pods/status
+      # k8s_events receiver (core Event); events.k8s.io for newer API on some clusters.
       - events
       - replicationcontrollers
       - resourcequotas
@@ -38,6 +39,9 @@ rules:
   # k8s_cluster receiver with distribution: openshift watches ClusterResourceQuota (OpenShift).
   - apiGroups: ["quota.openshift.io"]
     resources: [clusterresourcequotas]
+    verbs: [get, list, watch]
+  - apiGroups: ["events.k8s.io"]
+    resources: [events]
     verbs: [get, list, watch]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

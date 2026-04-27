@@ -29,7 +29,7 @@ data:
           # Nested ECS + Elastic Observability log grouping (Overview uses event.dataset / data_stream).
           .service.name = "postgresql"
           .deployment.environment = "prd"
-          .event.dataset = "postgres.otel"
+          .event.dataset = "wkpoule.postgresql"
           .log_source = "postgres-csv"
 
     sinks:
@@ -53,11 +53,10 @@ data:
             - host
             - source_type
             - file
-        # Classic `bulk.index: name-%Y.%m.%d` creates rolling indices, not data streams.
-        # Data stream: logs-postgres.otel-prd — matches Elastic *.otel log naming (not "unknown").
+        # Data stream: logs-wkpoule.postgresql-prd (same data_stream.dataset as existing ES docs).
         # Grant the observability API key create/write on this pattern if roles are index-scoped.
         mode: data_stream
         data_stream:
           type: logs
-          dataset: postgres.otel
+          dataset: wkpoule.postgresql
           namespace: prd

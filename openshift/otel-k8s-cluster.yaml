@@ -1,5 +1,6 @@
-# Cluster collector (Deployment): k8s_cluster metrics → in-cluster gateway OTLP (Elastic K8s topology).
+# Cluster collector (Deployment): k8s_cluster metrics + k8s_events logs → gateway OTLP (Elastic K8s topology / dashboards).
 # Prereq: rbac-otel-cluster.yaml applied (ClusterRoleBinding).
+# Keep replicas: 1 unless you add k8s_leader_elector; otherwise duplicate event logs are possible.
 apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
@@ -24,6 +25,9 @@ spec:
         distribution: openshift
         node_conditions_to_report: [Ready, MemoryPressure, DiskPressure]
         allocatable_types_to_report: [cpu, memory]
+      # API Warning/Normal events → OTLP logs (what K8s “cluster events” dashboard panels query).
+      k8s_events:
+        auth_type: serviceAccount
     processors:
       memory_limiter:
         check_interval: 1s
@@ -40,6 +44,20 @@ spec:
           - action: upsert
             key: collector.role
             value: k8s-cluster
+      # Kibana kubernetes_otel dashboards filter on data_stream.dataset == "k8seventsreceiver.otel".
+      # OTLP hop via gateway can lose scope-based routing, so set explicitly (do not add to metrics pipeline).
+      resource/k8s_event_logs:
+        attributes:
+          - action: upsert
+            key: data_stream.dataset
+            value: k8seventsreceiver.otel
+      # Kibana kubernetes_otel ES|QL uses severity_text == "Warning" (Kubernetes Event type), not OTel "WARN".
+      transform/k8s_events_severity_for_kibana:
+        error_mode: silent
+        log_statements:
+          - set(log.severity_text, "Warning") where log.severity_text == "WARN"
+          - set(log.severity_text, "Warning") where log.severity_text == "warn"
+          - set(log.severity_text, "Warning") where log.severity_number >= 13 and log.severity_number <= 16 and log.severity_text != "Warning"
       batch: {}
     exporters:
       otlp_http/gateway:
@@ -52,4 +70,8 @@ spec:
         metrics:
           receivers: [k8s_cluster]
           processors: [memory_limiter, resource/cluster, batch]
+          exporters: [otlp_http/gateway]
+        logs:
+          receivers: [k8s_events]
+          processors: [memory_limiter, resource/cluster, resource/k8s_event_logs, transform/k8s_events_severity_for_kibana, batch]
           exporters: [otlp_http/gateway]
