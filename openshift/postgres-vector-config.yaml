@@ -23,8 +23,10 @@ data:
         type: remap
         inputs: [pg_csv]
         source: |
-          .service_name = "postgresql"
-          .environment = "prd"
+          # Nested ECS + Elastic Observability log grouping (Overview uses event.dataset / data_stream).
+          .service.name = "postgresql"
+          .deployment.environment = "prd"
+          .event.dataset = "postgres.otel"
           .log_source = "postgres-csv"
 
     sinks:
@@ -40,10 +42,17 @@ data:
             Authorization: "ApiKey ${ELASTIC_API_KEY:?ELASTIC_API_KEY_required}"
         tls:
           verify_certificate: false
+        # Drop file-source metadata that can break ES dynamic mappings on logs data streams.
+        encoding:
+          except_fields:
+            - host
+            - source_type
+            - file
         # Classic `bulk.index: name-%Y.%m.%d` creates rolling indices, not data streams.
-        # Data stream name becomes: logs-<dataset>-<namespace> (ECS / Observability convention).
+        # Data stream: logs-postgres.otel-prd — matches Elastic *.otel log naming (not "unknown").
+        # Grant the observability API key create/write on this pattern if roles are index-scoped.
         mode: data_stream
         data_stream:
           type: logs
-          dataset: wkpoule.postgresql
+          dataset: postgres.otel
           namespace: prd

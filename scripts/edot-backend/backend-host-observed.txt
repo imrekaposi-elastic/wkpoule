@@ -1,0 +1,30 @@
+Observed on otl01.ece.kaposi.net (172.16.64.135), AlmaLinux 9.7 — from live SSH/systemd inspection.
+
+EDOT OTLP gateway (uses /etc/edot):
+  Unit: edot-gateway.service  (/etc/systemd/system/edot-gateway.service)
+  ExecStart: /usr/share/elastic-agent/bin/elastic-agent otel --config /etc/edot/otel.yml
+  EnvironmentFile: /etc/edot/edot-gateway.env  (ELASTIC_ENDPOINT, ELASTIC_API_KEY for otel.yml)
+
+/etc/edot contents at time of check:
+  otel.yml          — OpenTelemetry/EDOT gateway pipelines (OTLP → Elasticsearch)
+  edot-gateway.env  — credentials for that collector (chmod 600 recommended)
+
+Separate stock Fleet-style agent:
+  Unit: elastic-agent.service  (/usr/lib/systemd/system/elastic-agent.service)
+  Uses: Environment BEAT_CONFIG_OPTS=-c /etc/elastic-agent/elastic-agent.yml
+        ExecStart=/usr/bin/elastic-agent run --environment systemd $BEAT_CONFIG_OPTS
+
+This RPM layout does not use --path.config in the unit; it passes a single file via BEAT_CONFIG_OPTS.
+The EDOT gateway is therefore configured by edot-gateway.service, not by retargeting elastic-agent.service
+to /etc/edot unless you intentionally merge roles (usually avoid: keep gateway on edot-gateway).
+
+Elasticsearch endpoint / API key check (curl from host, env from /etc/edot/edot-gateway.env):
+  Strict TLS: fails — cert SANs are *.ece.kaposi.net and ece.kaposi.net; they do not match the
+  hostname o11y.es.ece.kaposi.net (wildcard covers only one label before ece.kaposi.net).
+  Same message as edot logs: x509 certificate name mismatch.
+  curl -k + ApiKey: HTTP 200, cluster status green — key and URL reach a healthy cluster; auth OK.
+
+Workaround applied on gateway: elasticsearch/otel exporter in /etc/edot/otel.yml includes
+  tls.insecure_skip_verify: true (see patch_gateway_otel_tls.py in this folder). Prefer fixing
+  the ECE deployment proxy certificate or using a URL whose hostname is in the cert SANs, then
+  remove insecure_skip_verify.

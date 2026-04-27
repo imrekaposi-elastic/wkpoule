@@ -10,6 +10,7 @@ data:
   OTEL_RESOURCE_ATTRIBUTES: deployment.environment=prd,service.version=1.5.0
   # Substituted into frontend nginx ECS access log (service inventory / log correlation).
   DEPLOYMENT_ENVIRONMENT: prd
+  # OTLP → in-cluster gateway (Elastic: edge gateway → backend EDOT gateway only).
   OTEL_EXPORTER_OTLP_ENDPOINT: http://wkpoule-otel-collector:4318
   OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
   OTEL_TRACES_EXPORTER: otlp

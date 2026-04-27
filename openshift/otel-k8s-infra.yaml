@@ -1,5 +1,5 @@
 # Node + pod container metrics via kubelet (cAdvisor-style). Runs as a DaemonSet on every worker;
-# forwards OTLP metrics to the in-namespace gateway collector (wkpoule-otel), which exports to Elasticsearch.
+# forwards OTLP metrics to the in-namespace gateway (wkpoule-otel); gateway forwards OTLP to the backend EDOT gateway.
 #
 # Prereq: OpenTelemetry Operator already installed (same as wkpoule-otel).
 # Apply: oc apply -k openshift/

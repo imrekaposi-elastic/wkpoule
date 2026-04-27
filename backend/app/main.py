@@ -12,6 +12,10 @@ from app.db_schema import ensure_admin_access, ensure_schema
 from app.logging_config import configure_logging
 from app.routers import admin, auth, matches, predictions, rankings, subgroups, venues
 from app.services.score_poller import start_polling, stop_polling
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+
+# DB client spans → Elastic service map edge from wkpoule-api to postgresql (requires opentelemetry-instrument).
+SQLAlchemyInstrumentor().instrument(engine=engine)
 
 configure_logging()
 logger = logging.getLogger("wkpoule.api")

@@ -20,9 +20,13 @@ resources:
   - secret.yaml
   - observability-config.yaml
   - observability-secret.yaml
+  - rbac-otel-gateway.yaml
+  - rbac-otel-cluster.yaml
   - otel-collector.yaml
-  # DaemonSet: kubeletstats (node/pod/container metrics) → gateway wkpoule-otel → Elasticsearch
+  # DaemonSet: kubeletstats (node/pod/container metrics) → gateway wkpoule-otel → backend EDOT OTLP
   - otel-k8s-infra.yaml
+  # Deployment: k8s_cluster (OpenShift) → gateway OTLP (Elastic recommended cluster collector)
+  - otel-k8s-cluster.yaml
   - pvc-postgres.yaml
   - imagestreams.yaml
   - postgres-vector-config.yaml

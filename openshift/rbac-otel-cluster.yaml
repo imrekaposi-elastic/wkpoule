@@ -1,0 +1,50 @@
+# Cluster-level read API access for wkpoule-otel-cluster (k8s_cluster receiver). One Deployment per cluster.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: wkpoule-otel-cluster
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: wkpoule-otel-cluster-reader
+rules:
+  - apiGroups: [""]
+    resources:
+      - namespaces
+      - nodes
+      - nodes/status
+      - pods
+      - pods/status
+      - events
+      - replicationcontrollers
+      - resourcequotas
+      - services
+      - persistentvolumeclaims
+      - persistentvolumes
+    verbs: [get, list, watch]
+  - apiGroups: ["apps"]
+    resources: [deployments, daemonsets, replicasets, statefulsets]
+    verbs: [get, list, watch]
+  - apiGroups: ["batch"]
+    resources: [jobs, cronjobs]
+    verbs: [get, list, watch]
+  - apiGroups: ["autoscaling"]
+    resources: [horizontalpodautoscalers]
+    verbs: [get, list, watch]
+  - apiGroups: ["policy"]
+    resources: [poddisruptionbudgets]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: wkpoule-otel-cluster-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: wkpoule-otel-cluster-reader
+subjects:
+  - kind: ServiceAccount
+    name: wkpoule-otel-cluster
+    namespace: wkpoule-prd

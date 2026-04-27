@@ -43,4 +43,22 @@ oc apply -k openshift/
 
 Adjust `namespace` in [`kustomization.yaml`](kustomization.yaml) and image stream paths in the Deployments if your project name is not `wkpoule-prd`.
 
+## Observability (EDOT + exceptions)
+
+**EDOT / OpenTelemetry (Elastic guidance for ECE):**
+
+Topology matches [Kubernetes environments](https://www.elastic.co/docs/reference/opentelemetry/architecture/k8s): **edge** DaemonSet + cluster collector → **in-cluster gateway** → **backend EDOT gateway** (gateway-to-gateway for the hop into Elastic), not SDKs straight to the backend.
+
+- **In-cluster gateway:** [`otel-collector.yaml`](otel-collector.yaml) `OpenTelemetryCollector/wkpoule-otel` receives OTLP from apps ([`observability-config.yaml`](observability-config.yaml)), infra, and cluster collectors; enriches with **`k8sattributes` + `elasticapm`**; exports with **`otlphttp` → backend** (`EDOT_BACKEND_OTLP_HTTP`, default `http://172.16.64.135:4318`) and **`ELASTIC_API_KEY`** on `otlphttp/edot`.
+- **Edge DaemonSet:** [`otel-k8s-infra.yaml`](otel-k8s-infra.yaml) ships kubelet metrics OTLP **to the gateway** Service `wkpoule-otel-collector:4318`.
+- **Cluster collector:** [`otel-k8s-cluster.yaml`](otel-k8s-cluster.yaml) runs **`k8s_cluster`** (`distribution: openshift`) and sends OTLP **to the same gateway**. RBAC: [`rbac-otel-cluster.yaml`](rbac-otel-cluster.yaml). **Only one** `k8s_cluster` replica per cluster.
+- **Gateway RBAC:** [`rbac-otel-gateway.yaml`](rbac-otel-gateway.yaml) — ServiceAccount `wkpoule-otel-gateway` for `k8sattributes` API reads in the namespace.
+
+**Legacy / exceptions:**
+
+- **RUM:** Browser → APM Server URL via nginx (see [`observability-config.yaml`](observability-config.yaml)).
+- **Postgres CSV file logs:** Vector sidecar → Elasticsearch API key (see [`postgres-vector-config.yaml`](postgres-vector-config.yaml)); not on the OTLP gateway path.
+
+If the **backend** OTLP URL changes, update **`EDOT_BACKEND_OTLP_HTTP`** and the **`otlphttp/edot`** `tls` / `headers` blocks in [`otel-collector.yaml`](otel-collector.yaml). Ensure OpenShift **egress** allows the **gateway** Deployment to reach that host on `4318`. Edge components keep using **`http://wkpoule-otel-collector:4318`** unless you rename the gateway Service.
+
 **Public hostname:** Set [`route.yaml`](route.yaml) `spec.host` and the same URL (with `https://`) as **`PUBLIC_APP_URL`** in [`secret.yaml`](secret.yaml) so invite links and CORS stay aligned — see [`deploy.md`](../deploy.md) §7.

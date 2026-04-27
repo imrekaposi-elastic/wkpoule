@@ -17,7 +17,7 @@ spec:
           image: image-registry.openshift-image-registry.svc:5000/wkpoule-prd/wkpoule-api:latest
           imagePullPolicy: Always
           # Force EDOT auto-instrumentation. The image may otherwise start plain `uvicorn`, which
-          # ignores OTEL_* env vars and sends no spans to the in-cluster collector.
+          # ignores OTEL_* env vars and sends no spans to the in-cluster gateway.
           command: ["opentelemetry-instrument"]
           args:
             - uvicorn

@@ -1,0 +1,44 @@
+# Cluster collector (Deployment): k8s_cluster metrics → in-cluster gateway OTLP (Elastic K8s topology).
+# Prereq: rbac-otel-cluster.yaml applied (ClusterRoleBinding).
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: wkpoule-otel-cluster
+spec:
+  mode: deployment
+  replicas: 1
+  image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.3.2
+  serviceAccount: wkpoule-otel-cluster
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+  config:
+    receivers:
+      k8s_cluster:
+        auth_type: serviceAccount
+        collection_interval: 60s
+        distribution: openshift
+        node_conditions_to_report: [Ready, MemoryPressure, DiskPressure]
+        allocatable_types_to_report: [cpu, memory]
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 15
+      batch: {}
+    exporters:
+      otlphttp/gateway:
+        endpoint: http://wkpoule-otel-collector:4318
+        tls:
+          insecure: true
+        compression: gzip
+    service:
+      pipelines:
+        metrics:
+          receivers: [k8s_cluster]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/gateway]
