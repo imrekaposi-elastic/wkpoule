@@ -271,6 +271,7 @@
     "savedAllComplete": "Voorspelling opgeslagen — je bent bij met alle geplande wedstrijden.",
     "saveFailed": "Opslaan van voorspelling mislukt",
     "locked": "Voorspellingen zijn vergrendeld voor deze wedstrijd.",
+    "predictionReadOnly": "Deze wedstrijd is live of er staat een uitslag — je tip hieronder is alleen-lezen. Als de wedstrijd weer op ‘aankomend’ wordt gezet, kun je weer aanpassen.",
     "lockedBeforeKickoff": "Voorspellingen zijn vergrendeld — de wedstrijd begint over minder dan 4 uur.",
     "noPredictionBeforeLock": "Je hebt geen tip opgeslagen vóór de deadline.",
     "allPredictions": "Alle voorspellingen",

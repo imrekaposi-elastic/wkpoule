@@ -206,6 +206,10 @@ export default function MatchDetail() {
   const canEditPrediction =
     match.status === "upcoming" && match.prediction_editable;
   const myPredRow = predictions.find((p) => p.user_id === user?.id);
+  const readOnlyPredictionBoxClass =
+    "rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 opacity-90";
+  const readOnlyPredictionScoreClass =
+    "text-2xl font-bold font-mono text-gray-400 tabular-nums";
 
   const successMessages = [t("matchDetail.saved"), t("matchDetail.savedAllComplete")];
   const isSuccessMessage = message !== "" && successMessages.includes(message);
@@ -469,17 +473,32 @@ export default function MatchDetail() {
             <div className="text-center py-2 space-y-3">
               <p className="text-gray-500">{t("matchDetail.lockedBeforeKickoff")}</p>
               {myPredRow ? (
-                <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-2xl font-bold font-mono text-gray-800 w-full max-w-full">
-                  <span className="tabular-nums">{myPredRow.home_score}</span>
-                  <span className="text-gray-400">-</span>
-                  <span className="tabular-nums">{myPredRow.away_score}</span>
+                <div
+                  className={`${readOnlyPredictionBoxClass} flex flex-wrap items-center justify-center gap-x-4 gap-y-1 w-full max-w-full pointer-events-none select-none`}
+                >
+                  <span className={readOnlyPredictionScoreClass}>{myPredRow.home_score}</span>
+                  <span className="text-gray-300 text-xl">-</span>
+                  <span className={readOnlyPredictionScoreClass}>{myPredRow.away_score}</span>
                 </div>
               ) : (
                 <p className="text-sm text-gray-400">{t("matchDetail.noPredictionBeforeLock")}</p>
               )}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-4">{t("matchDetail.locked")}</p>
+            <div className="text-center py-2 space-y-3">
+              <p className="text-gray-500">{t("matchDetail.predictionReadOnly")}</p>
+              {myPredRow ? (
+                <div
+                  className={`${readOnlyPredictionBoxClass} flex flex-wrap items-center justify-center gap-x-4 gap-y-1 w-full max-w-full pointer-events-none select-none`}
+                >
+                  <span className={readOnlyPredictionScoreClass}>{myPredRow.home_score}</span>
+                  <span className="text-gray-300 text-xl">-</span>
+                  <span className={readOnlyPredictionScoreClass}>{myPredRow.away_score}</span>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400">{t("matchDetail.locked")}</p>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -517,20 +536,37 @@ export default function MatchDetail() {
                 </tr>
               </thead>
               <tbody>
-                {predictions.map((p) => (
+                {predictions.map((p) => {
+                  const isMe = p.user_id === user?.id;
+                  const myRowReadOnly = isMe && !canEditPrediction;
+                  return (
                   <tr
                     key={p.id}
                     className={`border-b last:border-0 ${
-                      p.user_id === user?.id ? "bg-green-50" : ""
+                      isMe
+                        ? myRowReadOnly
+                          ? "bg-gray-50 text-gray-500"
+                          : "bg-green-50"
+                        : ""
                     }`}
                   >
                     <td className="py-2.5">
                       {p.username}
-                      {p.user_id === user?.id && (
-                        <span className="ml-1 text-xs text-pitch-600">{t("matchDetail.you")}</span>
+                      {isMe && (
+                        <span
+                          className={`ml-1 text-xs ${
+                            myRowReadOnly ? "text-gray-400" : "text-pitch-600"
+                          }`}
+                        >
+                          {t("matchDetail.you")}
+                        </span>
                       )}
                     </td>
-                    <td className="py-2.5 text-center font-mono font-semibold">
+                    <td
+                      className={`py-2.5 text-center font-mono font-semibold ${
+                        myRowReadOnly ? "text-gray-400" : ""
+                      }`}
+                    >
                       {p.home_score} - {p.away_score}
                     </td>
                     <td className="py-2.5 text-center font-semibold">
@@ -543,7 +579,8 @@ export default function MatchDetail() {
                       )}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

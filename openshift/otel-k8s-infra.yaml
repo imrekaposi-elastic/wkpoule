@@ -123,12 +123,35 @@ spec:
             enabled: true
         extra_metadata_labels:
           - container.id
+      # cAdvisor counters exposed by kubelet cover data kubeletstats does not provide:
+      # network packets and container filesystem read/write operations/bytes.
+      prometheus/cadvisor:
+        config:
+          scrape_configs:
+            - job_name: kubelet-cadvisor
+              scrape_interval: 30s
+              scheme: https
+              metrics_path: /metrics/cadvisor
+              bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+              tls_config:
+                insecure_skip_verify: true
+              static_configs:
+                - targets: ["${env:K8S_NODE_IP}:10250"]
 
     processors:
       memory_limiter:
         check_interval: 1s
         limit_percentage: 75
         spike_limit_percentage: 15
+      filter/cadvisor:
+        metrics:
+          include:
+            match_type: regexp
+            metric_names:
+              - ^container_cpu_usage_seconds_total$
+              - ^container_memory_(usage|working_set)_bytes$
+              - ^container_fs_(reads|writes|reads_bytes|writes_bytes)_total$
+              - ^container_network_(receive|transmit)_(packets|bytes)_total$
       # Elastic / Inventory filters often key on deployment.environment; kubeletstats does not set it by default.
       resource/infra:
         attributes:
@@ -138,6 +161,25 @@ spec:
           - action: upsert
             key: service.namespace
             value: wkpoule-prd
+      resource/cadvisor:
+        attributes:
+          - action: upsert
+            key: deployment.environment
+            value: prd
+          - action: upsert
+            key: service.namespace
+            value: wkpoule-prd
+          - action: upsert
+            key: data_stream.dataset
+            value: cadvisor
+      transform/cadvisor_k8s_attributes:
+        error_mode: ignore
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(resource.attributes["k8s.namespace.name"], datapoint.attributes["namespace"]) where datapoint.attributes["namespace"] != nil
+              - set(resource.attributes["k8s.pod.name"], datapoint.attributes["pod"]) where datapoint.attributes["pod"] != nil
+              - set(resource.attributes["k8s.container.name"], datapoint.attributes["container"]) where datapoint.attributes["container"] != nil
       # Adds host.* / node identity so node-level kubelet metrics correlate in Observability views.
       resourcedetection/k8snode:
         detectors: [k8snode]
@@ -156,8 +198,28 @@ spec:
         compression: gzip
 
     service:
+      telemetry:
+        logs:
+          level: info
+          processors:
+            - batch:
+                exporter:
+                  otlp:
+                    protocol: http/protobuf
+                    endpoint: http://wkpoule-otel-collector:4318
+        metrics:
+          readers:
+            - periodic:
+                exporter:
+                  otlp:
+                    protocol: http/protobuf
+                    endpoint: http://wkpoule-otel-collector:4318
       pipelines:
         metrics:
           receivers: [kubeletstats]
           processors: [memory_limiter, resource/infra, resourcedetection/k8snode, batch]
+          exporters: [otlp_http]
+        metrics/cadvisor:
+          receivers: [prometheus/cadvisor]
+          processors: [memory_limiter, filter/cadvisor, resource/cadvisor, transform/cadvisor_k8s_attributes, resourcedetection/k8snode, batch]
           exporters: [otlp_http]

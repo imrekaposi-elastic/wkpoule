@@ -193,6 +193,9 @@ export default function Matches() {
             <div className="space-y-3">
               {dayMatches.map((m) => {
                 const myTip = myPredByMatchId[m.id];
+                const userTipLocked = !(
+                  m.status === "upcoming" && m.prediction_editable
+                );
                 return (
                 <Link
                   key={m.id}
@@ -257,17 +260,31 @@ export default function Matches() {
                               {m.home_score} - {m.away_score}
                             </span>
                             {myTip && (
-                              <span className="text-[10px] sm:text-xs text-pitch-700 font-medium leading-tight">
+                              <span
+                                className={`text-[10px] sm:text-xs font-medium leading-tight ${
+                                  userTipLocked ? "text-gray-400" : "text-pitch-700"
+                                }`}
+                              >
                                 {t("matches.yourTip")}: {myTip.home}–{myTip.away}
                               </span>
                             )}
                           </div>
                         ) : myTip ? (
                           <div className="flex flex-col items-center gap-0.5">
-                            <span className="font-semibold text-base sm:text-lg text-pitch-700 leading-tight tabular-nums">
+                            <span
+                              className={`font-semibold text-base sm:text-lg leading-tight tabular-nums ${
+                                userTipLocked ? "text-gray-400" : "text-pitch-700"
+                              }`}
+                            >
                               {myTip.home} – {myTip.away}
                             </span>
-                            <span className="text-[10px] text-gray-500 leading-tight">{t("matches.yourTip")}</span>
+                            <span
+                              className={`text-[10px] leading-tight ${
+                                userTipLocked ? "text-gray-400" : "text-gray-500"
+                              }`}
+                            >
+                              {t("matches.yourTip")}
+                            </span>
                           </div>
                         ) : (
                           <span className="text-gray-400 text-sm">{t("matches.vs")}</span>

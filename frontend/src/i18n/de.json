@@ -271,6 +271,7 @@
     "savedAllComplete": "Tipp gespeichert — du bist bei allen kommenden Spielen durch.",
     "saveFailed": "Speichern fehlgeschlagen",
     "locked": "Tipps sind für dieses Spiel gesperrt.",
+    "predictionReadOnly": "Das Spiel läuft oder ist entschieden — dein Tipp unten ist schreibgeschützt. Wird das Spiel wieder auf „bevorstehend“ gesetzt, kannst du ihn erneut ändern.",
     "lockedBeforeKickoff": "Tipps sind gesperrt — bis zum Anpfiff sind es weniger als 4 Stunden.",
     "noPredictionBeforeLock": "Du hast vor der Sperrfrist keinen Tipp gespeichert.",
     "allPredictions": "Alle Tipps",

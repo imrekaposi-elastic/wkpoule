@@ -18,6 +18,32 @@ spec:
     # ECE: in-cluster gateway forwards OTLP to backend EDOT gateway (not direct ES from this collector).
     - name: EDOT_BACKEND_OTLP_HTTP
       value: http://172.16.64.135:4318
+    # PostgreSQL receiver credentials (least-privileged user).
+    - name: POSTGRES_OTEL_HOST
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-postgres-otel
+          key: POSTGRES_OTEL_HOST
+    - name: POSTGRES_OTEL_PORT
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-postgres-otel
+          key: POSTGRES_OTEL_PORT
+    - name: POSTGRES_OTEL_DB
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-postgres-otel
+          key: POSTGRES_OTEL_DB
+    - name: POSTGRES_OTEL_USER
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-postgres-otel
+          key: POSTGRES_OTEL_USER
+    - name: POSTGRES_OTEL_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-postgres-otel
+          key: POSTGRES_OTEL_PASSWORD
   config:
     receivers:
       otlp:
@@ -37,6 +63,62 @@ spec:
               static_configs:
                 # FQDN avoids ambiguous DNS in some OpenShift / multitenant setups.
                 - targets: ["postgres.wkpoule-prd.svc.cluster.local:9187"]
+      # Direct PostgreSQL metrics via an OTel receiver (used by the PostgreSQL OTel integration).
+      postgresql:
+        endpoint: "${env:POSTGRES_OTEL_HOST}:${env:POSTGRES_OTEL_PORT}"
+        transport: tcp
+        username: "${env:POSTGRES_OTEL_USER}"
+        password: "${env:POSTGRES_OTEL_PASSWORD}"
+        databases: ["${env:POSTGRES_OTEL_DB}"]
+        collection_interval: 30s
+        # Postgres image here is not configured for TLS; disable SSL on the client.
+        tls:
+          insecure: true
+        metrics:
+          postgresql.blks_hit:
+            enabled: true
+          postgresql.blks_read:
+            enabled: true
+          postgresql.database.locks:
+            enabled: true
+          postgresql.deadlocks:
+            enabled: true
+          postgresql.sequential_scans:
+            enabled: true
+          postgresql.temp_files:
+            enabled: true
+          postgresql.temp.io:
+            enabled: true
+          postgresql.tup_deleted:
+            enabled: true
+          postgresql.tup_fetched:
+            enabled: true
+          postgresql.tup_inserted:
+            enabled: true
+          postgresql.tup_returned:
+            enabled: true
+          postgresql.tup_updated:
+            enabled: true
+          postgresql.wal.delay:
+            enabled: true
+          postgresql.function.calls:
+            enabled: true
+        # PostgreSQL OTel dashboards use these receiver-emitted event logs:
+        # db.server.query_sample (pg_stat_activity) and db.server.top_query (pg_stat_statements).
+        events:
+          db.server.query_sample:
+            enabled: true
+          db.server.top_query:
+            enabled: true
+        query_sample_collection:
+          max_rows_per_query: 100
+        top_query_collection:
+          max_rows_per_query: 100
+          top_n_query: 200
+          # Query plans are optional; disabling EXPLAIN avoids errors on parameterized receiver queries.
+          max_explain_each_interval: 0
+          query_plan_cache_size: 1000
+          query_plan_cache_ttl: 1h
 
     processors:
       memory_limiter:
@@ -130,11 +212,11 @@ spec:
       # Enrich OTel spans for Elastic Observability / APM UIs (raw OTel ES export is not enough).
       elasticapm: {}
       # Cluster collector tags logs with collector.role=k8s-cluster. K8s OTel dashboards require
-      # data_stream.dataset k8seventsreceiver.otel; a second OTLP hop can lose scope-based ES routing.
+      # data_stream.dataset k8seventsreceiver.otel; set the base dataset name and let OTel mapping append ".otel".
       transform/logs_k8s_events_datastream:
         error_mode: silent
         log_statements:
-          - set(resource.attributes["data_stream.dataset"], "k8seventsreceiver.otel") where resource.attributes["collector.role"] == "k8s-cluster"
+          - set(resource.attributes["data_stream.dataset"], "k8seventsreceiver") where resource.attributes["collector.role"] == "k8s-cluster"
           # Match Kibana kubernetes_otel filters (severity_text == "Warning"), not OTel canonical "WARN".
           - set(log.severity_text, "Warning") where resource.attributes["collector.role"] == "k8s-cluster" and log.severity_text == "WARN"
           - set(log.severity_text, "Warning") where resource.attributes["collector.role"] == "k8s-cluster" and log.severity_text == "warn"
@@ -154,6 +236,22 @@ spec:
           Authorization: "ApiKey ${env:ELASTIC_API_KEY}"
 
     service:
+      telemetry:
+        logs:
+          level: info
+          processors:
+            - batch:
+                exporter:
+                  otlp:
+                    protocol: http/protobuf
+                    endpoint: http://127.0.0.1:4318
+        metrics:
+          readers:
+            - periodic:
+                exporter:
+                  otlp:
+                    protocol: http/protobuf
+                    endpoint: http://127.0.0.1:4318
       pipelines:
         traces:
           receivers: [otlp]
@@ -165,6 +263,14 @@ spec:
           exporters: [otlp_http/edot]
         metrics/postgres_exporter:
           receivers: [prometheus]
+          processors: [memory_limiter, resource/postgres_metrics, batch]
+          exporters: [otlp_http/edot]
+        metrics/postgresql:
+          receivers: [postgresql]
+          processors: [memory_limiter, resource/postgres_metrics, batch]
+          exporters: [otlp_http/edot]
+        logs/postgresql:
+          receivers: [postgresql]
           processors: [memory_limiter, resource/postgres_metrics, batch]
           exporters: [otlp_http/edot]
         metrics/apm-aggregated:

@@ -270,6 +270,7 @@
     "savedAllComplete": "Previsão salva — você está em dia com todos os jogos futuros.",
     "saveFailed": "Falha ao salvar previsão",
     "locked": "As previsões estão bloqueadas para este jogo.",
+    "predictionReadOnly": "O jogo está em andamento ou o resultado está final — seu palpite abaixo é só leitura. Se o jogo voltar para “próximo”, você pode editar de novo.",
     "lockedBeforeKickoff": "As previsões estão bloqueadas — o jogo começa em menos de 4 horas.",
     "noPredictionBeforeLock": "Você não salvou um palpite antes do prazo.",
     "allPredictions": "Todas as previsões",

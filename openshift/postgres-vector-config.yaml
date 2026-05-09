@@ -11,13 +11,12 @@ data:
     sources:
       pg_csv:
         type: file
-        # With log_destination=csvlog, PostgreSQL names files *.csv (log_filename .log → .csv).
+        # Elastic's PostgreSQL integration parses CSV logs natively. Do not ship the paired .log file too,
+        # or the same event appears twice with the text-log copy parsed less richly.
         include:
           - /pglogs/*.csv
-          - /pglogs/*.log
           # PG may rotate to postgresql-*.csv depending on log_truncate_on_rotation / log_filename.
           - /pglogs/postgresql*.csv
-          - /pglogs/postgresql*.log
         read_from: beginning
         max_line_bytes: 1048576
 
@@ -26,10 +25,12 @@ data:
         type: remap
         inputs: [pg_csv]
         source: |
-          # Nested ECS + Elastic Observability log grouping (Overview uses event.dataset / data_stream).
+          # Route PostgreSQL CSV logs into Elastic's native PostgreSQL integration data stream.
+          # The package ingest pipeline parses message into postgresql.log.* fields.
           .service.name = "postgresql"
           .deployment.environment = "prd"
-          .event.dataset = "wkpoule.postgresql"
+          .event.module = "postgresql"
+          .event.dataset = "postgresql.log"
           .log_source = "postgres-csv"
 
     sinks:
@@ -53,10 +54,10 @@ data:
             - host
             - source_type
             - file
-        # Data stream: logs-wkpoule.postgresql-prd (same data_stream.dataset as existing ES docs).
-        # Grant the observability API key create/write on this pattern if roles are index-scoped.
+        # Native Elastic PostgreSQL integration data stream: logs-postgresql.log-prd.
+        # Requires the PostgreSQL integration package assets (pipelines/templates) to be installed.
         mode: data_stream
         data_stream:
           type: logs
-          dataset: wkpoule.postgresql
+          dataset: postgresql.log
           namespace: prd

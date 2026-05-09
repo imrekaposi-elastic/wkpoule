@@ -1,0 +1,86 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wkpoule-postgres-otel-user
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: create-user
+          image: docker.io/library/postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            # Admin creds (existing app owner) to create/grant the OTel user.
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wkpoule-secrets
+                  key: POSTGRES_PASSWORD
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: wkpoule-secrets
+                  key: POSTGRES_USER
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: wkpoule-secrets
+                  key: POSTGRES_DB
+            - name: PGHOST
+              value: postgres
+            - name: PGPORT
+              value: "5432"
+
+            # Target OTel creds to create/update.
+            - name: OTEL_PG_USER
+              valueFrom:
+                secretKeyRef:
+                  name: wkpoule-postgres-otel
+                  key: POSTGRES_OTEL_USER
+            - name: OTEL_PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wkpoule-postgres-otel
+                  key: POSTGRES_OTEL_PASSWORD
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              echo "Ensuring OTel role exists and has monitoring privileges..."
+              # Avoid DO $$ blocks (some shells/middlewares can mangle $$).
+              OTEL_ROLE_EXISTS="$(psql -v ON_ERROR_STOP=1 -tA \
+                -c "SELECT 1 FROM pg_roles WHERE rolname = '${OTEL_PG_USER}';")"
+              if [ "$OTEL_ROLE_EXISTS" = "1" ]; then
+                echo "Role ${OTEL_PG_USER} exists; updating password"
+                psql -v ON_ERROR_STOP=1 \
+                  -c "ALTER ROLE \"${OTEL_PG_USER}\" WITH LOGIN PASSWORD '${OTEL_PG_PASSWORD}';"
+              else
+                echo "Creating role ${OTEL_PG_USER}"
+                psql -v ON_ERROR_STOP=1 \
+                  -c "CREATE ROLE \"${OTEL_PG_USER}\" LOGIN PASSWORD '${OTEL_PG_PASSWORD}';"
+              fi
+
+              # Monitoring privileges.
+              psql -v ON_ERROR_STOP=1 \
+                -c "GRANT pg_monitor TO \"${OTEL_PG_USER}\";"
+              psql -v ON_ERROR_STOP=1 \
+                -c "GRANT CONNECT ON DATABASE \"${PGDATABASE}\" TO \"${OTEL_PG_USER}\";"
+
+              # Apply schema/table grants inside the database (optional but useful if queries are used later).
+              psql -v ON_ERROR_STOP=1 \
+                -v otel_user="${OTEL_PG_USER}" <<'SQL'
+              GRANT USAGE ON SCHEMA public TO :"otel_user";
+              GRANT SELECT ON ALL TABLES IN SCHEMA public TO :"otel_user";
+              ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO :"otel_user";
+              SQL
+
+              # Required by the PostgreSQL OTel dashboards for top-query events.
+              # The receiver may query pg_stat_statements from the target DB and the default postgres DB.
+              for db in "${PGDATABASE}" postgres; do
+                echo "Ensuring pg_stat_statements in database ${db}..."
+                psql -v ON_ERROR_STOP=1 -d "${db}" \
+                  -c "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
+                psql -v ON_ERROR_STOP=1 -d "${db}" \
+                  -c "GRANT SELECT ON pg_stat_statements TO \"${OTEL_PG_USER}\";"
+              done

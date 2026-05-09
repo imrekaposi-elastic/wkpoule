@@ -271,6 +271,7 @@
     "savedAllComplete": "Prediction saved — you’re all caught up on upcoming matches.",
     "saveFailed": "Failed to save prediction",
     "locked": "Predictions are locked for this match.",
+    "predictionReadOnly": "This match is live or the result is final — your tip is read-only below. If the match is set back to upcoming, you can edit it again.",
     "lockedBeforeKickoff": "Predictions are locked — the match starts in less than 4 hours.",
     "noPredictionBeforeLock": "You did not save a tip before the cutoff.",
     "allPredictions": "All Predictions",

@@ -25,6 +25,14 @@ spec:
         distribution: openshift
         node_conditions_to_report: [Ready, MemoryPressure, DiskPressure]
         allocatable_types_to_report: [cpu, memory]
+        metrics:
+          # Cluster-state metric used by the Kubernetes OTel Cluster Overview "Container Restarts" panel.
+          k8s.container.restarts:
+            enabled: true
+        resource_attributes:
+          # Dashboard groups restarts by the last terminated reason when available.
+          k8s.container.status.last_terminated_reason:
+            enabled: true
       # API Warning/Normal events → OTLP logs (what K8s “cluster events” dashboard panels query).
       k8s_events:
         auth_type: serviceAccount
@@ -45,12 +53,12 @@ spec:
             key: collector.role
             value: k8s-cluster
       # Kibana kubernetes_otel dashboards filter on data_stream.dataset == "k8seventsreceiver.otel".
-      # OTLP hop via gateway can lose scope-based routing, so set explicitly (do not add to metrics pipeline).
+      # Set the base dataset name; the Elasticsearch OTel mapping appends ".otel".
       resource/k8s_event_logs:
         attributes:
           - action: upsert
             key: data_stream.dataset
-            value: k8seventsreceiver.otel
+            value: k8seventsreceiver
       # Kibana kubernetes_otel ES|QL uses severity_text == "Warning" (Kubernetes Event type), not OTel "WARN".
       transform/k8s_events_severity_for_kibana:
         error_mode: silent
@@ -66,6 +74,22 @@ spec:
           insecure: true
         compression: gzip
     service:
+      telemetry:
+        logs:
+          level: info
+          processors:
+            - batch:
+                exporter:
+                  otlp:
+                    protocol: http/protobuf
+                    endpoint: http://wkpoule-otel-collector:4318
+        metrics:
+          readers:
+            - periodic:
+                exporter:
+                  otlp:
+                    protocol: http/protobuf
+                    endpoint: http://wkpoule-otel-collector:4318
       pipelines:
         metrics:
           receivers: [k8s_cluster]

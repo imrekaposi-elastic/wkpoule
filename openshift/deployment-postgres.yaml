@@ -34,6 +34,9 @@ spec:
             - log_disconnections=on
             - -c
             - log_min_duration_statement=1000
+            # Required by the PostgreSQL OTel receiver for top-query events (pg_stat_statements).
+            - -c
+            - shared_preload_libraries=pg_stat_statements
             # vector-logs runs non-root: permissions must allow group/other read. Use decimal 420 (= chmod 0644)
             # so leading-zero stripping (YAML/K8s) cannot turn 0644 into invalid 644.
             - -c
