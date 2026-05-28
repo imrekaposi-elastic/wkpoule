@@ -14,8 +14,17 @@ currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+Report security issues privately to the repository maintainers (do not open a
+public issue for exploitable findings). Include steps to reproduce, impact,
+and affected components (API, frontend, OpenShift manifests).
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+## Automated scanning (GitLab CI)
+
+Every push and merge request runs:
+
+- **SAST** — static analysis of application source code
+- **Dependency scanning** — known vulnerabilities in `backend/requirements.txt` and `frontend/package.json`
+- **Secret detection** — committed credentials and tokens
+
+Findings appear under **Security & Compliance** in GitLab. Triage and remediate
+high/critical items before production releases.

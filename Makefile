@@ -8,7 +8,15 @@
 IMAGE_API ?= wkpoule-api:latest
 IMAGE_FRONTEND ?= wkpoule-frontend:latest
 
-.PHONY: build-api build-frontend build-all push-api push-frontend push-all
+.PHONY: build-api build-frontend build-all push-api push-frontend push-all test test-backend test-frontend
+
+test: test-backend test-frontend
+
+test-backend:
+	cd backend && pip install -r requirements-dev.txt && pytest tests/ -v
+
+test-frontend:
+	cd frontend && npm install && npm run test:ci
 
 build-api:
 	docker build -t $(IMAGE_API) -f backend/Dockerfile backend

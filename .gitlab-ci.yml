@@ -1,0 +1,84 @@
+# Run tests and security scans on every push and merge request.
+# https://docs.gitlab.com/ee/user/application_security/
+
+stages:
+  - test
+  - security
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.cache/npm"
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+# --- Application tests -------------------------------------------------------
+
+backend:unit:
+  stage: test
+  image: python:3.12-slim
+  cache:
+    key: backend-pip
+    paths:
+      - .cache/pip
+  before_script:
+    - pip install --upgrade pip
+    - pip install -r backend/requirements-dev.txt
+  script:
+    - cd backend
+    - pytest tests/unit -v --cov=app --cov-report=term-missing --cov-fail-under=0
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+backend:integration:
+  stage: test
+  image: python:3.12-slim
+  cache:
+    key: backend-pip
+    paths:
+      - .cache/pip
+  before_script:
+    - pip install --upgrade pip
+    - pip install -r backend/requirements-dev.txt
+  script:
+    - cd backend
+    - pytest tests/integration -v
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+frontend:test:
+  stage: test
+  image: node:20-alpine
+  cache:
+    key: frontend-npm
+    paths:
+      - .cache/npm
+      - frontend/node_modules
+  before_script:
+    - cd frontend
+    - npm install
+  script:
+    - npm run test:ci
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# --- Security template overrides ---------------------------------------------
+
+# Scan Python (backend/requirements.txt) and JavaScript (frontend/package.json).
+dependency_scanning:
+  stage: security
+  variables:
+    DS_MAX_DEPTH: "4"
+
+# Allow SAST to report without blocking merges until findings are triaged.
+sast:
+  stage: security
+  allow_failure: true
+
+secret_detection:
+  stage: security
