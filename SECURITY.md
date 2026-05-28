@@ -18,13 +18,15 @@ Report security issues privately to the repository maintainers (do not open a
 public issue for exploitable findings). Include steps to reproduce, impact,
 and affected components (API, frontend, OpenShift manifests).
 
-## Automated scanning (GitLab CI)
+## Automated scanning (GitHub Actions)
 
-Every push and merge request runs:
+Every push and pull request to `main` runs workflows under `.github/workflows/`:
 
-- **SAST** — static analysis of application source code
-- **Dependency scanning** — known vulnerabilities in `backend/requirements.txt` and `frontend/package.json`
-- **Secret detection** — committed credentials and tokens
+- **CI** — backend unit/integration tests, frontend tests, `pip-audit`, `npm audit`
+- **CodeQL** — static analysis for Python and TypeScript/JavaScript
 
-Findings appear under **Security & Compliance** in GitLab. Triage and remediate
-high/critical items before production releases.
+Results: [Actions](https://github.com/imrekaposi-elastic/wkpoule/actions) and
+[Security](https://github.com/imrekaposi-elastic/wkpoule/security) tabs on GitHub.
+
+If the repo is mirrored to GitLab, `.gitlab-ci.yml` runs SAST, dependency scanning,
+and secret detection there as well.
