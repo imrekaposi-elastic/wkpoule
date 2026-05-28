@@ -97,6 +97,8 @@ export interface FunComment {
   comment_text_nl?: string;
   comment_text_pt?: string;
   comment_text_de?: string;
+  comment_text_it?: string;
+  comment_text_es?: string;
   style: string;
 }
 

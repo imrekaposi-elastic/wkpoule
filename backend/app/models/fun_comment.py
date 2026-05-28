@@ -13,6 +13,8 @@ class FunComment(Base):
     comment_text_nl: Mapped[str | None] = mapped_column(Text, nullable=True)
     comment_text_pt: Mapped[str | None] = mapped_column(Text, nullable=True)
     comment_text_de: Mapped[str | None] = mapped_column(Text, nullable=True)
+    comment_text_it: Mapped[str | None] = mapped_column(Text, nullable=True)
+    comment_text_es: Mapped[str | None] = mapped_column(Text, nullable=True)
     style: Mapped[str] = mapped_column(String(20), nullable=False)
 
     match: Mapped["Match"] = relationship(back_populates="fun_comment")  # noqa: F821

@@ -7,6 +7,7 @@ from app.models.fun_comment import FunComment
 from app.models.match import Match
 from app.models.team import Team
 from app.models.venue import Venue
+from fun_comment_locales import locales_for_comment_bundle
 from match_comments import (
     MATCH_COMMENTS,
     KNOCKOUT_MATCH_COMMENTS,
@@ -35,41 +36,50 @@ def reseed_comments():
 
             if mn in MATCH_COMMENTS:
                 c = MATCH_COMMENTS[mn]
+                text_it, text_es = locales_for_comment_bundle(c)
                 db.add(FunComment(
                     match_id=m.id,
                     comment_text=c["en"],
                     comment_text_nl=c["nl"],
                     comment_text_pt=c["pt"],
                     comment_text_de=c["de"],
+                    comment_text_it=text_it,
+                    comment_text_es=text_es,
                     style=c["style"],
                 ))
                 count += 1
             elif mn in KNOCKOUT_MATCH_COMMENTS:
                 c = KNOCKOUT_MATCH_COMMENTS[mn]
+                text_it, text_es = locales_for_comment_bundle(c)
                 db.add(FunComment(
                     match_id=m.id,
                     comment_text=c["en"],
                     comment_text_nl=c["nl"],
                     comment_text_pt=c["pt"],
                     comment_text_de=c["de"],
+                    comment_text_it=text_it,
+                    comment_text_es=text_es,
                     style=c["style"],
                 ))
                 count += 1
             elif m.home_team_id is None:
                 style = random.choice(ALL_STYLE_NAMES)
                 tmpl = KNOCKOUT_TEMPLATES.get(style, KNOCKOUT_TEMPLATES["lineker"])
+                text_it, text_es = locales_for_comment_bundle(tmpl)
                 db.add(FunComment(
                     match_id=m.id,
                     comment_text=tmpl["en"],
                     comment_text_nl=tmpl["nl"],
                     comment_text_pt=tmpl["pt"],
                     comment_text_de=tmpl["de"],
+                    comment_text_it=text_it,
+                    comment_text_es=text_es,
                     style=style,
                 ))
                 count += 1
 
         db.commit()
-        print(f"Re-seeded {count} fun comments (4 languages each).")
+        print(f"Re-seeded {count} fun comments (6 languages each).")
         ko_custom = sum(
             1 for x in matches if x.match_number in KNOCKOUT_MATCH_COMMENTS
         )

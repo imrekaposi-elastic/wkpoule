@@ -73,6 +73,8 @@ class FunCommentOut(BaseModel):
     comment_text_nl: str | None = None
     comment_text_pt: str | None = None
     comment_text_de: str | None = None
+    comment_text_it: str | None = None
+    comment_text_es: str | None = None
     style: str
 
     model_config = {"from_attributes": True}

@@ -8,6 +8,7 @@ import VirtualGroupStandings from "../components/VirtualGroupStandings";
 import { resolveLocale } from "../i18n/languages";
 import { localizedTeam } from "../i18n/teamNames";
 import { formatStageSlug } from "../utils/formatStage";
+import { funCommentText } from "../utils/funCommentText";
 import {
   firstMatchNeedingPrediction,
   isKnockoutStage,
@@ -244,9 +245,7 @@ export default function MatchDetail() {
       const away = match.away_team ? localizedTeam(match.away_team, i18n.language) : t("matches.tbd");
       return `${home} נגד ${away}: המומחה צופה משחק מסקרן שבו הדירוג, המומנטום והאווירה באצטדיון יכולים להשפיע על כל מהלך.`;
     }
-    const fc = match.fun_comment as any;
-    const langField = `comment_text_${i18n.language}`;
-    return fc[langField] || fc.comment_text;
+    return funCommentText(match.fun_comment, i18n.language);
   })();
 
   return (

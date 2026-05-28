@@ -13,6 +13,54 @@ from app.models.user import User
 logger = logging.getLogger(__name__)
 
 
+def _backfill_fun_comment_it_es(conn) -> None:
+    """Fill Italian/Spanish commentary from EN/PT when columns were added to an existing DB."""
+    try:
+        from fun_comment_locales import (
+            derive_italian_from_english,
+            derive_spanish_from_portuguese,
+        )
+    except ImportError:
+        logger.debug("fun_comment_locales not importable; skipping IT/ES backfill")
+        return
+
+    dialect = conn.dialect.name
+    if dialect == "postgresql":
+        rows = conn.execute(
+            text(
+                "SELECT id, comment_text, comment_text_pt, comment_text_it, comment_text_es "
+                "FROM fun_comments"
+            )
+        ).fetchall()
+    else:
+        try:
+            rows = conn.execute(
+                text(
+                    "SELECT id, comment_text, comment_text_pt, comment_text_it, comment_text_es "
+                    "FROM fun_comments"
+                )
+            ).fetchall()
+        except Exception:
+            return
+
+    for row in rows:
+        rid, en, pt, it_val, es_val = row[0], row[1], row[2], row[3], row[4]
+        if not en:
+            continue
+        pt_src = pt or en
+        it_new = it_val or derive_italian_from_english(en)
+        es_new = es_val or derive_spanish_from_portuguese(pt_src)
+        if it_val == it_new and es_val == es_new:
+            continue
+        conn.execute(
+            text(
+                "UPDATE fun_comments SET comment_text_it = :it, comment_text_es = :es "
+                "WHERE id = :id"
+            ),
+            {"it": it_new, "es": es_new, "id": rid},
+        )
+
+
 def _backfill_venue_hebrew(conn) -> None:
     """Fill review_he / accessibility_he from seed_data when columns were added to an existing DB."""
     try:
@@ -64,6 +112,18 @@ def ensure_schema() -> None:
                     "ADD COLUMN IF NOT EXISTS advance_team_id INTEGER REFERENCES teams(id)"
                 )
             )
+            conn.execute(
+                text(
+                    "ALTER TABLE fun_comments "
+                    "ADD COLUMN IF NOT EXISTS comment_text_it TEXT"
+                )
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE fun_comments "
+                    "ADD COLUMN IF NOT EXISTS comment_text_es TEXT"
+                )
+            )
         elif dialect == "sqlite":
             insp = inspect(engine)
             user_cols = {c["name"] for c in insp.get_columns("users")}
@@ -96,8 +156,18 @@ def ensure_schema() -> None:
                         "ADD COLUMN advance_team_id INTEGER REFERENCES teams(id)"
                     )
                 )
+            fc_cols = {c["name"] for c in insp.get_columns("fun_comments")}
+            if "comment_text_it" not in fc_cols:
+                conn.execute(
+                    text("ALTER TABLE fun_comments ADD COLUMN comment_text_it TEXT")
+                )
+            if "comment_text_es" not in fc_cols:
+                conn.execute(
+                    text("ALTER TABLE fun_comments ADD COLUMN comment_text_es TEXT")
+                )
 
         _backfill_venue_hebrew(conn)
+        _backfill_fun_comment_it_es(conn)
 
         conn.execute(
             text(

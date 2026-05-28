@@ -23,52 +23,52 @@
     "close": "Cerrar"
   },
   "landing": {
-    "kicker": "Partido de pronósticos da Copa 2026",
-    "heroTitle": "Pronóstico em todos os partidos, desafía amigos e sigue a Copa como experto.",
-    "heroSubtitle": "Crea sua própria historia do torneo com marcadores, información dos estadios, análisis de expertos em estilo IA, subligas privadas e chat para seu grupo.",
+    "kicker": "Juego de pronósticos Copa del Mundo 2026",
+    "heroTitle": "Pronostica cada partido, desafía a tus amigos y sigue el Mundial como un experto.",
+    "heroSubtitle": "Crea tu propia historia del torneo con marcadores, información de estadios, análisis de expertos en estilo IA, subligas privadas y chat para tu grupo.",
     "registerCta": "Crear cuenta",
-    "loginCta": "Entrar",
-    "previewLabel": "Ajuda de pronóstico",
-    "previewTitle": "Seu próximo pronóstico",
+    "loginCta": "Iniciar sesión",
+    "previewLabel": "Ayuda de pronóstico",
+    "previewTitle": "Tu próximo pronóstico",
     "previewHome": "Local",
     "previewAway": "Visitante",
-    "previewExpert": "Dica do experto",
-    "previewExpertText": "Compara sua intuición com uma sugerencia de marcador antes de confirmar o pronóstico.",
-    "featuresKicker": "Tudo em uma liga",
-    "featuresTitle": "Mais que um formulário de marcador",
+    "previewExpert": "Consejo del experto",
+    "previewExpertText": "Compara tu instinto con una sugerencia de marcador del experto antes de confirmar tu pronóstico.",
+    "featuresKicker": "Todo en una liga",
+    "featuresTitle": "Más que un formulario de marcador",
     "features": {
       "venues": {
         "icon": "🏟️",
-        "title": "Informações dos estadios",
-        "text": "Explora estadios, cidades, condições esperadas, consejos de transporte e calendário de partidos."
+        "title": "Información de estadios",
+        "text": "Explora estadios, ciudades, condiciones previstas, consejos de transporte y calendario de partidos."
       },
       "analysis": {
         "icon": "🎙️",
-        "title": "Análise de expertos",
-        "text": "Lee comentários coloridos em estilo IA antes de fazer sua elige."
+        "title": "Análisis de expertos",
+        "text": "Lee comentarios coloridos en estilo IA antes de elegir."
       },
       "helper": {
         "icon": "📈",
-        "title": "Ajuda de pronóstico",
-        "text": "Use sugerencias de marcador baseadas no ranking como segunda opinión para cada partido."
+        "title": "Ayuda de pronóstico",
+        "text": "Usa sugerencias de marcador basadas en la clasificación como segunda opinión para cada partido."
       },
       "subleague": {
         "icon": "🏆",
         "title": "Subligas privadas",
-        "text": "Crea uma miniliga para amigos, familia ou colegas e sigue seu próprio ranking."
+        "text": "Crea una miniliga para amigos, familia o colegas y sigue tu propia clasificación."
       },
       "chat": {
         "icon": "💬",
-        "title": "Chat da subliga",
-        "text": "Provoca, celebra marcadores exactos e mantén a competición viva no grupo."
+        "title": "Chat de la subliga",
+        "text": "Provoca, celebra marcadores exactos y mantén viva la competición en tu grupo."
       }
     },
-    "expertsKicker": "Análise de expertos renombrados",
-    "expertsTitle": "Conheça o panel de expertos IA",
-    "expertsText": "Um reparto divertido de comentaristas inspirados em IA dá personalidad às prévias. Os avatares são versiones originais em cartoon cápsula hechas para este partido.",
+    "expertsKicker": "Análisis de expertos de renombre",
+    "expertsTitle": "Conoce el panel de expertos IA",
+    "expertsText": "Un elenco divertido de comentaristas inspirados en IA da personalidad a las previas. Sus avatares son versiones originales en caricatura cápsula hechas para este juego.",
     "aiVersion": "Versión IA",
-    "finalTitle": "Listo para entrar na liga?",
-    "finalText": "Regístrate, haz seus primeros pronósticos, invita sua subliga e disfruta a Copa 2026 juntos."
+    "finalTitle": "¿Listo para unirte a la liga?",
+    "finalText": "Regístrate, haz tus primeros pronósticos, invita tu subliga y disfruta la Copa 2026 juntos."
   },
   "adminScores": {
     "title": "Marcadores oficiales (plan B)",

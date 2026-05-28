@@ -488,6 +488,7 @@ KNOCKOUT_MATCHES = [
 # ---------------------------------------------------------------------------
 # Fun comments — imported from match_comments.py (unique per game)
 # ---------------------------------------------------------------------------
+from fun_comment_locales import locales_for_comment_bundle
 from match_comments import (
     MATCH_COMMENTS,
     KNOCKOUT_MATCH_COMMENTS,
@@ -569,35 +570,44 @@ def seed():
         for mn, m in match_objects.items():
             if mn in MATCH_COMMENTS:
                 c = MATCH_COMMENTS[mn]
+                text_it, text_es = locales_for_comment_bundle(c)
                 db.add(FunComment(
                     match_id=m.id,
                     comment_text=c["en"],
                     comment_text_nl=c["nl"],
                     comment_text_pt=c["pt"],
                     comment_text_de=c["de"],
+                    comment_text_it=text_it,
+                    comment_text_es=text_es,
                     style=c["style"],
                 ))
                 comment_count += 1
             elif mn in KNOCKOUT_MATCH_COMMENTS:
                 c = KNOCKOUT_MATCH_COMMENTS[mn]
+                text_it, text_es = locales_for_comment_bundle(c)
                 db.add(FunComment(
                     match_id=m.id,
                     comment_text=c["en"],
                     comment_text_nl=c["nl"],
                     comment_text_pt=c["pt"],
                     comment_text_de=c["de"],
+                    comment_text_it=text_it,
+                    comment_text_es=text_es,
                     style=c["style"],
                 ))
                 comment_count += 1
             elif m.home_team_id is None:
                 style = random.choice(ALL_STYLE_NAMES)
                 tmpl = KNOCKOUT_TEMPLATES.get(style, KNOCKOUT_TEMPLATES["lineker"])
+                text_it, text_es = locales_for_comment_bundle(tmpl)
                 db.add(FunComment(
                     match_id=m.id,
                     comment_text=tmpl["en"],
                     comment_text_nl=tmpl["nl"],
                     comment_text_pt=tmpl["pt"],
                     comment_text_de=tmpl["de"],
+                    comment_text_it=text_it,
+                    comment_text_es=text_es,
                     style=style,
                 ))
                 comment_count += 1
