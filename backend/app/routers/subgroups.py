@@ -1,4 +1,3 @@
-import re
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -25,9 +24,6 @@ from app.services.subgroup_rankings import compute_participant_rankings
 router = APIRouter()
 
 SUBGROUP_CHAT_MAX_MESSAGES = 256
-
-_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-
 
 def _normalize_email(email: str) -> str:
     return email.strip().lower()
@@ -411,9 +407,7 @@ def create_invite(
     if not m or m.role != "admin":
         raise HTTPException(status_code=403, detail="Only subgroup admins can invite")
 
-    email = _normalize_email(body.email)
-    if not _EMAIL_RE.match(email):
-        raise HTTPException(status_code=400, detail="Invalid email address")
+    email = _normalize_email(str(body.email))
     if email == _normalize_email(user.email):
         raise HTTPException(status_code=400, detail="You cannot invite yourself")
 

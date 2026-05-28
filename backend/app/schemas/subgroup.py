@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 from app.schemas.ranking import ParticipantRanking
 
@@ -40,7 +40,7 @@ class SubgroupDetailOut(BaseModel):
 
 
 class SubgroupInviteCreate(BaseModel):
-    email: str = Field(..., min_length=3, max_length=255)
+    email: EmailStr
 
 
 class SubgroupMessageCreate(BaseModel):

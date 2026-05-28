@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import { formatStageSlug } from "../utils/formatStage";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
 import { localizedTeam } from "../i18n/teamNames";
 import type { Match, MyPrediction, VirtualGroupTable } from "../types";
@@ -214,7 +215,7 @@ export default function Matches() {
                             ? t("matches.group", { letter: m.group_letter })
                             : t(
                                 `matches.${m.stage}`,
-                                m.stage.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+                                formatStageSlug(m.stage)
                               )}
                         </span>
                         <span className="text-gray-400">·</span>

@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import ExpertAvatar from "../components/ExpertAvatar";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
 import { localizedTeam } from "../i18n/teamNames";
+import { formatStageSlug } from "../utils/formatStage";
 import {
   firstMatchNeedingPrediction,
   isKnockoutStage,
@@ -264,7 +265,7 @@ export default function MatchDetail() {
               {t("matchDetail.match", { number: match.match_number })} &middot;{" "}
               {match.group_letter
                 ? t("matches.group", { letter: match.group_letter })
-                : match.stage.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                : formatStageSlug(match.stage)}
             </span>
             <span
               className={`px-2 py-0.5 rounded-full text-xs font-medium ${

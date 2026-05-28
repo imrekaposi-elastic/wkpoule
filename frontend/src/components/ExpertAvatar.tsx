@@ -294,7 +294,7 @@ function Mouth({ expression = "smile" }: { expression?: ExpertStyle["expression"
 export default function ExpertAvatar({ styleKey, label, size = "md" }: Props) {
   const expert = EXPERT_STYLES[styleKey as ExpertStyleKey] ?? EXPERT_STYLES.lineker;
   const sizeClass = size === "lg" ? "h-28 w-24" : size === "sm" ? "h-16 w-14" : "h-24 w-20";
-  const idSafe = styleKey.replace(/[^a-z0-9_-]/gi, "");
+  const idSafe = styleKey in EXPERT_STYLES ? styleKey : "lineker";
 
   return (
     <svg

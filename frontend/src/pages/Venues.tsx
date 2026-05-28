@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import { formatStageSlugSpacesOnly } from "../utils/formatStage";
 import { localizedTeamName, localizedVenueCountry } from "../i18n/teamNames";
 import type { VenueDetail, VenueScheduledMatch } from "../types";
 
@@ -58,7 +59,9 @@ function VenueMatchRow({
   const away = m.away_team_name
     ? localizedTeamName(m.away_team_code, m.away_team_name, locale)
     : t("venues.tbd");
-  const stage = t(`venues.stages.${m.stage}`, { defaultValue: m.stage.replace(/_/g, " ") });
+  const stage = t(`venues.stages.${m.stage}`, {
+    defaultValue: formatStageSlugSpacesOnly(m.stage),
+  });
   const groupHint =
     m.stage === "group" && m.group_letter
       ? ` · ${t("venues.groupLetter", { letter: m.group_letter })}`
