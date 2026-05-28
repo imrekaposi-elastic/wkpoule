@@ -16,7 +16,7 @@ from app.models.team import Team
 from app.schemas.match import TeamOut
 from app.services.annex_c import annex_lookup
 from app.schemas.ranking import GroupTable
-from app.services.prediction_advance import predicted_winner_team_id
+from app.services.knockout_winner import predicted_winner_team_id
 from app.services.virtual_standings import best_third_place_team_ids, compute_virtual_group_standings
 
 R16_SOURCES: dict[int, tuple[int, int]] = {
@@ -64,21 +64,6 @@ R32_STRUCTURE: dict[int, tuple[tuple[str, str], tuple[str, str]]] = {
     87: (("1", "K"), ("3", "K")),
     88: (("2", "D"), ("2", "G")),
 }
-
-
-def _winner_from_scores(
-    home_id: int,
-    away_id: int,
-    home_score: int,
-    away_score: int,
-    teams_by_id: dict[int, Team],
-) -> int:
-    if home_score > away_score:
-        return home_id
-    if home_score < away_score:
-        return away_id
-    th, ta = teams_by_id[home_id], teams_by_id[away_id]
-    return home_id if th.world_ranking <= ta.world_ranking else away_id
 
 
 def _first(gt_by: dict[str, GroupTable], letter: str) -> int | None:

@@ -2,7 +2,7 @@
 
 from types import SimpleNamespace
 
-from app.services.prediction_advance import predicted_winner_team_id
+from app.services.knockout_winner import predicted_winner_team_id
 
 
 def _team(team_id: int, ranking: int):

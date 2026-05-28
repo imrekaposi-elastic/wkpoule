@@ -6,8 +6,6 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.models.match import Match
-from app.models.team import Team
-from app.services.bracket_resolver import compute_predicted_knockout_teams
 from app.services.match_stages import is_knockout_stage
 
 
@@ -21,6 +19,8 @@ def resolve_fixture_team_ids(
         return match.home_team_id, match.away_team_id
     if not is_knockout_stage(match.stage) or match.match_number < 73:
         return match.home_team_id, match.away_team_id
+    from app.services.bracket_resolver import compute_predicted_knockout_teams
+
     predicted_map, _ = compute_predicted_knockout_teams(db, user_id)
     pair = predicted_map.get(match.match_number)
     if not pair:
@@ -73,21 +73,3 @@ def validate_advance_team_for_prediction(
             detail="Choose which team advances after a predicted draw",
         )
     return advance_team_id
-
-
-def predicted_winner_team_id(
-    home_id: int,
-    away_id: int,
-    home_score: int,
-    away_score: int,
-    teams_by_id: dict[int, Team],
-    advance_team_id: int | None,
-) -> int:
-    if home_score > away_score:
-        return home_id
-    if home_score < away_score:
-        return away_id
-    if advance_team_id is not None:
-        return advance_team_id
-    th, ta = teams_by_id[home_id], teams_by_id[away_id]
-    return home_id if th.world_ranking <= ta.world_ranking else away_id
