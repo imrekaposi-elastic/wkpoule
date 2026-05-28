@@ -11,7 +11,8 @@ from app.services.scoring import calculate_points
         (2, 1, 2, 1, 12, True, True, True),
         (1, 0, 2, 0, 3, True, False, False),
         (0, 0, 1, 1, 3, True, False, False),
-        (3, 2, 1, 0, 0, False, False, False),
+        (3, 2, 1, 0, 3, True, False, False),
+        (3, 2, 0, 1, 0, False, False, False),
         (2, 2, 1, 0, 0, False, False, False),
     ],
 )
