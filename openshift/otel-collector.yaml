@@ -9,15 +9,17 @@ spec:
   # EDOT collector image (OpenTelemetry Operator needs otelcol, not Fleet `elastic-agent`).
   image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.3.2
   env:
-    # Same API key style as Elasticsearch; ECE backend EDOT OTLP typically accepts ApiKey here.
+    # Direct Elasticsearch ingest (same pattern as backend EDOT gateway on otl01: elasticsearch/otel exporter).
+    - name: ELASTICSEARCH_URL
+      valueFrom:
+        configMapKeyRef:
+          name: wkpoule-observability-config
+          key: ELASTICSEARCH_URL
     - name: ELASTIC_API_KEY
       valueFrom:
         secretKeyRef:
           name: wkpoule-observability-secrets
           key: ELASTIC_API_KEY
-    # ECE: in-cluster gateway forwards OTLP to backend EDOT gateway (not direct ES from this collector).
-    - name: EDOT_BACKEND_OTLP_HTTP
-      value: http://172.16.64.135:4318
     # PostgreSQL receiver credentials (least-privileged user).
     - name: POSTGRES_OTEL_HOST
       valueFrom:
@@ -52,18 +54,7 @@ spec:
             endpoint: 0.0.0.0:4317
           http:
             endpoint: 0.0.0.0:4318
-      # Postgres exporter (sidecar on Service postgres:9187) → gateway → backend OTLP.
-      prometheus:
-        config:
-          scrape_configs:
-            - job_name: postgres
-              scrape_interval: 30s
-              scrape_timeout: 15s
-              metrics_path: /metrics
-              static_configs:
-                # FQDN avoids ambiguous DNS in some OpenShift / multitenant setups.
-                - targets: ["postgres.wkpoule-prd.svc.cluster.local:9187"]
-      # Direct PostgreSQL metrics via an OTel receiver (used by the PostgreSQL OTel integration).
+      # PostgreSQL: Elastic PostgreSQL OpenTelemetry Assets integration (postgresqlreceiver only).
       postgresql:
         endpoint: "${env:POSTGRES_OTEL_HOST}:${env:POSTGRES_OTEL_PORT}"
         transport: tcp
@@ -227,13 +218,16 @@ spec:
       elasticapm: {}
 
     exporters:
-      otlp_http/edot:
-        endpoint: ${env:EDOT_BACKEND_OTLP_HTTP}
+      elasticsearch/otel:
+        endpoints:
+          - ${env:ELASTICSEARCH_URL}
+        api_key: ${env:ELASTIC_API_KEY}
+        mapping:
+          mode: otel
+        # ECE: deployment URL hostname may not match cert SANs (*.ece.kaposi.net). Fix cert/URL on the
+        # platform when possible; same workaround as otl01 / scripts/edot-backend/patch_gateway_otel_tls.py.
         tls:
-          insecure: true
-        compression: gzip
-        headers:
-          Authorization: "ApiKey ${env:ELASTIC_API_KEY}"
+          insecure_skip_verify: true
 
     service:
       telemetry:
@@ -256,28 +250,24 @@ spec:
         traces:
           receivers: [otlp]
           processors: [memory_limiter, k8sattributes, resourcedetection/env, batch, elasticapm]
-          exporters: [elasticapm, otlp_http/edot]
+          exporters: [elasticapm, elasticsearch/otel]
         metrics:
           receivers: [otlp]
           processors: [memory_limiter, k8sattributes, resourcedetection/env, resource/otlp_metrics_env, elasticinframetrics, transform/kubelet_service_correlation, batch]
-          exporters: [otlp_http/edot]
-        metrics/postgres_exporter:
-          receivers: [prometheus]
-          processors: [memory_limiter, resource/postgres_metrics, batch]
-          exporters: [otlp_http/edot]
+          exporters: [elasticsearch/otel]
         metrics/postgresql:
           receivers: [postgresql]
           processors: [memory_limiter, resource/postgres_metrics, batch]
-          exporters: [otlp_http/edot]
+          exporters: [elasticsearch/otel]
         logs/postgresql:
           receivers: [postgresql]
           processors: [memory_limiter, resource/postgres_metrics, batch]
-          exporters: [otlp_http/edot]
+          exporters: [elasticsearch/otel]
         metrics/apm-aggregated:
           receivers: [elasticapm]
           processors: []
-          exporters: [otlp_http/edot]
+          exporters: [elasticsearch/otel]
         logs:
           receivers: [otlp]
           processors: [memory_limiter, k8sattributes, resourcedetection/env, transform/logs_k8s_events_datastream, batch]
-          exporters: [otlp_http/edot]
+          exporters: [elasticsearch/otel]

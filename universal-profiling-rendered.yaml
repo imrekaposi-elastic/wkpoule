@@ -1,0 +1,155 @@
+---
+# Source: profiling-agent/templates/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: universal-profiling
+  name: universal-profiling-host-agent
+automountServiceAccountToken: true
+---
+# Source: profiling-agent/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: universal-profiling
+  name: universal-profiling-9.3.3
+  labels:
+    name: pf-host-agent
+data:
+  pf-host-agent.conf: |
+    project-id 1
+    tracers all
+    verbose false
+    collection-agent 0a07eb70c1a6425b92f4246e00d43cfe.ece.kaposi.net:9243
+    secret-token 03p9K89z5m7G7MMI
+    disable-tls false
+    insecure true
+---
+# Source: profiling-agent/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: universal-profiling-cluster-discovery
+rules:
+  - verbs:
+      - get
+      - watch
+      - list
+    resources:
+      - nodes
+    apiGroups:
+      - ""
+---
+# Source: profiling-agent/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: universal-profiling-sa-view
+subjects:
+  - kind: ServiceAccount
+    name: universal-profiling-host-agent
+    namespace: universal-profiling
+roleRef:
+  kind: ClusterRole
+  name: view
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: profiling-agent/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: universal-profiling-sa-cluster-discovery
+subjects:
+  - kind: ServiceAccount
+    name: universal-profiling-host-agent
+    namespace: universal-profiling
+roleRef:
+  kind: ClusterRole
+  name: universal-profiling-cluster-discovery
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: profiling-agent/templates/daemonset.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  namespace: universal-profiling
+  name: universal-profiling
+  labels:
+    name: pf-host-agent
+    provider: Elastic
+spec:
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: "5%"
+  selector:
+    matchLabels:
+      app: profiling-agent
+      app.kubernetes.io/name: profiling-agent
+      app.kubernetes.io/part-of: continuous-profiling
+  template:
+    metadata:
+      annotations:
+          
+        checksum/config: 3a059acb169421a6304723d065a8a4bc831caeb0966673b95e14c26ae0303044
+      labels:
+        app: profiling-agent
+        app.kubernetes.io/name: profiling-agent
+        app.kubernetes.io/part-of: continuous-profiling
+        app.kubernetes.io/version: 9.3.3
+    spec:
+      hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: pf-host-agent
+          image: docker.elastic.co/observability/profiling-agent:9.3.3
+          command: [ "/root/pf-host-agent" ]
+          args:
+          resources:
+            limits:
+              memory: 400Mi
+            requests:
+              memory: 200Mi
+          env:
+              
+            - name: KUBERNETES_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - SYS_ADMIN
+          volumeMounts:
+            - name: config
+              mountPath: /etc/Elastic/universal-profiling
+              readOnly: true
+            - name: dbusmachineid
+              mountPath: /var/lib/dbus
+              readOnly: true
+            - name: etcmachineid
+              mountPath: /etc/machine-id
+              readOnly: true
+            - name: debugfs
+              mountPath: /sys/kernel/debug
+              readOnly: true
+      serviceAccountName: universal-profiling-host-agent
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: config
+          configMap:
+            name: universal-profiling-9.3.3
+        - name: dbusmachineid
+          hostPath:
+            path: /var/lib/dbus
+            type: DirectoryOrCreate
+        - name: etcmachineid
+          hostPath:
+            path: /etc/machine-id
+            type: File
+        - name: debugfs
+          hostPath:
+            path: /sys/kernel/debug
+            type: Directory

@@ -20,27 +20,9 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - postgres
-            - -c
-            - log_destination=stderr,csvlog
-            - -c
-            - logging_collector=on
-            - -c
-            - log_directory=/pglogs
-            - -c
-            - log_filename=postgresql.log
-            - -c
-            - log_connections=on
-            - -c
-            - log_disconnections=on
-            - -c
-            - log_min_duration_statement=1000
-            # Required by the PostgreSQL OTel receiver for top-query events (pg_stat_statements).
+            # Required by the PostgreSQL OTel receiver (Elastic PostgreSQL OpenTelemetry Assets).
             - -c
             - shared_preload_libraries=pg_stat_statements
-            # vector-logs runs non-root: permissions must allow group/other read. Use decimal 420 (= chmod 0644)
-            # so leading-zero stripping (YAML/K8s) cannot turn 0644 into invalid 644.
-            - -c
-            - log_file_mode=420
           ports:
             - containerPort: 5432
           env:
@@ -57,8 +39,6 @@ spec:
             # often denies that bit on emptyDir—the failure is ignored and PostgreSQL continues.
             - name: postgres-run
               mountPath: /var/run/postgresql
-            - name: pglogs
-              mountPath: /pglogs
           readinessProbe:
             exec:
               command:
@@ -67,68 +47,11 @@ spec:
                 - wkpoule
             initialDelaySeconds: 5
             periodSeconds: 10
-        # Prometheus-format metrics → scraped by wkpoule-otel (prometheus receiver) → Elasticsearch.
-        - name: postgres-exporter
-          image: quay.io/prometheuscommunity/postgres-exporter:v0.15.0
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 9187
-              name: metrics
-          env:
-            - name: DATA_SOURCE_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: wkpoule-secrets
-                  key: POSTGRES_EXPORTER_DSN
-          readinessProbe:
-            tcpSocket:
-              port: metrics
-            initialDelaySeconds: 5
-            periodSeconds: 15
-        # Ship CSV logs from /pglogs to Elasticsearch (same cluster as wkpoule-otel).
-        - name: vector-logs
-          image: docker.io/timberio/vector:0.41.1-debian
-          imagePullPolicy: IfNotPresent
-          args: ["--config", "/etc/vector/vector.yaml"]
-          env:
-            - name: ELASTICSEARCH_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: wkpoule-observability-config
-                  key: ELASTICSEARCH_URL
-            - name: ELASTIC_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: wkpoule-observability-secrets
-                  key: ELASTIC_API_KEY
-          ports:
-            - containerPort: 8686
-              name: vector-api
-          volumeMounts:
-            - name: pglogs
-              mountPath: /pglogs
-              readOnly: true
-            - name: vector-config
-              mountPath: /etc/vector
-            - name: vector-data
-              mountPath: /var/lib/vector
-          readinessProbe:
-            tcpSocket:
-              port: vector-api
-            initialDelaySeconds: 10
-            periodSeconds: 15
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
             claimName: wkpoule-postgres-pvc
-        - name: pglogs
-          emptyDir: {}
         - name: postgres-run
-          emptyDir: {}
-        - name: vector-config
-          configMap:
-            name: wkpoule-postgres-vector
-        - name: vector-data
           emptyDir: {}
 ---
 apiVersion: v1
@@ -142,6 +65,3 @@ spec:
     - name: postgres
       port: 5432
       targetPort: 5432
-    - name: metrics
-      port: 9187
-      targetPort: 9187

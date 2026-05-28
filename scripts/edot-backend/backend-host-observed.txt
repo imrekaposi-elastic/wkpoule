@@ -28,3 +28,6 @@ Workaround applied on gateway: elasticsearch/otel exporter in /etc/edot/otel.yml
   tls.insecure_skip_verify: true (see patch_gateway_otel_tls.py in this folder). Prefer fixing
   the ECE deployment proxy certificate or using a URL whose hostname is in the cert SANs, then
   remove insecure_skip_verify.
+
+OpenShift in-cluster gateway (wkpoule-otel) mirrors this export path: see openshift/otel-collector.yaml
+  exporters.elasticsearch/otel (endpoints from ELASTICSEARCH_URL, api_key, mapping.mode otel, same TLS workaround).
