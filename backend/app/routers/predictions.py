@@ -9,6 +9,7 @@ from app.models.user import User
 from app.schemas.prediction import MyPredictionOut, PredictionOut, PredictionRequest
 from app.schemas.prediction_milestone import PredictionMilestoneOut
 from app.schemas.ranking import VirtualGroupTable
+from app.services.prediction_advance import validate_advance_team_for_prediction
 from app.services.prediction_lock import match_accepts_prediction_updates
 from app.services.prediction_milestones import list_milestones_for_user, record_new_milestones
 from app.services.scoring import calculate_points
@@ -48,6 +49,10 @@ def upsert_prediction(
             detail="Predictions cannot be changed within 4 hours of kickoff",
         )
 
+    advance_team_id = validate_advance_team_for_prediction(
+        match, body.home_score, body.away_score, body.advance_team_id
+    )
+
     pred = (
         db.query(Prediction)
         .filter(Prediction.user_id == user.id, Prediction.match_id == match_id)
@@ -56,12 +61,14 @@ def upsert_prediction(
     if pred:
         pred.home_score = body.home_score
         pred.away_score = body.away_score
+        pred.advance_team_id = advance_team_id
     else:
         pred = Prediction(
             user_id=user.id,
             match_id=match_id,
             home_score=body.home_score,
             away_score=body.away_score,
+            advance_team_id=advance_team_id,
         )
         db.add(pred)
     db.commit()
@@ -75,6 +82,7 @@ def upsert_prediction(
         match_id=pred.match_id,
         home_score=pred.home_score,
         away_score=pred.away_score,
+        advance_team_id=pred.advance_team_id,
         points=None,
         created_at=pred.created_at,
         updated_at=pred.updated_at,
@@ -168,6 +176,7 @@ def match_predictions(
                 match_id=p.match_id,
                 home_score=p.home_score,
                 away_score=p.away_score,
+                advance_team_id=p.advance_team_id,
                 points=pts,
                 created_at=p.created_at,
                 updated_at=p.updated_at,

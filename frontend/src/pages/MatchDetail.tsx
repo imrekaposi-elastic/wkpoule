@@ -6,6 +6,11 @@ import { useAuth } from "../context/AuthContext";
 import ExpertAvatar from "../components/ExpertAvatar";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
 import { localizedTeam } from "../i18n/teamNames";
+import {
+  firstMatchNeedingPrediction,
+  isKnockoutStage,
+  isPredictedDraw,
+} from "../utils/predictions";
 import type { Match, MyPrediction, Prediction, VirtualGroupTable } from "../types";
 
 const LOCALE_MAP: Record<string, string> = {
@@ -44,6 +49,7 @@ export default function MatchDetail() {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [homeScore, setHomeScore] = useState<ScoreInput>("");
   const [awayScore, setAwayScore] = useState<ScoreInput>("");
+  const [advanceTeamId, setAdvanceTeamId] = useState<number | null>(null);
   const [predictionTipDismissed, setPredictionTipDismissed] = useState(readPredictionTipDismissed);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -82,6 +88,7 @@ export default function MatchDetail() {
     setLoading(true);
     setHomeScore("");
     setAwayScore("");
+    setAdvanceTeamId(null);
     setVirtualStandings(null);
 
     const applyPredScores = (rows: Prediction[]) => {
@@ -89,9 +96,11 @@ export default function MatchDetail() {
       if (myPred) {
         setHomeScore(myPred.home_score);
         setAwayScore(myPred.away_score);
+        setAdvanceTeamId(myPred.advance_team_id ?? null);
       } else {
         setHomeScore("");
         setAwayScore("");
+        setAdvanceTeamId(null);
       }
     };
 
@@ -124,6 +133,7 @@ export default function MatchDetail() {
             setPredictions([]);
             setHomeScore("");
             setAwayScore("");
+            setAdvanceTeamId(null);
           }
         }
       } catch {
@@ -158,9 +168,19 @@ export default function MatchDetail() {
         setMessage(t("matchDetail.scoresRequired"));
         return;
       }
+      const knockoutDraw =
+        isKnockoutStage(match.stage) &&
+        isPredictedDraw(homeScore, awayScore) &&
+        match.home_team &&
+        match.away_team;
+      if (knockoutDraw && advanceTeamId === null) {
+        setMessage(t("matchDetail.advanceTeamRequired"));
+        return;
+      }
       await api.put(`/predictions/${match.id}`, {
         home_score: homeScore,
         away_score: awayScore,
+        advance_team_id: knockoutDraw ? advanceTeamId : null,
       });
       const predRes = await api.get<Prediction[]>(`/predictions/match/${match.id}`);
       setPredictions(predRes.data);
@@ -174,10 +194,7 @@ export default function MatchDetail() {
       const allMatches = await api.get<Match[]>("/matches", {
         params: { predicted_teams: "true" },
       });
-      const nextEmpty = allMatches.data
-        .filter((m) => m.status === "upcoming" && m.prediction_editable)
-        .sort((a, b) => a.match_number - b.match_number)
-        .find((m) => !predictedIds.has(m.id));
+      const nextEmpty = firstMatchNeedingPrediction(allMatches.data, predictedIds);
 
       if (nextEmpty && nextEmpty.match_number !== match.match_number) {
         navigate(`/matches/${nextEmpty.match_number}`, { replace: true });
@@ -206,6 +223,18 @@ export default function MatchDetail() {
   const canEditPrediction =
     match.status === "upcoming" && match.prediction_editable;
   const myPredRow = predictions.find((p) => p.user_id === user?.id);
+  const showKnockoutAfter90Hint = isKnockoutStage(match.stage);
+  const showAdvancePicker =
+    canEditPrediction &&
+    isKnockoutStage(match.stage) &&
+    isPredictedDraw(homeScore, awayScore) &&
+    Boolean(match.home_team && match.away_team);
+  const advanceTeamLabel = (teamId: number | null | undefined) => {
+    if (!teamId || !match.home_team || !match.away_team) return null;
+    if (teamId === match.home_team.id) return localizedTeam(match.home_team, i18n.language);
+    if (teamId === match.away_team.id) return localizedTeam(match.away_team, i18n.language);
+    return null;
+  };
   const readOnlyPredictionBoxClass =
     "rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 opacity-90";
   const readOnlyPredictionScoreClass =
@@ -399,6 +428,11 @@ export default function MatchDetail() {
           </h3>
           {canEditPrediction ? (
             <form onSubmit={handleSubmit}>
+              {showKnockoutAfter90Hint && (
+                <p className="mb-4 text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
+                  {t("matchDetail.knockoutAfter90Hint")}
+                </p>
+              )}
               {!predictionTipDismissed && (
                 <div className="mb-4 rounded-lg border border-sky-200 bg-sky-50 px-3 py-3 text-sm text-sky-950">
                   <p className="mb-3 leading-relaxed">{t("matchDetail.predictionProgressTip")}</p>
@@ -431,7 +465,12 @@ export default function MatchDetail() {
                     min={0}
                     max={20}
                     value={homeScore === "" ? "" : homeScore}
-                    onChange={(e) => setHomeScore(parseScoreField(e.target.value))}
+                    onChange={(e) => {
+                      setHomeScore(parseScoreField(e.target.value));
+                      const nextHome = parseScoreField(e.target.value);
+                      const away = awayScore === "" ? "" : awayScore;
+                      if (!isPredictedDraw(nextHome, away)) setAdvanceTeamId(null);
+                    }}
                     className="w-full max-w-[5.5rem] mx-auto sm:w-20 text-center text-2xl font-bold border border-gray-300 rounded-lg py-2 focus:ring-2 focus:ring-pitch-600 outline-none"
                     inputMode="numeric"
                   />
@@ -446,15 +485,71 @@ export default function MatchDetail() {
                     min={0}
                     max={20}
                     value={awayScore === "" ? "" : awayScore}
-                    onChange={(e) => setAwayScore(parseScoreField(e.target.value))}
+                    onChange={(e) => {
+                      setAwayScore(parseScoreField(e.target.value));
+                      const nextAway = parseScoreField(e.target.value);
+                      const home = homeScore === "" ? "" : homeScore;
+                      if (!isPredictedDraw(home, nextAway)) setAdvanceTeamId(null);
+                    }}
                     className="w-full max-w-[5.5rem] mx-auto sm:w-20 text-center text-2xl font-bold border border-gray-300 rounded-lg py-2 focus:ring-2 focus:ring-pitch-600 outline-none"
                     inputMode="numeric"
                   />
                 </div>
               </div>
+              {showAdvancePicker && match.home_team && match.away_team && (
+                <fieldset className="mb-4 rounded-lg border border-pitch-200 bg-pitch-50/50 px-3 py-3">
+                  <legend className="text-sm font-medium text-pitch-900 px-1">
+                    {t("matchDetail.advanceTeamLegend")}
+                  </legend>
+                  <p className="text-xs text-gray-600 mb-3">{t("matchDetail.advanceTeamHelp")}</p>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <label
+                      className={`flex items-center gap-2 rounded-lg border px-3 py-2 cursor-pointer flex-1 ${
+                        advanceTeamId === match.home_team.id
+                          ? "border-pitch-600 bg-white ring-1 ring-pitch-600"
+                          : "border-gray-200 bg-white hover:border-pitch-300"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="advanceTeam"
+                        className="text-pitch-600 focus:ring-pitch-500"
+                        checked={advanceTeamId === match.home_team.id}
+                        onChange={() => setAdvanceTeamId(match.home_team!.id)}
+                      />
+                      <span className="text-sm font-medium truncate">
+                        {localizedTeam(match.home_team, i18n.language)}
+                      </span>
+                    </label>
+                    <label
+                      className={`flex items-center gap-2 rounded-lg border px-3 py-2 cursor-pointer flex-1 ${
+                        advanceTeamId === match.away_team.id
+                          ? "border-pitch-600 bg-white ring-1 ring-pitch-600"
+                          : "border-gray-200 bg-white hover:border-pitch-300"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="advanceTeam"
+                        className="text-pitch-600 focus:ring-pitch-500"
+                        checked={advanceTeamId === match.away_team.id}
+                        onChange={() => setAdvanceTeamId(match.away_team!.id)}
+                      />
+                      <span className="text-sm font-medium truncate">
+                        {localizedTeam(match.away_team, i18n.language)}
+                      </span>
+                    </label>
+                  </div>
+                </fieldset>
+              )}
               <button
                 type="submit"
-                disabled={saving || homeScore === "" || awayScore === ""}
+                disabled={
+                  saving ||
+                  homeScore === "" ||
+                  awayScore === "" ||
+                  (showAdvancePicker && advanceTeamId === null)
+                }
                 className="w-full bg-pitch-600 hover:bg-pitch-700 text-white py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50"
               >
                 {saving ? t("matchDetail.saving") : t("matchDetail.savePrediction")}
@@ -473,12 +568,20 @@ export default function MatchDetail() {
             <div className="text-center py-2 space-y-3">
               <p className="text-gray-500">{t("matchDetail.lockedBeforeKickoff")}</p>
               {myPredRow ? (
-                <div
-                  className={`${readOnlyPredictionBoxClass} flex flex-wrap items-center justify-center gap-x-4 gap-y-1 w-full max-w-full pointer-events-none select-none`}
-                >
-                  <span className={readOnlyPredictionScoreClass}>{myPredRow.home_score}</span>
-                  <span className="text-gray-300 text-xl">-</span>
-                  <span className={readOnlyPredictionScoreClass}>{myPredRow.away_score}</span>
+                <div className={`${readOnlyPredictionBoxClass} space-y-2 text-center`}>
+                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pointer-events-none select-none">
+                    <span className={readOnlyPredictionScoreClass}>{myPredRow.home_score}</span>
+                    <span className="text-gray-300 text-xl">-</span>
+                    <span className={readOnlyPredictionScoreClass}>{myPredRow.away_score}</span>
+                  </div>
+                  {myPredRow.home_score === myPredRow.away_score &&
+                    advanceTeamLabel(myPredRow.advance_team_id) && (
+                      <p className="text-xs text-gray-500">
+                        {t("matchDetail.advanceTeamReadOnly", {
+                          team: advanceTeamLabel(myPredRow.advance_team_id),
+                        })}
+                      </p>
+                    )}
                 </div>
               ) : (
                 <p className="text-sm text-gray-400">{t("matchDetail.noPredictionBeforeLock")}</p>
@@ -488,12 +591,20 @@ export default function MatchDetail() {
             <div className="text-center py-2 space-y-3">
               <p className="text-gray-500">{t("matchDetail.predictionReadOnly")}</p>
               {myPredRow ? (
-                <div
-                  className={`${readOnlyPredictionBoxClass} flex flex-wrap items-center justify-center gap-x-4 gap-y-1 w-full max-w-full pointer-events-none select-none`}
-                >
-                  <span className={readOnlyPredictionScoreClass}>{myPredRow.home_score}</span>
-                  <span className="text-gray-300 text-xl">-</span>
-                  <span className={readOnlyPredictionScoreClass}>{myPredRow.away_score}</span>
+                <div className={`${readOnlyPredictionBoxClass} space-y-2 text-center`}>
+                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pointer-events-none select-none">
+                    <span className={readOnlyPredictionScoreClass}>{myPredRow.home_score}</span>
+                    <span className="text-gray-300 text-xl">-</span>
+                    <span className={readOnlyPredictionScoreClass}>{myPredRow.away_score}</span>
+                  </div>
+                  {myPredRow.home_score === myPredRow.away_score &&
+                    advanceTeamLabel(myPredRow.advance_team_id) && (
+                      <p className="text-xs text-gray-500">
+                        {t("matchDetail.advanceTeamReadOnly", {
+                          team: advanceTeamLabel(myPredRow.advance_team_id),
+                        })}
+                      </p>
+                    )}
                 </div>
               ) : (
                 <p className="text-sm text-gray-400">{t("matchDetail.locked")}</p>

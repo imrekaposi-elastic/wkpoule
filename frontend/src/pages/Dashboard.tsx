@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { localizedTeamName } from "../i18n/teamNames";
+import { firstMatchNeedingPrediction } from "../utils/predictions";
 import type {
   Match,
   MyPrediction,
@@ -25,7 +26,7 @@ const TOTAL_PREDICTIONS = 104;
 export default function Dashboard() {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
-  const [nextMatch, setNextMatch] = useState<Match | null>(null);
+  const [matchToPredict, setMatchToPredict] = useState<Match | null>(null);
   const [myRank, setMyRank] = useState<ParticipantRanking | null>(null);
   const [recentPredictions, setRecentPredictions] = useState<MyPrediction[]>([]);
   const [subgroupMine, setSubgroupMine] = useState<SubgroupMine[]>([]);
@@ -62,14 +63,10 @@ export default function Dashboard() {
       api.get<SubgroupMine[]>("/subgroups/mine").catch(() => ({ data: [] as SubgroupMine[] })),
     ])
       .then(([matchesRes, rankingsRes, predsRes, subRes]) => {
-        const upcoming = matchesRes.data
-          .filter((m) => m.status === "upcoming")
-          .sort(
-            (a, b) =>
-              new Date(a.kickoff_utc).getTime() -
-              new Date(b.kickoff_utc).getTime()
-          );
-        setNextMatch(upcoming[0] || null);
+        const predictedIds = new Set(predsRes.data.map((p) => p.match_id));
+        setMatchToPredict(
+          firstMatchNeedingPrediction(matchesRes.data, predictedIds),
+        );
         const me = rankingsRes.data.find((r) => r.user_id === user?.id);
         setMyRank(me || null);
         setRecentPredictions(predsRes.data.slice(-5).reverse());
@@ -163,30 +160,37 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Next Match Card */}
+        {/* Next match to predict */}
         <div className="bg-white rounded-xl shadow-md p-6">
           <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-            {t("dashboard.nextMatch")}
+            {t("dashboard.nextToPredict")}
           </h2>
-          {nextMatch ? (
+          {matchToPredict ? (
             <div className="mt-3">
+              <p className="text-xs text-gray-500 mb-2">
+                {t("dashboard.matchNumber", { number: matchToPredict.match_number })}
+              </p>
               <div className="flex items-center gap-3">
-                {nextMatch.home_team && (
+                {matchToPredict.home_team ? (
                   <div className="flex items-center gap-1.5">
-                    <img src={nextMatch.home_team.flag_url} alt="" className="w-6 h-4 object-cover rounded-sm" />
-                    <span className="font-semibold text-sm">{nextMatch.home_team.fifa_code}</span>
+                    <img src={matchToPredict.home_team.flag_url} alt="" className="w-6 h-4 object-cover rounded-sm" />
+                    <span className="font-semibold text-sm">{matchToPredict.home_team.fifa_code}</span>
                   </div>
+                ) : (
+                  <span className="text-sm text-gray-400">{t("dashboard.tbd")}</span>
                 )}
                 <span className="text-gray-400 text-xs">{t("dashboard.vs")}</span>
-                {nextMatch.away_team && (
+                {matchToPredict.away_team ? (
                   <div className="flex items-center gap-1.5">
-                    <img src={nextMatch.away_team.flag_url} alt="" className="w-6 h-4 object-cover rounded-sm" />
-                    <span className="font-semibold text-sm">{nextMatch.away_team.fifa_code}</span>
+                    <img src={matchToPredict.away_team.flag_url} alt="" className="w-6 h-4 object-cover rounded-sm" />
+                    <span className="font-semibold text-sm">{matchToPredict.away_team.fifa_code}</span>
                   </div>
+                ) : (
+                  <span className="text-sm text-gray-400">{t("dashboard.tbd")}</span>
                 )}
               </div>
               <p className="mt-2 text-sm text-gray-500">
-                {new Date(nextMatch.kickoff_utc).toLocaleDateString(locale, {
+                {new Date(matchToPredict.kickoff_utc).toLocaleDateString(locale, {
                   weekday: "short",
                   month: "short",
                   day: "numeric",
@@ -194,18 +198,20 @@ export default function Dashboard() {
                   minute: "2-digit",
                 })}
               </p>
-              <p className="text-sm text-gray-500">{nextMatch.venue.name}</p>
+              <p className="text-sm text-gray-500">{matchToPredict.venue.name}</p>
               <Link
-                to={`/matches/${nextMatch.match_number}`}
-                className="mt-2 inline-block text-sm text-pitch-600 hover:underline"
+                to={`/matches/${matchToPredict.match_number}`}
+                className="mt-2 inline-block text-sm text-pitch-600 hover:underline font-medium"
               >
-                {nextMatch.prediction_editable
-                  ? t("dashboard.makePrediction")
-                  : t("dashboard.viewMatch")}
+                {t("dashboard.makePrediction")}
               </Link>
             </div>
+          ) : predictionsComplete ? (
+            <p className="mt-3 text-green-700 text-sm font-medium">
+              {t("dashboard.allPredictionsComplete")}
+            </p>
           ) : (
-            <p className="mt-3 text-gray-500">{t("dashboard.noUpcoming")}</p>
+            <p className="mt-3 text-gray-500">{t("dashboard.noMatchesToPredict")}</p>
           )}
         </div>
       </div>

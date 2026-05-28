@@ -58,6 +58,12 @@ def ensure_schema() -> None:
                     "ALTER TABLE venues ADD COLUMN IF NOT EXISTS accessibility_he TEXT"
                 )
             )
+            conn.execute(
+                text(
+                    "ALTER TABLE predictions "
+                    "ADD COLUMN IF NOT EXISTS advance_team_id INTEGER REFERENCES teams(id)"
+                )
+            )
         elif dialect == "sqlite":
             insp = inspect(engine)
             user_cols = {c["name"] for c in insp.get_columns("users")}
@@ -81,6 +87,14 @@ def ensure_schema() -> None:
             if "accessibility_he" not in vcols:
                 conn.execute(
                     text("ALTER TABLE venues ADD COLUMN accessibility_he TEXT")
+                )
+            pred_cols = {c["name"] for c in insp.get_columns("predictions")}
+            if "advance_team_id" not in pred_cols:
+                conn.execute(
+                    text(
+                        "ALTER TABLE predictions "
+                        "ADD COLUMN advance_team_id INTEGER REFERENCES teams(id)"
+                    )
                 )
 
         _backfill_venue_hebrew(conn)

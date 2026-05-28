@@ -16,6 +16,7 @@ from app.models.team import Team
 from app.schemas.match import TeamOut
 from app.services.annex_c import annex_lookup
 from app.schemas.ranking import GroupTable
+from app.services.prediction_advance import predicted_winner_team_id
 from app.services.virtual_standings import best_third_place_team_ids, compute_virtual_group_standings
 
 R16_SOURCES: dict[int, tuple[int, int]] = {
@@ -203,7 +204,14 @@ def compute_predicted_knockout_teams(
         p = pred_by_mid.get(m.id)
         if p is None:
             return None
-        return _winner_from_scores(home_id, away_id, p.home_score, p.away_score, teams_by_id)
+        return predicted_winner_team_id(
+            home_id,
+            away_id,
+            p.home_score,
+            p.away_score,
+            teams_by_id,
+            p.advance_team_id,
+        )
 
     for mn in range(73, 89):
         computed[mn] = r32_pairs.get(mn, (None, None))
@@ -240,7 +248,9 @@ def compute_predicted_knockout_teams(
         p = pred_by_mid.get(m.id)
         if p is None:
             return None
-        w = _winner_from_scores(hid, aid, p.home_score, p.away_score, teams_by_id)
+        w = predicted_winner_team_id(
+            hid, aid, p.home_score, p.away_score, teams_by_id, p.advance_team_id
+        )
         return aid if w == hid else hid
 
     computed[103] = (loser_from(101), loser_from(102))

@@ -15,6 +15,10 @@ class Prediction(Base):
     match_id: Mapped[int] = mapped_column(Integer, ForeignKey("matches.id"), nullable=False)
     home_score: Mapped[int] = mapped_column(Integer, nullable=False)
     away_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    # Knockout only: when predicted score is a draw, which team advances (penalties/extra time).
+    advance_team_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("teams.id"), nullable=True
+    )
     points: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

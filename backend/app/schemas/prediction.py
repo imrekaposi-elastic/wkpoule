@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 class PredictionRequest(BaseModel):
     home_score: int = Field(ge=0, le=20)
     away_score: int = Field(ge=0, le=20)
+    advance_team_id: int | None = None
 
 
 class PredictionOut(BaseModel):
@@ -15,6 +16,7 @@ class PredictionOut(BaseModel):
     match_id: int
     home_score: int
     away_score: int
+    advance_team_id: int | None = None
     points: int | None = None
     created_at: datetime
     updated_at: datetime

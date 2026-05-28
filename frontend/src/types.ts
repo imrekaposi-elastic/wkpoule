@@ -135,6 +135,8 @@ export interface Prediction {
   match_id: number;
   home_score: number;
   away_score: number;
+  /** Knockout draw: team predicted to advance */
+  advance_team_id?: number | null;
   points: number | null;
   created_at: string;
   updated_at: string;
