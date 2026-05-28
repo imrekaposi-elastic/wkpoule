@@ -54,3 +54,20 @@ def test_knockout_draw_requires_advance_team():
 
     with pytest.raises(HTTPException):
         validate_advance_team_for_prediction(match, 1, 1, 99)
+
+
+def test_knockout_draw_accepts_resolved_team_ids_when_match_row_is_tbd():
+    """Knockout rows often have NULL home_team_id/away_team_id; UI uses bracket resolution."""
+    match = _knockout_match()
+    match.home_team_id = None
+    match.away_team_id = None
+
+    assert (
+        validate_advance_team_for_prediction(
+            match, 0, 0, 2, home_team_id=1, away_team_id=2
+        )
+        == 2
+    )
+
+    with pytest.raises(HTTPException):
+        validate_advance_team_for_prediction(match, 0, 0, 2)

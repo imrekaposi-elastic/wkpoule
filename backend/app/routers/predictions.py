@@ -9,7 +9,10 @@ from app.models.user import User
 from app.schemas.prediction import MyPredictionOut, PredictionOut, PredictionRequest
 from app.schemas.prediction_milestone import PredictionMilestoneOut
 from app.schemas.ranking import VirtualGroupTable
-from app.services.prediction_advance import validate_advance_team_for_prediction
+from app.services.prediction_advance import (
+    resolve_fixture_team_ids,
+    validate_advance_team_for_prediction,
+)
 from app.services.prediction_lock import match_accepts_prediction_updates
 from app.services.prediction_milestones import list_milestones_for_user, record_new_milestones
 from app.services.scoring import calculate_points
@@ -49,8 +52,14 @@ def upsert_prediction(
             detail="Predictions cannot be changed within 4 hours of kickoff",
         )
 
+    home_tid, away_tid = resolve_fixture_team_ids(db, match, user.id)
     advance_team_id = validate_advance_team_for_prediction(
-        match, body.home_score, body.away_score, body.advance_team_id
+        match,
+        body.home_score,
+        body.away_score,
+        body.advance_team_id,
+        home_team_id=home_tid,
+        away_team_id=away_tid,
     )
 
     pred = (
