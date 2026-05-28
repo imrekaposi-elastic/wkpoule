@@ -13,7 +13,7 @@ def test_register_login_and_me(client):
     )
     assert register.status_code == 201
     assert register.json()["username"] == "player1"
-    assert register.json()["preferred_language"] == "nl"
+    assert register.json()["preferred_language"] == "es"
 
     login = client.post(
         "/api/auth/login",
