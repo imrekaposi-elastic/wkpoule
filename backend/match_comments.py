@@ -937,3 +937,7 @@ KNOCKOUT_TEMPLATES = {
         "de": "K.o.-Zeit, Baby — hier gehen Nerven supernova und Legenden werden aus purem, schreiendem Kohlenstoff geschmiedet! Kein Sicherheitsnetz, kein Kissen — nur neunzig Minuten Fußball-Blitz! Jemand geht als Held aus Donner hinaus; jemand anderes wird zusammengefaltet wie ein billiger Klappstuhl! Großartiger Wahnsinn!",
     },
 }
+
+from match_comments_locale_es_it import merge_into as _merge_es_it
+
+_merge_es_it(MATCH_COMMENTS, KNOCKOUT_MATCH_COMMENTS, KNOCKOUT_TEMPLATES)

@@ -2,7 +2,7 @@
 
 import logging
 
-from sqlalchemy import inspect, text
+from sqlalchemy import bindparam, inspect, text
 from sqlalchemy.orm import Session
 
 from app.auth import hash_password
@@ -14,42 +14,53 @@ logger = logging.getLogger(__name__)
 
 
 def _backfill_fun_comment_it_es(conn) -> None:
-    """Fill Italian/Spanish commentary from EN/PT when columns were added to an existing DB."""
+    """Fill Italian/Spanish from native match_comments data when DB rows predate es/it columns."""
     try:
-        from fun_comment_locales import (
-            derive_italian_from_english,
-            derive_spanish_from_portuguese,
+        from match_comments import (
+            KNOCKOUT_MATCH_COMMENTS,
+            KNOCKOUT_TEMPLATES,
+            MATCH_COMMENTS,
         )
+        from fun_comment_locales import locales_for_comment_bundle
     except ImportError:
-        logger.debug("fun_comment_locales not importable; skipping IT/ES backfill")
+        logger.debug("match_comments locales not importable; skipping IT/ES backfill")
         return
 
-    dialect = conn.dialect.name
-    if dialect == "postgresql":
+    try:
         rows = conn.execute(
             text(
-                "SELECT id, comment_text, comment_text_pt, comment_text_it, comment_text_es "
+                "SELECT id, match_id, comment_text_it, comment_text_es, style "
                 "FROM fun_comments"
             )
         ).fetchall()
-    else:
-        try:
-            rows = conn.execute(
-                text(
-                    "SELECT id, comment_text, comment_text_pt, comment_text_it, comment_text_es "
-                    "FROM fun_comments"
-                )
-            ).fetchall()
-        except Exception:
-            return
+    except Exception:
+        return
 
-    for row in rows:
-        rid, en, pt, it_val, es_val = row[0], row[1], row[2], row[3], row[4]
-        if not en:
+    match_ids = {r[1]: r[0] for r in rows}
+    match_numbers = {}
+    if match_ids:
+        mn_rows = conn.execute(
+            text("SELECT id, match_number FROM matches WHERE id IN :ids").bindparams(
+                bindparam("ids", expanding=True)
+            ),
+            {"ids": list(match_ids.keys())},
+        ).fetchall()
+        match_numbers = {mid: mn for mid, mn in mn_rows}
+
+    for rid, match_id, it_val, es_val, style in rows:
+        mn = match_numbers.get(match_id)
+        if mn is None:
             continue
-        pt_src = pt or en
-        it_new = it_val or derive_italian_from_english(en)
-        es_new = es_val or derive_spanish_from_portuguese(pt_src)
+        bundle = None
+        if mn in MATCH_COMMENTS:
+            bundle = MATCH_COMMENTS[mn]
+        elif mn in KNOCKOUT_MATCH_COMMENTS:
+            bundle = KNOCKOUT_MATCH_COMMENTS[mn]
+        elif style and style in KNOCKOUT_TEMPLATES:
+            bundle = KNOCKOUT_TEMPLATES[style]
+        if not bundle:
+            continue
+        it_new, es_new = locales_for_comment_bundle(bundle)
         if it_val == it_new and es_val == es_new:
             continue
         conn.execute(
