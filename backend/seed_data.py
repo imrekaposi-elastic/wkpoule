@@ -292,6 +292,10 @@ VENUES = [
     },
 ]
 
+from venue_locales_es_it import merge_into_venues
+
+merge_into_venues(VENUES)
+
 # ---------------------------------------------------------------------------
 # Teams (48 qualified teams with approximate FIFA rankings)
 # ---------------------------------------------------------------------------

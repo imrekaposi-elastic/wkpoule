@@ -93,6 +93,30 @@ def _backfill_venue_hebrew(conn) -> None:
         )
 
 
+def _backfill_venue_es_it(conn) -> None:
+    """Fill review_es/it and accessibility_es/it from seed_data for existing databases."""
+    try:
+        from seed_data import VENUES
+    except ImportError:
+        logger.debug("seed_data not importable; skipping venue ES/IT backfill")
+        return
+    for v in VENUES:
+        res = v.get("review_es")
+        rit = v.get("review_it")
+        aes = v.get("accessibility_es")
+        ait = v.get("accessibility_it")
+        if not res or not rit or not aes or not ait:
+            continue
+        conn.execute(
+            text(
+                "UPDATE venues SET review_es = :res, review_it = :rit, "
+                "accessibility_es = :aes, accessibility_it = :ait "
+                "WHERE name = :n AND (review_es IS NULL OR review_es = '')"
+            ),
+            {"res": res, "rit": rit, "aes": aes, "ait": ait, "n": v["name"]},
+        )
+
+
 def ensure_schema() -> None:
     dialect = engine.dialect.name
     with engine.begin() as conn:
@@ -115,6 +139,22 @@ def ensure_schema() -> None:
             conn.execute(
                 text(
                     "ALTER TABLE venues ADD COLUMN IF NOT EXISTS accessibility_he TEXT"
+                )
+            )
+            conn.execute(
+                text("ALTER TABLE venues ADD COLUMN IF NOT EXISTS review_es TEXT")
+            )
+            conn.execute(
+                text("ALTER TABLE venues ADD COLUMN IF NOT EXISTS review_it TEXT")
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE venues ADD COLUMN IF NOT EXISTS accessibility_es TEXT"
+                )
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE venues ADD COLUMN IF NOT EXISTS accessibility_it TEXT"
                 )
             )
             conn.execute(
@@ -159,6 +199,18 @@ def ensure_schema() -> None:
                 conn.execute(
                     text("ALTER TABLE venues ADD COLUMN accessibility_he TEXT")
                 )
+            if "review_es" not in vcols:
+                conn.execute(text("ALTER TABLE venues ADD COLUMN review_es TEXT"))
+            if "review_it" not in vcols:
+                conn.execute(text("ALTER TABLE venues ADD COLUMN review_it TEXT"))
+            if "accessibility_es" not in vcols:
+                conn.execute(
+                    text("ALTER TABLE venues ADD COLUMN accessibility_es TEXT")
+                )
+            if "accessibility_it" not in vcols:
+                conn.execute(
+                    text("ALTER TABLE venues ADD COLUMN accessibility_it TEXT")
+                )
             pred_cols = {c["name"] for c in insp.get_columns("predictions")}
             if "advance_team_id" not in pred_cols:
                 conn.execute(
@@ -178,6 +230,7 @@ def ensure_schema() -> None:
                 )
 
         _backfill_venue_hebrew(conn)
+        _backfill_venue_es_it(conn)
         _backfill_fun_comment_it_es(conn)
 
         conn.execute(

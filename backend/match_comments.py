@@ -2,8 +2,9 @@
 Unique hand-crafted fun comments for every group-stage match (72 matches).
 Each entry is keyed by match number and contains the style plus 4 translations.
 
-Styles: trump, burr, sponder, cantona, klopp, zlatan, hudson, seinfeld, carr,
-        maradona, gijp, derksen, lineker, al_sahhaf
+Styles: trump, burr, cantona, klopp, zlatan, hudson, seinfeld, carr,
+        maradona, gijp, derksen, lineker, al_sahhaf,
+        balotelli, kahn, gascoigne, crouch, joaquin
 """
 
 MATCH_COMMENTS = {
@@ -846,8 +847,9 @@ KNOCKOUT_MATCH_COMMENTS = {
 
 # Styles used in this module (for validation / export)
 ALL_STYLE_NAMES = [
-    "trump", "burr", "sponder", "cantona", "klopp", "zlatan", "hudson",
+    "trump", "burr", "cantona", "klopp", "zlatan", "hudson",
     "seinfeld", "carr", "maradona", "gijp", "derksen", "lineker", "al_sahhaf",
+    "balotelli", "kahn", "gascoigne", "crouch", "joaquin",
 ]
 
 # Generic knockout templates (teams unknown at seed time)
@@ -900,12 +902,6 @@ KNOCKOUT_TEMPLATES = {
         "pt": "Fase eliminatória. Qual é o lance da prorrogação? Você joga 90 minutos e de repente tem mais 30? É como um voo pousar e o piloto dizer 'na verdade, vamos circular por mais uma hora.' Ninguém se inscreveu pra isso!",
         "de": "K.o.-Runde. Was soll das mit der Verlängerung? Man spielt 90 Minuten und dann sind es plötzlich 30 mehr? Das ist, als würde ein Flugzeug landen und der Pilot sagt 'eigentlich kreisen wir noch eine Stunde.' Dafür hat sich niemand angemeldet!",
     },
-    "sponder": {
-        "en": "Knockout stage. Oh great, now every game is an emotional roller coaster I didn't buy a ticket for. Win and you're heroes. Lose and your entire country needs therapy. No pressure though.",
-        "nl": "Knock-outfase. Oh geweldig, nu is elke wedstrijd een emotionele achtbaan waar ik geen kaartje voor gekocht heb. Win en je bent helden. Verlies en je hele land heeft therapie nodig. Geen druk verder.",
-        "pt": "Fase eliminatória. Ah ótimo, agora cada jogo é uma montanha-russa emocional pra qual eu não comprei ingresso. Ganhe e vocês são heróis. Perca e o país inteiro precisa de terapia. Sem pressão.",
-        "de": "K.o.-Phase. Oh toll, jetzt ist jedes Spiel eine emotionale Achterbahn, für die ich keine Karte gekauft habe. Gewinne und ihr seid Helden. Verliert und euer ganzes Land braucht Therapie. Kein Druck.",
-    },
     "carr": {
         "en": "Knockout round. One team advances, one goes home. Much like my last relationship. Ha ha ha HAAA! But seriously, this is where the magic happens. Or the heartbreak. Usually both.",
         "nl": "Knock-outronde. Eén team gaat door, één gaat naar huis. Net als mijn laatste relatie. Ha ha ha HAAA! Maar serieus, hier gebeurt de magie. Of de hartverscheuring. Meestal allebei.",
@@ -937,6 +933,14 @@ KNOCKOUT_TEMPLATES = {
         "de": "K.o.-Zeit, Baby — hier gehen Nerven supernova und Legenden werden aus purem, schreiendem Kohlenstoff geschmiedet! Kein Sicherheitsnetz, kein Kissen — nur neunzig Minuten Fußball-Blitz! Jemand geht als Held aus Donner hinaus; jemand anderes wird zusammengefaltet wie ein billiger Klappstuhl! Großartiger Wahnsinn!",
     },
 }
+
+from match_comments_analysts_new import (
+    KNOCKOUT_TEMPLATES_NEW,
+    apply_analyst_updates,
+)
+
+apply_analyst_updates(MATCH_COMMENTS, KNOCKOUT_MATCH_COMMENTS)
+KNOCKOUT_TEMPLATES.update(KNOCKOUT_TEMPLATES_NEW)
 
 from match_comments_locale_es_it import merge_into as _merge_es_it
 

@@ -221,6 +221,8 @@ export interface VenueDetail {
   review_nl: string | null;
   review_pt: string | null;
   review_de: string | null;
+  review_es: string | null;
+  review_it: string | null;
   review_he: string | null;
   expected_temp_celsius: number | null;
   city_attractiveness: number | null;
@@ -228,6 +230,8 @@ export interface VenueDetail {
   accessibility_nl: string | null;
   accessibility_pt: string | null;
   accessibility_de: string | null;
+  accessibility_es: string | null;
+  accessibility_it: string | null;
   accessibility_he: string | null;
   matches: VenueScheduledMatch[];
 }

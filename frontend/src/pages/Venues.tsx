@@ -23,7 +23,8 @@ function Stars({ count, max = 5 }: { count: number; max?: number }) {
 }
 
 function localized(v: VenueDetail, field: "review" | "accessibility", lang: string): string {
-  const langField = `${field}_${lang}` as keyof VenueDetail;
+  const base = lang.split("-")[0];
+  const langField = `${field}_${base}` as keyof VenueDetail;
   const fallback = `${field}_en` as keyof VenueDetail;
   return (v[langField] as string) || (v[fallback] as string) || "";
 }

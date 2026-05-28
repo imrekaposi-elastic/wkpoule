@@ -455,10 +455,6 @@ KNOCKOUT_TEMPLATES_ES_IT = {
         "es": "Eliminatoria. ¿Cuál es el rollo de la prórroga? Juegas 90 minutos y de repente hay 30 más. Es como un vuelo que aterriza y el piloto dice 'en realidad, vamos a dar vueltas una hora más'. ¡Nadie se apuntó a esto!",
         "it": "Turno a eliminazione. Qual è il problema dei supplementari? Giochi 90 minuti e poi all'improvviso ce ne sono altri 30? È come un volo che atterra e il pilota dice 'in realtà, giriamo ancora un'ora'. Nessuno si è iscritto a questo!",
     },
-    "sponder": {
-        "es": "Fase eliminatoria. Oh genial, ahora cada partido es una montaña rusa emocional para la que no compré entrada. Ganas y sois héroes. Perdéis y todo vuestro país necesita terapia. Sin presión.",
-        "it": "Fase a eliminazione. Oh fantastico, ora ogni partita è un ottovolante emotivo per cui non ho comprato il biglietto. Vincete e siete eroi. Perdete e tutto il paese ha bisogno di terapia. Nessuna pressione.",
-    },
     "carr": {
         "es": "Eliminatoria. Un equipo avanza, otro se va a casa. Como mi última relación. Ha ha ha HAAA. Pero en serio, aquí ocurre la magia. O el desamor. Normalmente ambos.",
         "it": "Turno a eliminazione. Una squadra avanza, una va a casa. Come la mia ultima relazione. Ha ha ha HAAA! Ma sul serio, è qui che succede la magia. O il cuore spezzato. Di solito entrambi.",
@@ -484,6 +480,8 @@ KNOCKOUT_TEMPLATES_ES_IT = {
 
 def merge_into(match_comments, knockout_comments, knockout_templates):
     """Inject native es/it texts into the comment dicts (called from match_comments)."""
+    from match_comments_analysts_es_it import merge_analyst_es_it
+
     for mn, loc in MATCH_COMMENTS_ES_IT.items():
         if mn in match_comments:
             match_comments[mn]["es"] = loc["es"]
@@ -496,3 +494,4 @@ def merge_into(match_comments, knockout_comments, knockout_templates):
         if style in knockout_templates:
             knockout_templates[style]["es"] = loc["es"]
             knockout_templates[style]["it"] = loc["it"]
+    merge_analyst_es_it(match_comments, knockout_comments, knockout_templates)
