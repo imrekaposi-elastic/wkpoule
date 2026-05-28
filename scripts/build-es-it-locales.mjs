@@ -611,11 +611,22 @@ const DE_IT = [
   ["Spiel {{n}}", "Partita {{n}}"],
 ];
 
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+function isUnsafeKey(key) {
+  return UNSAFE_KEYS.has(key);
+}
+
+function isPlainRecord(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
 function applyReplacements(obj, pairs) {
-  if (obj && typeof obj === "object" && !Array.isArray(obj)) {
-    const out = {};
-    for (const [k, v] of Object.entries(obj)) {
-      out[k] = applyReplacements(v, pairs);
+  if (isPlainRecord(obj)) {
+    const out = Object.create(null);
+    for (const key of Object.keys(obj)) {
+      if (isUnsafeKey(key)) continue;
+      out[key] = applyReplacements(obj[key], pairs);
     }
     return out;
   }
@@ -627,16 +638,6 @@ function applyReplacements(obj, pairs) {
     return s;
   }
   return obj;
-}
-
-function deepMerge(target, patch) {
-  for (const [k, v] of Object.entries(patch)) {
-    if (v && typeof v === "object" && !Array.isArray(v) && target[k]) {
-      deepMerge(target[k], v);
-    } else {
-      target[k] = v;
-    }
-  }
 }
 
 // Sort longest-first so partial replacements do not corrupt longer words.
@@ -669,79 +670,83 @@ const ES_EXTRA = [
 ];
 ES_EXTRA.sort((a, b) => b[0].length - a[0].length);
 es = applyReplacements(es, ES_EXTRA);
-deepMerge(es, {
-  navbar: {
-    dashboard: "Panel",
-    matches: "Partidos",
-    rankings: "Clasificación",
-    help: "Ayuda",
-    about: "Acerca de",
-  },
-  login: {
-    submit: "Iniciar sesión",
-    submitting: "Iniciando sesión...",
-    register: "Regístrate aquí",
-  },
-  register: {
-    submit: "Crear cuenta",
-    submitting: "Creando cuenta...",
-    signIn: "Iniciar sesión",
-  },
-  dashboard: {
-    welcome: "¡Bienvenido de nuevo, {{name}}!",
-    yourRanking: "Tu clasificación",
-    viewLeaderboard: "Ver clasificación",
-  },
-  matches: { title: "Calendario de partidos", yourTip: "Tu pronóstico" },
-  rankings: { title: "Clasificación de participantes", player: "Jugador" },
-  matchDetail: {
-    home: "Local",
-    away: "Visitante",
-    savePrediction: "Guardar pronóstico",
-    saved: "¡Pronóstico guardado!",
-  },
-  venues: { title: "Estadios del Mundial" },
+Object.assign(es.navbar, {
+  dashboard: "Panel",
+  matches: "Partidos",
+  rankings: "Clasificación",
+  help: "Ayuda",
+  about: "Acerca de",
 });
+Object.assign(es.login, {
+  submit: "Iniciar sesión",
+  submitting: "Iniciando sesión...",
+  register: "Regístrate aquí",
+});
+Object.assign(es.register, {
+  submit: "Crear cuenta",
+  submitting: "Creando cuenta...",
+  signIn: "Iniciar sesión",
+});
+Object.assign(es.dashboard, {
+  welcome: "¡Bienvenido de nuevo, {{name}}!",
+  yourRanking: "Tu clasificación",
+  viewLeaderboard: "Ver clasificación",
+});
+Object.assign(es.matches, {
+  title: "Calendario de partidos",
+  yourTip: "Tu pronóstico",
+});
+Object.assign(es.rankings, {
+  title: "Clasificación de participantes",
+  player: "Jugador",
+});
+Object.assign(es.matchDetail, {
+  home: "Local",
+  away: "Visitante",
+  savePrediction: "Guardar pronóstico",
+  saved: "¡Pronóstico guardado!",
+});
+Object.assign(es.venues, { title: "Estadios del Mundial" });
 
 const it = applyReplacements(de, DE_IT);
-deepMerge(it, {
-  navbar: {
-    dashboard: "Dashboard",
-    matches: "Partite",
-    rankings: "Classifica",
-    logout: "Esci",
-    help: "Aiuto",
-    about: "Info",
-  },
-  login: { submit: "Accedi", submitting: "Accesso in corso..." },
-  register: {
-    submit: "Crea account",
-    submitting: "Creazione account...",
-    signIn: "Accedi",
-  },
-  dashboard: {
-    welcome: "Bentornato, {{name}}!",
-    yourRanking: "La tua classifica",
-  },
-  matches: { title: "Calendario partite", yourTip: "Il tuo pronostico" },
-  rankings: { title: "Classifica partecipanti" },
-  matchDetail: {
-    savePrediction: "Salva pronostico",
-    saved: "Pronostico salvato!",
-  },
-  adminSettings: { you: "tu" },
-  matchDetail: {
-    yourPrediction: "Il tuo pronostico",
-    prediction: "Pronostico",
-  },
-  subgroups: {
-    mySubgroups: "I miei sottogruppi",
-    backToList: "Torna ai sottogruppi",
-  },
-  dashboard: {
-    yourPrediction: "Il tuo pronostico",
-    makePrediction: "Fai un pronostico",
-  },
+Object.assign(it.navbar, {
+  dashboard: "Dashboard",
+  matches: "Partite",
+  rankings: "Classifica",
+  logout: "Esci",
+  help: "Aiuto",
+  about: "Info",
+});
+Object.assign(it.login, {
+  submit: "Accedi",
+  submitting: "Accesso in corso...",
+});
+Object.assign(it.register, {
+  submit: "Crea account",
+  submitting: "Creazione account...",
+  signIn: "Accedi",
+});
+Object.assign(it.dashboard, {
+  welcome: "Bentornato, {{name}}!",
+  yourRanking: "La tua classifica",
+  yourPrediction: "Il tuo pronostico",
+  makePrediction: "Fai un pronostico",
+});
+Object.assign(it.matches, {
+  title: "Calendario partite",
+  yourTip: "Il tuo pronostico",
+});
+Object.assign(it.rankings, { title: "Classifica partecipanti" });
+Object.assign(it.matchDetail, {
+  savePrediction: "Salva pronostico",
+  saved: "Pronostico salvato!",
+  yourPrediction: "Il tuo pronostico",
+  prediction: "Pronostico",
+});
+Object.assign(it.adminSettings, { you: "tu" });
+Object.assign(it.subgroups, {
+  mySubgroups: "I miei sottogruppi",
+  backToList: "Torna ai sottogruppi",
 });
 
 fs.writeFileSync(
