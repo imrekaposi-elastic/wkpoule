@@ -5,6 +5,7 @@ import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import ExpertAvatar from "../components/ExpertAvatar";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
+import { resolveLocale } from "../i18n/languages";
 import { localizedTeam } from "../i18n/teamNames";
 import { formatStageSlug } from "../utils/formatStage";
 import {
@@ -13,14 +14,6 @@ import {
   isPredictedDraw,
 } from "../utils/predictions";
 import type { Match, MyPrediction, Prediction, VirtualGroupTable } from "../types";
-
-const LOCALE_MAP: Record<string, string> = {
-  en: "en-US",
-  nl: "nl-NL",
-  pt: "pt-BR",
-  de: "de-DE",
-  he: "he-IL",
-};
 
 const PREDICTION_TIP_STORAGE_KEY = "wkpoule_prediction_progress_tip_dismissed";
 
@@ -58,7 +51,7 @@ export default function MatchDetail() {
   const [virtualStandings, setVirtualStandings] = useState<VirtualGroupTable | null>(null);
   const [virtualLoading, setVirtualLoading] = useState(false);
 
-  const locale = LOCALE_MAP[i18n.language] || "en-US";
+  const locale = resolveLocale(i18n.language);
 
   const loadVirtualStandings = (
     groupLetter: string | null | undefined

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import { resolveLocale } from "../i18n/languages";
 import type { AdminSubgroupRow } from "../types";
 
 export default function AdminSubgroups() {
@@ -10,8 +11,7 @@ export default function AdminSubgroups() {
   const [banner, setBanner] = useState<{ ok: boolean; text: string } | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const locale =
-    { en: "en-US", nl: "nl-NL", pt: "pt-BR", de: "de-DE", he: "he-IL" }[i18n.language] || "en-US";
+  const locale = resolveLocale(i18n.language);
 
   const load = useCallback(() => {
     setLoading(true);

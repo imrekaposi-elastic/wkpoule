@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
+import { SUPPORTED_LANGUAGE_CODES } from "../i18n/languages";
 
 export default function Register() {
   const { user, register } = useAuth();
@@ -24,7 +25,7 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      const allowed = new Set(["en", "nl", "pt", "de", "he"]);
+      const allowed = new Set<string>(SUPPORTED_LANGUAGE_CODES);
       const pref = allowed.has(i18n.language) ? i18n.language : "en";
       await register(username, email, password, pref);
     } catch (err: any) {

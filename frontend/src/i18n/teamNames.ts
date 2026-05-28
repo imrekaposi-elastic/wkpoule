@@ -1,4 +1,5 @@
 import type { Team } from "../types";
+import { resolveLocale } from "./languages";
 
 const FIFA_TO_REGION: Record<string, string> = {
   MEX: "MX",
@@ -72,20 +73,12 @@ const VENUE_COUNTRY_TO_REGION: Record<string, string> = {
   USA: "US",
 };
 
-const LOCALE_MAP: Record<string, string> = {
-  en: "en-US",
-  nl: "nl-NL",
-  pt: "pt-BR",
-  de: "de-DE",
-  he: "he-IL",
-};
-
 function baseLanguage(language: string): string {
   return language.split("-")[0] || "en";
 }
 
 function localeFor(language: string): string {
-  return LOCALE_MAP[baseLanguage(language)] || language || "en-US";
+  return resolveLocale(baseLanguage(language));
 }
 
 function regionDisplayName(regionCode: string, language: string): string | null {

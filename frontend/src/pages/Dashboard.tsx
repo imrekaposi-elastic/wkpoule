@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { resolveLocale } from "../i18n/languages";
 import { localizedTeamName } from "../i18n/teamNames";
 import { firstMatchNeedingPrediction } from "../utils/predictions";
 import type {
@@ -12,14 +13,6 @@ import type {
   SubgroupDetail,
   SubgroupMine,
 } from "../types";
-
-const LOCALE_MAP: Record<string, string> = {
-  en: "en-US",
-  nl: "nl-NL",
-  pt: "pt-BR",
-  de: "de-DE",
-  he: "he-IL",
-};
 
 const TOTAL_PREDICTIONS = 104;
 
@@ -33,7 +26,7 @@ export default function Dashboard() {
   const [subgroupRankings, setSubgroupRankings] = useState<SubgroupDetail[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const locale = LOCALE_MAP[i18n.language] || "en-US";
+  const locale = resolveLocale(i18n.language);
   const predictionsMade = myRank?.predictions_made || 0;
   const predictionsComplete = predictionsMade >= TOTAL_PREDICTIONS;
 

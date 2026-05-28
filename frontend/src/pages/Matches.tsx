@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { formatStageSlug } from "../utils/formatStage";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
+import { resolveLocale } from "../i18n/languages";
 import { localizedTeam } from "../i18n/teamNames";
 import type { Match, MyPrediction, VirtualGroupTable } from "../types";
 
@@ -28,14 +29,6 @@ const STAGE_KEYS: { value: string; labelKey: string }[] = [
 
 const GROUPS = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 
-const LOCALE_MAP: Record<string, string> = {
-  en: "en-US",
-  nl: "nl-NL",
-  pt: "pt-BR",
-  de: "de-DE",
-  he: "he-IL",
-};
-
 export default function Matches() {
   const { t, i18n } = useTranslation();
   const [matches, setMatches] = useState<Match[]>([]);
@@ -48,7 +41,7 @@ export default function Matches() {
   const [group, setGroup] = useState("");
   const [search, setSearch] = useState("");
 
-  const locale = LOCALE_MAP[i18n.language] || "en-US";
+  const locale = resolveLocale(i18n.language);
 
   useEffect(() => {
     const params: Record<string, string> = { predicted_teams: "true" };

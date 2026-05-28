@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { resolveLocale } from "../i18n/languages";
 import type { SubgroupDetail as SubgroupDetailType, SubgroupMessage } from "../types";
 
 export default function SubgroupDetail() {
@@ -188,8 +189,7 @@ export default function SubgroupDetail() {
     );
   }
 
-  const locale =
-    { en: "en-US", nl: "nl-NL", pt: "pt-BR", de: "de-DE", he: "he-IL" }[i18n.language] || "en-US";
+  const locale = resolveLocale(i18n.language);
 
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">

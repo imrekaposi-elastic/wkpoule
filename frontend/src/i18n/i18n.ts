@@ -5,6 +5,8 @@ import nl from "./nl.json";
 import pt from "./pt.json";
 import de from "./de.json";
 import he from "./he.json";
+import it from "./it.json";
+import es from "./es.json";
 
 const LANG_KEY = "wkpoule_lang";
 
@@ -23,6 +25,8 @@ i18n.use(initReactI18next).init({
     pt: { translation: pt },
     de: { translation: de },
     he: { translation: he },
+    it: { translation: it },
+    es: { translation: es },
   },
   lng: initialLng,
   fallbackLng: "en",

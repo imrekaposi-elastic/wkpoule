@@ -8,7 +8,7 @@ def test_register_login_and_me(client):
             "username": "player1",
             "email": "player1@example.com",
             "password": "secret12",
-            "preferred_language": "nl",
+            "preferred_language": "es",
         },
     )
     assert register.status_code == 201

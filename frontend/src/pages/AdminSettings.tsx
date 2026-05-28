@@ -2,15 +2,8 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { resolveLocale } from "../i18n/languages";
 import type { AdminUserRow } from "../types";
-
-const LOCALE_MAP: Record<string, string> = {
-  en: "en-US",
-  nl: "nl-NL",
-  pt: "pt-BR",
-  de: "de-DE",
-  he: "he-IL",
-};
 
 function parseApiDetail(err: unknown): string | undefined {
   const raw = (err as { response?: { data?: { detail?: unknown } } })?.response?.data
@@ -44,7 +37,7 @@ export default function AdminSettings() {
     null
   );
 
-  const locale = LOCALE_MAP[i18n.language] || "en-US";
+  const locale = resolveLocale(i18n.language);
 
   const load = useCallback(() => {
     setLoading(true);

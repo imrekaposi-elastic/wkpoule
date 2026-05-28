@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field
 
-SupportedLanguage = Literal["en", "nl", "pt", "de", "he"]
+SupportedLanguage = Literal["en", "nl", "pt", "de", "he", "it", "es"]
 
 
 class RegisterRequest(BaseModel):
