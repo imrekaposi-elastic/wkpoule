@@ -4,6 +4,7 @@ import api from "../api/client";
 import Pagination from "../components/Pagination";
 import { useAuth } from "../context/AuthContext";
 import type { PaginatedResponse, ParticipantRanking } from "../types";
+import { normalizeRankingsResponse } from "../utils/rankings";
 
 export default function Rankings() {
   const { user } = useAuth();
@@ -21,10 +22,11 @@ export default function Rankings() {
         params: { page: p, page_size: 20 },
       })
       .then((r) => {
-        setRankings(r.data.items);
-        setPage(r.data.page);
-        setTotalPages(r.data.total_pages);
-        setTotal(r.data.total);
+        const pageData = normalizeRankingsResponse(r.data);
+        setRankings(pageData.items);
+        setPage(pageData.page);
+        setTotalPages(pageData.total_pages);
+        setTotal(pageData.total);
       })
       .catch(() => {
         setRankings([]);

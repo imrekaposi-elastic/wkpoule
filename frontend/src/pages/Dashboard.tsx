@@ -13,6 +13,7 @@ import type {
   SubgroupDetail,
   SubgroupMine,
 } from "../types";
+import { rankingsItems } from "../utils/rankings";
 
 const TOTAL_PREDICTIONS = 104;
 
@@ -36,7 +37,13 @@ export default function Dashboard() {
       return Promise.resolve();
     }
     return Promise.all(
-      mine.map((s) => api.get<SubgroupDetail>(`/subgroups/${s.id}`).then((r) => r.data)),
+      mine.map((s) =>
+        api
+          .get<SubgroupDetail>(`/subgroups/${s.id}`, {
+            params: { page: 1, page_size: 20 },
+          })
+          .then((r) => r.data),
+      ),
     )
       .then((details) =>
         setSubgroupRankings(
@@ -254,7 +261,7 @@ export default function Dashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sg.rankings.items.slice(0, 3).map((r) => (
+                      {rankingsItems(sg.rankings).slice(0, 3).map((r) => (
                         <tr
                           key={r.user_id}
                           className={`border-b last:border-0 ${

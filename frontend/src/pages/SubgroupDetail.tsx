@@ -6,6 +6,7 @@ import Pagination from "../components/Pagination";
 import { useAuth } from "../context/AuthContext";
 import { resolveLocale } from "../i18n/languages";
 import type { SubgroupDetail as SubgroupDetailType, SubgroupMessage } from "../types";
+import { normalizeRankingsResponse, rankingsItems } from "../utils/rankings";
 
 export default function SubgroupDetail() {
   const { id } = useParams<{ id: string }>();
@@ -42,7 +43,12 @@ export default function SubgroupDetail() {
         .get<SubgroupDetailType>(`/subgroups/${subgroupId}`, {
           params: { page, page_size: 20 },
         })
-        .then((r) => setDetail(r.data))
+        .then((r) =>
+          setDetail({
+            ...r.data,
+            rankings: normalizeRankingsResponse(r.data.rankings),
+          }),
+        )
         .catch(() => setDetail(null));
     },
     [subgroupId],
@@ -61,7 +67,10 @@ export default function SubgroupDetail() {
       api.get<SubgroupMessage[]>(`/subgroups/${subgroupId}/messages`),
     ])
       .then(([d, m]) => {
-        setDetail(d.data);
+        setDetail({
+          ...d.data,
+          rankings: normalizeRankingsResponse(d.data.rankings),
+        });
         setMessages(m.data);
         window.dispatchEvent(new Event("subgroups-mine-changed"));
       })
@@ -288,7 +297,7 @@ export default function SubgroupDetail() {
                 </tr>
               </thead>
               <tbody>
-                {detail.rankings.items.map((r) => {
+                {rankingsItems(detail.rankings).map((r) => {
                   const memberMeta = detail.members.find((m) => m.user_id === r.user_id);
                   const canRemove =
                     detail.my_role === "admin" &&
@@ -336,7 +345,7 @@ export default function SubgroupDetail() {
               </tbody>
             </table>
           </div>
-          {detail.rankings.items.length === 0 && (
+          {rankingsItems(detail.rankings).length === 0 && (
             <p className="text-gray-500 text-center py-6 text-sm">{t("subgroups.noMembers")}</p>
           )}
           <Pagination
