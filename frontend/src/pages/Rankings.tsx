@@ -1,28 +1,50 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import Pagination from "../components/Pagination";
 import { useAuth } from "../context/AuthContext";
-import type { ParticipantRanking } from "../types";
+import type { PaginatedResponse, ParticipantRanking } from "../types";
 
 export default function Rankings() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [rankings, setRankings] = useState<ParticipantRanking[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const load = useCallback((p: number) => {
+    setLoading(true);
     api
-      .get<ParticipantRanking[]>("/rankings")
-      .then((r) => setRankings(r.data))
+      .get<PaginatedResponse<ParticipantRanking>>("/rankings", {
+        params: { page: p, page_size: 20 },
+      })
+      .then((r) => {
+        setRankings(r.data.items);
+        setPage(r.data.page);
+        setTotalPages(r.data.total_pages);
+        setTotal(r.data.total);
+      })
+      .catch(() => {
+        setRankings([]);
+        setTotal(0);
+        setTotalPages(1);
+      })
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading)
+  useEffect(() => {
+    load(page);
+  }, [page, load]);
+
+  if (loading && rankings.length === 0) {
     return (
       <div className="flex justify-center py-20">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pitch-600" />
       </div>
     );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
@@ -90,9 +112,17 @@ export default function Rankings() {
         </table>
         </div>
 
-        {rankings.length === 0 && (
+        {rankings.length === 0 && !loading && (
           <p className="text-gray-500 text-center py-8">{t("rankings.noRankings")}</p>
         )}
+
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          onPageChange={setPage}
+          disabled={loading}
+        />
       </div>
 
       <div className="mt-6 bg-white rounded-xl shadow-md p-6">

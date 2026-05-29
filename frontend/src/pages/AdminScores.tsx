@@ -2,7 +2,22 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { localizedTeam } from "../i18n/teamNames";
-import type { Match } from "../types";
+import type { Match, PaginatedResponse } from "../types";
+
+async function fetchAllMatches(params: Record<string, string>): Promise<Match[]> {
+  const all: Match[] = [];
+  let page = 1;
+  let totalPages = 1;
+  do {
+    const { data } = await api.get<PaginatedResponse<Match>>("/matches", {
+      params: { ...params, page, page_size: 20 },
+    });
+    all.push(...data.items);
+    totalPages = data.total_pages;
+    page += 1;
+  } while (page <= totalPages);
+  return all;
+}
 
 type Draft = { home: number; away: number; status: string };
 
@@ -30,12 +45,11 @@ export default function AdminScores() {
 
   const load = () => {
     setLoading(true);
-    api
-      .get<Match[]>("/matches")
-      .then((r) => {
-        setMatches(r.data);
+    fetchAllMatches({})
+      .then((items) => {
+        setMatches(items);
         const d: Record<number, Draft> = {};
-        for (const m of r.data) {
+        for (const m of items) {
           d[m.id] = {
             home: m.home_score ?? 0,
             away: m.away_score ?? 0,

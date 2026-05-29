@@ -6,6 +6,23 @@ export interface User {
   preferred_language: string;
 }
 
+/** Paginated list responses from the API (page_size max 20). */
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+/** GET /predictions/mine/brief */
+export interface MyPredictionBrief {
+  match_id: number;
+  home_score: number;
+  away_score: number;
+  advance_team_id?: number | null;
+}
+
 /** GET /admin/users */
 export interface AdminUserRow {
   id: number;
@@ -14,6 +31,24 @@ export interface AdminUserRow {
   is_admin: boolean;
   include_in_rankings: boolean;
   preferred_language: string;
+  created_at: string;
+}
+
+/** GET /subgroups/directory */
+export interface SubgroupDirectory {
+  id: number;
+  name: string;
+  member_count: number;
+  membership_status: "none" | "member" | "admin" | "application_pending";
+}
+
+/** GET /subgroups/join-requests/incoming */
+export interface SubgroupJoinRequestRow {
+  id: number;
+  subgroup_id: number;
+  subgroup_name: string;
+  user_id: number;
+  username: string;
   created_at: string;
 }
 
@@ -48,7 +83,7 @@ export interface SubgroupDetail {
   name: string;
   my_role: string;
   members: SubgroupMemberBrief[];
-  rankings: ParticipantRanking[];
+  rankings: PaginatedResponse<ParticipantRanking>;
 }
 
 /** GET /admin/subgroups */

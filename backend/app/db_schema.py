@@ -140,6 +140,34 @@ def ensure_schema() -> None:
                 )
             )
             conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS subgroup_join_requests (
+                        id SERIAL PRIMARY KEY,
+                        subgroup_id INTEGER NOT NULL REFERENCES subgroups(id) ON DELETE CASCADE,
+                        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                        status VARCHAR(20) NOT NULL DEFAULT 'pending',
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        decided_at TIMESTAMPTZ,
+                        decided_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+                        CONSTRAINT uq_subgroup_join_request_user UNIQUE (subgroup_id, user_id)
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    "CREATE INDEX IF NOT EXISTS ix_subgroup_join_requests_subgroup_id "
+                    "ON subgroup_join_requests (subgroup_id)"
+                )
+            )
+            conn.execute(
+                text(
+                    "CREATE INDEX IF NOT EXISTS ix_subgroup_join_requests_user_id "
+                    "ON subgroup_join_requests (user_id)"
+                )
+            )
+            conn.execute(
                 text("ALTER TABLE venues ADD COLUMN IF NOT EXISTS review_he TEXT")
             )
             conn.execute(
@@ -202,6 +230,24 @@ def ensure_schema() -> None:
                     text(
                         "ALTER TABLE subgroup_members "
                         "ADD COLUMN last_read_message_id INTEGER"
+                    )
+                )
+            tables = set(insp.get_table_names())
+            if "subgroup_join_requests" not in tables:
+                conn.execute(
+                    text(
+                        """
+                        CREATE TABLE subgroup_join_requests (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            subgroup_id INTEGER NOT NULL REFERENCES subgroups(id) ON DELETE CASCADE,
+                            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                            status VARCHAR(20) NOT NULL DEFAULT 'pending',
+                            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            decided_at DATETIME,
+                            decided_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+                            CONSTRAINT uq_subgroup_join_request_user UNIQUE (subgroup_id, user_id)
+                        )
+                        """
                     )
                 )
             vcols = {c["name"] for c in insp.get_columns("venues")}

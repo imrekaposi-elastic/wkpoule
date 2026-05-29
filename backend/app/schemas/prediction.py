@@ -24,6 +24,15 @@ class PredictionOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class MyPredictionBrief(BaseModel):
+    """Lightweight tip for match list overlays (all user tips, not paginated)."""
+
+    match_id: int
+    home_score: int
+    away_score: int
+    advance_team_id: int | None = None
+
+
 class MyPredictionOut(BaseModel):
     match_id: int
     match_number: int

@@ -5,10 +5,10 @@ import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { resolveLocale } from "../i18n/languages";
 import { localizedTeamName } from "../i18n/teamNames";
-import { firstMatchNeedingPrediction } from "../utils/predictions";
 import type {
   Match,
   MyPrediction,
+  PaginatedResponse,
   ParticipantRanking,
   SubgroupDetail,
   SubgroupMine,
@@ -50,19 +50,19 @@ export default function Dashboard() {
 
   useEffect(() => {
     Promise.all([
-      api.get<Match[]>("/matches", { params: { predicted_teams: "true" } }),
-      api.get<ParticipantRanking[]>("/rankings"),
-      api.get<MyPrediction[]>("/predictions/mine"),
+      api.get<Match | null>("/matches/next-needing-prediction", {
+        params: { predicted_teams: "true" },
+      }),
+      api.get<ParticipantRanking | null>("/rankings/me"),
+      api.get<PaginatedResponse<MyPrediction>>("/predictions/mine", {
+        params: { page: 1, page_size: 5 },
+      }),
       api.get<SubgroupMine[]>("/subgroups/mine").catch(() => ({ data: [] as SubgroupMine[] })),
     ])
-      .then(([matchesRes, rankingsRes, predsRes, subRes]) => {
-        const predictedIds = new Set(predsRes.data.map((p) => p.match_id));
-        setMatchToPredict(
-          firstMatchNeedingPrediction(matchesRes.data, predictedIds),
-        );
-        const me = rankingsRes.data.find((r) => r.user_id === user?.id);
-        setMyRank(me || null);
-        setRecentPredictions(predsRes.data.slice(-5).reverse());
+      .then(([nextRes, myRankRes, predsRes, subRes]) => {
+        setMatchToPredict(nextRes.data);
+        setMyRank(myRankRes.data);
+        setRecentPredictions(predsRes.data.items);
         setSubgroupMine(subRes.data);
         return loadSubgroupRankings(subRes.data);
       })
@@ -254,7 +254,7 @@ export default function Dashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sg.rankings.slice(0, 3).map((r) => (
+                      {sg.rankings.items.slice(0, 3).map((r) => (
                         <tr
                           key={r.user_id}
                           className={`border-b last:border-0 ${

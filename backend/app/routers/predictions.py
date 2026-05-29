@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 
 from app.auth import get_current_user
@@ -6,7 +6,13 @@ from app.database import get_db
 from app.models.match import Match
 from app.models.prediction import Prediction
 from app.models.user import User
-from app.schemas.prediction import MyPredictionOut, PredictionOut, PredictionRequest
+from app.schemas.pagination import DEFAULT_PAGE_SIZE, PaginatedResponse, paginate_list
+from app.schemas.prediction import (
+    MyPredictionBrief,
+    MyPredictionOut,
+    PredictionOut,
+    PredictionRequest,
+)
 from app.schemas.prediction_milestone import PredictionMilestoneOut
 from app.schemas.ranking import VirtualGroupTable
 from app.services.prediction_advance import (
@@ -118,8 +124,37 @@ def virtual_groups(
     return result
 
 
-@router.get("/mine", response_model=list[MyPredictionOut])
+@router.get("/mine/brief", response_model=list[MyPredictionBrief])
+def my_predictions_brief(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """All user tips (scores only) for match list overlays — max one row per fixture."""
+    rows = (
+        db.query(
+            Prediction.match_id,
+            Prediction.home_score,
+            Prediction.away_score,
+            Prediction.advance_team_id,
+        )
+        .filter(Prediction.user_id == user.id)
+        .all()
+    )
+    return [
+        MyPredictionBrief(
+            match_id=mid,
+            home_score=h,
+            away_score=a,
+            advance_team_id=adv,
+        )
+        for mid, h, a, adv in rows
+    ]
+
+
+@router.get("/mine", response_model=PaginatedResponse[MyPredictionOut])
 def my_predictions(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=20),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -128,6 +163,7 @@ def my_predictions(
         .filter(Prediction.user_id == user.id)
         .options(joinedload(Prediction.match).joinedload(Match.home_team))
         .options(joinedload(Prediction.match).joinedload(Match.away_team))
+        .order_by(Prediction.updated_at.desc())
         .all()
     )
     results = []
@@ -151,12 +187,14 @@ def my_predictions(
                 match_status=p.match.status,
             )
         )
-    return results
+    return paginate_list(results, page, page_size)
 
 
-@router.get("/match/{match_id}", response_model=list[PredictionOut])
+@router.get("/match/{match_id}", response_model=PaginatedResponse[PredictionOut])
 def match_predictions(
     match_id: int,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=20),
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -168,6 +206,7 @@ def match_predictions(
         db.query(Prediction)
         .filter(Prediction.match_id == match_id)
         .options(joinedload(Prediction.user))
+        .order_by(Prediction.updated_at.desc())
         .all()
     )
     results = []
@@ -191,4 +230,4 @@ def match_predictions(
                 updated_at=p.updated_at,
             )
         )
-    return results
+    return paginate_list(results, page, page_size)

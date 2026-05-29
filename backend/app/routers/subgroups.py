@@ -1,24 +1,39 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.auth import get_current_user
 from app.database import get_db
-from app.models.subgroup import Subgroup, SubgroupInvite, SubgroupMember, SubgroupMessage
+from app.models.subgroup import (
+    Subgroup,
+    SubgroupInvite,
+    SubgroupJoinRequest,
+    SubgroupMember,
+    SubgroupMessage,
+)
 from app.models.user import User
+from app.schemas.pagination import paginate_list
 from app.schemas.subgroup import (
     SubgroupCreate,
     SubgroupDetailOut,
+    SubgroupDirectoryOut,
     SubgroupInviteCreate,
     SubgroupInvitePendingOut,
+    SubgroupJoinRequestOut,
     SubgroupMemberBrief,
     SubgroupMessageCreate,
     SubgroupMessageOut,
     SubgroupMineOut,
 )
 from app.services.invite_email import send_subgroup_invite_email
+from app.services.subgroup_join_requests import (
+    approve_join_request,
+    membership_status_for_user,
+    pending_request_for_user,
+    reject_join_request,
+)
 from app.services.subgroup_rankings import compute_participant_rankings
 
 router = APIRouter()
@@ -148,6 +163,73 @@ def list_my_subgroups(
     return sorted(out, key=lambda x: x.name.lower())
 
 
+@router.get("/directory", response_model=list[SubgroupDirectoryOut])
+def list_subgroup_directory(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """All subgroups with membership status for the current user."""
+    subgroups = db.query(Subgroup).order_by(Subgroup.name).all()
+    out: list[SubgroupDirectoryOut] = []
+    for sg in subgroups:
+        cnt = (
+            db.query(func.count())
+            .select_from(SubgroupMember)
+            .filter(SubgroupMember.subgroup_id == sg.id)
+            .scalar()
+        )
+        out.append(
+            SubgroupDirectoryOut(
+                id=sg.id,
+                name=sg.name,
+                member_count=int(cnt or 0),
+                membership_status=membership_status_for_user(db, sg.id, user.id),
+            )
+        )
+    return out
+
+
+@router.get("/join-requests/incoming", response_model=list[SubgroupJoinRequestOut])
+def list_incoming_join_requests(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Pending membership applications for subgroups the current user administers."""
+    admin_subgroup_ids = [
+        row[0]
+        for row in db.query(SubgroupMember.subgroup_id)
+        .filter(
+            SubgroupMember.user_id == user.id,
+            SubgroupMember.role == "admin",
+        )
+        .all()
+    ]
+    if not admin_subgroup_ids:
+        return []
+    rows = (
+        db.query(SubgroupJoinRequest, Subgroup.name, User.username)
+        .join(Subgroup, Subgroup.id == SubgroupJoinRequest.subgroup_id)
+        .join(User, User.id == SubgroupJoinRequest.user_id)
+        .filter(
+            SubgroupJoinRequest.subgroup_id.in_(admin_subgroup_ids),
+            SubgroupJoinRequest.status == "pending",
+        )
+        .order_by(SubgroupJoinRequest.created_at.asc())
+        .all()
+    )
+    return [
+        SubgroupJoinRequestOut(
+            id=req.id,
+            subgroup_id=req.subgroup_id,
+            subgroup_name=name,
+            user_id=req.user_id,
+            username=uname,
+            created_at=req.created_at,
+        )
+        for req, name, uname in rows
+    ]
+
+
 @router.get("/invites/pending", response_model=list[SubgroupInvitePendingOut])
 def list_pending_invites(
     user: User = Depends(get_current_user),
@@ -261,9 +343,162 @@ def decline_invite(
     return None
 
 
+@router.post(
+    "/{subgroup_id}/join-requests",
+    response_model=SubgroupJoinRequestOut,
+    status_code=status.HTTP_201_CREATED,
+)
+def apply_for_membership(
+    subgroup_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    sg = db.query(Subgroup).filter(Subgroup.id == subgroup_id).first()
+    if not sg:
+        raise HTTPException(status_code=404, detail="Subgroup not found")
+    if _get_member(db, subgroup_id, user.id):
+        raise HTTPException(status_code=400, detail="You are already a member")
+    pending = pending_request_for_user(db, subgroup_id, user.id)
+    if pending:
+        raise HTTPException(status_code=400, detail="You already have a pending application")
+
+    prior = (
+        db.query(SubgroupJoinRequest)
+        .filter(
+            SubgroupJoinRequest.subgroup_id == subgroup_id,
+            SubgroupJoinRequest.user_id == user.id,
+        )
+        .first()
+    )
+    if prior and prior.status == "rejected":
+        prior.status = "pending"
+        prior.decided_at = None
+        prior.decided_by_user_id = None
+        prior.created_at = datetime.now(timezone.utc)
+        req = prior
+        db.commit()
+        db.refresh(req)
+    else:
+        req = SubgroupJoinRequest(subgroup_id=subgroup_id, user_id=user.id, status="pending")
+        db.add(req)
+        db.commit()
+        db.refresh(req)
+    return SubgroupJoinRequestOut(
+        id=req.id,
+        subgroup_id=sg.id,
+        subgroup_name=sg.name,
+        user_id=user.id,
+        username=user.username,
+        created_at=req.created_at,
+    )
+
+
+@router.delete(
+    "/{subgroup_id}/join-requests/mine",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def cancel_my_join_request(
+    subgroup_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    req = pending_request_for_user(db, subgroup_id, user.id)
+    if req is None:
+        raise HTTPException(status_code=404, detail="No pending application found")
+    db.delete(req)
+    db.commit()
+    return None
+
+
+@router.post(
+    "/{subgroup_id}/join-requests/{request_id}/approve",
+    response_model=SubgroupMineOut,
+)
+def approve_join_request_endpoint(
+    subgroup_id: int,
+    request_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    admin_m = _get_member(db, subgroup_id, user.id)
+    if not admin_m or admin_m.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Only subgroup admins can approve applications",
+        )
+    req = (
+        db.query(SubgroupJoinRequest)
+        .filter(
+            SubgroupJoinRequest.id == request_id,
+            SubgroupJoinRequest.subgroup_id == subgroup_id,
+        )
+        .first()
+    )
+    if req is None:
+        raise HTTPException(status_code=404, detail="Application not found")
+    if req.status != "pending":
+        raise HTTPException(status_code=400, detail="Application is no longer pending")
+
+    approve_join_request(db, req, user.id)
+    db.commit()
+
+    sg = db.query(Subgroup).filter(Subgroup.id == subgroup_id).first()
+    cnt = (
+        db.query(func.count())
+        .select_from(SubgroupMember)
+        .filter(SubgroupMember.subgroup_id == subgroup_id)
+        .scalar()
+    )
+    return SubgroupMineOut(
+        id=sg.id,
+        name=sg.name,
+        member_count=int(cnt or 0),
+        my_role="admin",
+        unread_message_count=_unread_message_count(
+            db, subgroup_id, user.id, admin_m.last_read_message_id
+        ),
+    )
+
+
+@router.post(
+    "/{subgroup_id}/join-requests/{request_id}/reject",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def reject_join_request_endpoint(
+    subgroup_id: int,
+    request_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    admin_m = _get_member(db, subgroup_id, user.id)
+    if not admin_m or admin_m.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Only subgroup admins can reject applications",
+        )
+    req = (
+        db.query(SubgroupJoinRequest)
+        .filter(
+            SubgroupJoinRequest.id == request_id,
+            SubgroupJoinRequest.subgroup_id == subgroup_id,
+        )
+        .first()
+    )
+    if req is None:
+        raise HTTPException(status_code=404, detail="Application not found")
+    if req.status != "pending":
+        raise HTTPException(status_code=400, detail="Application is no longer pending")
+
+    reject_join_request(db, req, user.id)
+    db.commit()
+    return None
+
+
 @router.get("/{subgroup_id}", response_model=SubgroupDetailOut)
 def get_subgroup_detail(
     subgroup_id: int,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=20),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -280,7 +515,8 @@ def get_subgroup_detail(
         .filter(SubgroupMember.subgroup_id == subgroup_id)
         .all()
     ]
-    rankings = compute_participant_rankings(db, member_ids)
+    all_rankings = compute_participant_rankings(db, member_ids)
+    rankings = paginate_list(all_rankings, page, page_size)
 
     member_rows = (
         db.query(SubgroupMember.user_id, User.username, SubgroupMember.role)

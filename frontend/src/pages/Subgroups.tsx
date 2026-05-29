@@ -2,30 +2,45 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
-import type { SubgroupInvitePending, SubgroupMine } from "../types";
+import type {
+  SubgroupDirectory,
+  SubgroupInvitePending,
+  SubgroupJoinRequestRow,
+  SubgroupMine,
+} from "../types";
 
 export default function Subgroups() {
   const { t } = useTranslation();
   const [mine, setMine] = useState<SubgroupMine[]>([]);
+  const [directory, setDirectory] = useState<SubgroupDirectory[]>([]);
   const [pending, setPending] = useState<SubgroupInvitePending[]>([]);
+  const [incoming, setIncoming] = useState<SubgroupJoinRequestRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [applyingId, setApplyingId] = useState<number | null>(null);
+  const [reviewingId, setReviewingId] = useState<number | null>(null);
   const [banner, setBanner] = useState<{ ok: boolean; text: string } | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
     Promise.all([
       api.get<SubgroupMine[]>("/subgroups/mine"),
+      api.get<SubgroupDirectory[]>("/subgroups/directory"),
       api.get<SubgroupInvitePending[]>("/subgroups/invites/pending"),
+      api.get<SubgroupJoinRequestRow[]>("/subgroups/join-requests/incoming"),
     ])
-      .then(([m, p]) => {
+      .then(([m, d, p, inc]) => {
         setMine(m.data);
+        setDirectory(d.data);
         setPending(p.data);
+        setIncoming(inc.data);
       })
       .catch(() => {
         setMine([]);
+        setDirectory([]);
         setPending([]);
+        setIncoming([]);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -42,17 +57,14 @@ export default function Subgroups() {
         .catch(() => {});
     }, 30000);
     const onMineChanged = () => {
-      api
-        .get<SubgroupMine[]>("/subgroups/mine")
-        .then((r) => setMine(r.data))
-        .catch(() => {});
+      load();
     };
     window.addEventListener("subgroups-mine-changed", onMineChanged);
     return () => {
       window.clearInterval(tmr);
       window.removeEventListener("subgroups-mine-changed", onMineChanged);
     };
-  }, []);
+  }, [load]);
 
   const onCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +77,7 @@ export default function Subgroups() {
       setName("");
       setBanner({ ok: true, text: t("subgroups.created") });
       load();
+      window.dispatchEvent(new Event("subgroups-mine-changed"));
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data
         ?.detail;
@@ -84,6 +97,7 @@ export default function Subgroups() {
       setBanner({ ok: true, text: t("subgroups.inviteAccepted") });
       load();
       window.dispatchEvent(new Event("subgroups-invites-changed"));
+      window.dispatchEvent(new Event("subgroups-mine-changed"));
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data
         ?.detail;
@@ -103,6 +117,81 @@ export default function Subgroups() {
       /* ignore */
     }
   };
+
+  const onApply = async (subgroupId: number) => {
+    setApplyingId(subgroupId);
+    setBanner(null);
+    try {
+      await api.post(`/subgroups/${subgroupId}/join-requests`);
+      setBanner({ ok: true, text: t("subgroups.applicationSent") });
+      load();
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data
+        ?.detail;
+      setBanner({
+        ok: false,
+        text: typeof detail === "string" ? detail : t("subgroups.applicationFailed"),
+      });
+    } finally {
+      setApplyingId(null);
+    }
+  };
+
+  const onCancelApplication = async (subgroupId: number) => {
+    setApplyingId(subgroupId);
+    try {
+      await api.delete(`/subgroups/${subgroupId}/join-requests/mine`);
+      setBanner({ ok: true, text: t("subgroups.applicationCancelled") });
+      load();
+    } catch {
+      setBanner({ ok: false, text: t("subgroups.applicationCancelFailed") });
+    } finally {
+      setApplyingId(null);
+    }
+  };
+
+  const onApproveApplication = async (req: SubgroupJoinRequestRow) => {
+    setReviewingId(req.id);
+    setBanner(null);
+    try {
+      await api.post(`/subgroups/${req.subgroup_id}/join-requests/${req.id}/approve`);
+      setBanner({
+        ok: true,
+        text: t("subgroups.applicationApproved", { username: req.username }),
+      });
+      load();
+      window.dispatchEvent(new Event("subgroups-mine-changed"));
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data
+        ?.detail;
+      setBanner({
+        ok: false,
+        text: typeof detail === "string" ? detail : t("subgroups.applicationReviewFailed"),
+      });
+    } finally {
+      setReviewingId(null);
+    }
+  };
+
+  const onRejectApplication = async (req: SubgroupJoinRequestRow) => {
+    setReviewingId(req.id);
+    try {
+      await api.post(`/subgroups/${req.subgroup_id}/join-requests/${req.id}/reject`);
+      setBanner({
+        ok: true,
+        text: t("subgroups.applicationRejected", { username: req.username }),
+      });
+      load();
+    } catch {
+      setBanner({ ok: false, text: t("subgroups.applicationReviewFailed") });
+    } finally {
+      setReviewingId(null);
+    }
+  };
+
+  const browseRows = directory.filter(
+    (sg) => sg.membership_status === "none" || sg.membership_status === "application_pending",
+  );
 
   if (loading) {
     return (
@@ -150,6 +239,50 @@ export default function Subgroups() {
         </form>
       </section>
 
+      {incoming.length > 0 && (
+        <section className="mb-10">
+          <h2 className="text-lg font-semibold text-pitch-800 mb-3">
+            {t("subgroups.incomingApplications")}
+          </h2>
+          <ul className="space-y-3">
+            {incoming.map((req) => (
+              <li
+                key={req.id}
+                className="bg-sky-50 border border-sky-200 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+              >
+                <div>
+                  <p className="font-medium text-sky-950">
+                    {req.username}{" "}
+                    <span className="font-normal text-sky-900/80">
+                      → {req.subgroup_name}
+                    </span>
+                  </p>
+                  <p className="text-xs text-sky-900/70">{t("subgroups.applicationWantsToJoin")}</p>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    type="button"
+                    disabled={reviewingId === req.id}
+                    onClick={() => onApproveApplication(req)}
+                    className="text-sm bg-pitch-700 text-white px-3 py-1.5 rounded-md hover:bg-pitch-800 disabled:opacity-50"
+                  >
+                    {t("subgroups.approveApplication")}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={reviewingId === req.id}
+                    onClick={() => onRejectApplication(req)}
+                    className="text-sm border border-gray-300 px-3 py-1.5 rounded-md hover:bg-white disabled:opacity-50"
+                  >
+                    {t("subgroups.rejectApplication")}
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {pending.length > 0 && (
         <section className="mb-10">
           <h2 className="text-lg font-semibold text-pitch-800 mb-3">
@@ -186,6 +319,52 @@ export default function Subgroups() {
           </ul>
         </section>
       )}
+
+      <section className="mb-10">
+        <h2 className="text-lg font-semibold text-pitch-800 mb-3">{t("subgroups.browseSubgroups")}</h2>
+        {browseRows.length === 0 ? (
+          <p className="text-gray-500 text-sm">{t("subgroups.browseEmpty")}</p>
+        ) : (
+          <ul className="space-y-2">
+            {browseRows.map((sg) => (
+              <li
+                key={sg.id}
+                className="flex items-center justify-between gap-3 bg-white rounded-lg border border-gray-100 shadow-sm px-4 py-3"
+              >
+                <div>
+                  <span className="font-medium text-pitch-900">{sg.name}</span>
+                  <span className="text-sm text-gray-500 ml-2">
+                    ({t("subgroups.memberCount", { count: sg.member_count })})
+                  </span>
+                </div>
+                {sg.membership_status === "application_pending" ? (
+                  <button
+                    type="button"
+                    disabled={applyingId === sg.id}
+                    onClick={() => onCancelApplication(sg.id)}
+                    className="text-sm border border-gray-300 px-3 py-1.5 rounded-md hover:bg-gray-50 disabled:opacity-50 shrink-0"
+                  >
+                    {applyingId === sg.id
+                      ? t("subgroups.applying")
+                      : t("subgroups.cancelApplication")}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={applyingId === sg.id}
+                    onClick={() => onApply(sg.id)}
+                    className="text-sm bg-pitch-700 text-white px-3 py-1.5 rounded-md hover:bg-pitch-800 disabled:opacity-50 shrink-0"
+                  >
+                    {applyingId === sg.id
+                      ? t("subgroups.applying")
+                      : t("subgroups.applyToJoin")}
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section>
         <h2 className="text-lg font-semibold text-pitch-800 mb-3">{t("subgroups.mySubgroups")}</h2>

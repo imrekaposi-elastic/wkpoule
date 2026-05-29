@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import Pagination from "../components/Pagination";
 import { formatStageSlug } from "../utils/formatStage";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
 import { resolveLocale } from "../i18n/languages";
 import { localizedTeam } from "../i18n/teamNames";
-import type { Match, MyPrediction, VirtualGroupTable } from "../types";
+import type { Match, MyPredictionBrief, PaginatedResponse, VirtualGroupTable } from "../types";
 
-function predictionsByMatchId(mine: MyPrediction[]) {
+function predictionsByMatchId(mine: MyPredictionBrief[]) {
   const map: Record<number, { home: number; away: number }> = {};
   for (const p of mine) {
     map[p.match_id] = { home: p.home_score, away: p.away_score };
@@ -40,71 +41,85 @@ export default function Matches() {
   const [stage, setStage] = useState("");
   const [group, setGroup] = useState("");
   const [search, setSearch] = useState("");
+  const [searchApplied, setSearchApplied] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const locale = resolveLocale(i18n.language);
 
   useEffect(() => {
-    const params: Record<string, string> = { predicted_teams: "true" };
-    if (stage) params.stage = stage;
-    if (group) params.group = group;
+    api
+      .get<MyPredictionBrief[]>("/predictions/mine/brief")
+      .then((r) => setMyPredByMatchId(predictionsByMatchId(r.data)))
+      .catch(() => setMyPredByMatchId({}));
+  }, []);
 
-    const loadMatches = api.get<Match[]>("/matches", { params });
-    const loadMine = api
-      .get<MyPrediction[]>("/predictions/mine")
-      .catch(() => ({ data: [] as MyPrediction[] }));
+  const loadMatches = useCallback(
+    (p: number, stageVal: string, groupVal: string, searchVal: string) => {
+      const params: Record<string, string | number> = {
+        predicted_teams: "true",
+        page: p,
+        page_size: 20,
+      };
+      if (stageVal) params.stage = stageVal;
+      if (groupVal) params.group = groupVal;
+      if (searchVal.trim()) params.search = searchVal.trim();
 
-    const showVirtualTable = !!group && (!stage || stage === "group");
+      const showVirtualTable = !!groupVal && (!stageVal || stageVal === "group");
 
-    if (showVirtualTable) {
       setLoading(true);
+      const requests: [
+        ReturnType<typeof api.get<PaginatedResponse<Match>>>,
+        ReturnType<typeof api.get<VirtualGroupTable[]>> | null,
+      ] = [
+        api.get<PaginatedResponse<Match>>("/matches", { params }),
+        showVirtualTable
+          ? api.get<VirtualGroupTable[]>("/predictions/virtual-groups", {
+              params: { _t: Date.now() },
+            })
+          : null,
+      ];
+
       Promise.all([
-        loadMatches,
-        loadMine,
-        api.get<VirtualGroupTable[]>("/predictions/virtual-groups", {
-          params: { _t: Date.now() },
-        }),
+        requests[0],
+        requests[1] ?? Promise.resolve({ data: [] as VirtualGroupTable[] }),
       ])
-        .then(([mr, mineRes, vr]) => {
-          setMatches(mr.data);
-          setMyPredByMatchId(predictionsByMatchId(mineRes.data));
-          const gl = group.trim().toUpperCase();
-          const v =
-            vr.data.find((x) => x.group_letter === gl) ??
-            vr.data.find((x) => x.group_letter?.toUpperCase() === gl);
-          setVirtualGroup(v ?? null);
+        .then(([mr, vr]) => {
+          setMatches(mr.data.items);
+          setPage(mr.data.page);
+          setTotalPages(mr.data.total_pages);
+          setTotal(mr.data.total);
+          if (showVirtualTable) {
+            const gl = groupVal.trim().toUpperCase();
+            const v =
+              vr.data.find((x) => x.group_letter === gl) ??
+              vr.data.find((x) => x.group_letter?.toUpperCase() === gl);
+            setVirtualGroup(v ?? null);
+          } else {
+            setVirtualGroup(null);
+          }
+        })
+        .catch(() => {
+          setMatches([]);
+          setTotal(0);
+          setTotalPages(1);
         })
         .finally(() => setLoading(false));
-    } else {
-      setVirtualGroup(null);
-      setLoading(true);
-      Promise.all([loadMatches, loadMine])
-        .then(([mr, mineRes]) => {
-          setMatches(mr.data);
-          setMyPredByMatchId(predictionsByMatchId(mineRes.data));
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [stage, group]);
+    },
+    [],
+  );
 
-  const filtered = matches.filter((m) => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    const homeName = localizedTeam(m.home_team, i18n.language).toLowerCase();
-    const awayName = localizedTeam(m.away_team, i18n.language).toLowerCase();
-    return (
-      m.home_team?.name.toLowerCase().includes(q) ||
-      m.away_team?.name.toLowerCase().includes(q) ||
-      homeName.includes(q) ||
-      awayName.includes(q) ||
-      m.home_team?.fifa_code.toLowerCase().includes(q) ||
-      m.away_team?.fifa_code.toLowerCase().includes(q) ||
-      m.venue.name.toLowerCase().includes(q) ||
-      m.venue.city.toLowerCase().includes(q)
-    );
-  });
+  useEffect(() => {
+    loadMatches(page, stage, group, searchApplied);
+  }, [page, stage, group, searchApplied, loadMatches]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [stage, group, searchApplied]);
 
   const grouped: Record<string, Match[]> = {};
-  for (const m of filtered) {
+  for (const m of matches) {
     const dateKey = new Date(m.kickoff_utc).toLocaleDateString(locale, {
       weekday: "long",
       year: "numeric",
@@ -156,8 +171,18 @@ export default function Matches() {
           placeholder={t("matches.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") setSearchApplied(search);
+          }}
           className="flex-1 min-w-[200px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-pitch-600 outline-none"
         />
+        <button
+          type="button"
+          onClick={() => setSearchApplied(search)}
+          className="px-3 py-2 rounded-lg bg-pitch-700 text-white text-sm font-medium hover:bg-pitch-800"
+        >
+          {t("matches.searchApply")}
+        </button>
       </div>
 
       {(stage === "" || stage === "group") && !group && (
@@ -176,10 +201,11 @@ export default function Matches() {
         <div className="flex justify-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pitch-600" />
         </div>
-      ) : filtered.length === 0 ? (
+      ) : matches.length === 0 ? (
         <p className="text-gray-500 py-10 text-center">{t("matches.noMatches")}</p>
       ) : (
-        Object.entries(grouped).map(([date, dayMatches]) => (
+        <>
+        {Object.entries(grouped).map(([date, dayMatches]) => (
           <div key={date} className="mb-8">
             <h2 className="text-base sm:text-lg font-semibold text-gray-700 mb-3 sticky top-14 z-10 bg-gray-50/95 backdrop-blur-sm py-2 -mx-1 px-1 border-b border-gray-100 sm:border-0 sm:top-0">
               {date}
@@ -309,7 +335,15 @@ export default function Matches() {
               })}
             </div>
           </div>
-        ))
+        ))}
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          onPageChange={setPage}
+          disabled={loading}
+        />
+        </>
       )}
     </div>
   );

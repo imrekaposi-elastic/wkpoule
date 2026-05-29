@@ -8,6 +8,7 @@ from app.models.fun_comment import FunComment  # noqa: F401
 from app.models.subgroup import (  # noqa: F401
     Subgroup,
     SubgroupInvite,
+    SubgroupJoinRequest,
     SubgroupMember,
     SubgroupMessage,
 )

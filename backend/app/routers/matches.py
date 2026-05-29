@@ -5,9 +5,13 @@ from app.auth import get_admin_user, get_current_user
 from app.database import get_db
 from app.models.match import Match
 from app.models.user import User
+from app.models.team import Team
+from app.models.venue import Venue
 from app.schemas.match import ExpertPrediction, FunCommentOut, MatchOut, ScoreUpdate, VenueOut, TeamOut
+from app.schemas.pagination import DEFAULT_PAGE_SIZE, PaginatedResponse, paginate_list
 from app.services.bracket_resolver import compute_predicted_knockout_teams
 from app.services.expert import generate_expert_prediction
+from app.services.next_match_prediction import first_match_needing_prediction
 from app.services.prediction_lock import match_accepts_prediction_updates
 from app.services.scoring import recalculate_points
 from app.services.weather import get_match_temperature
@@ -60,10 +64,13 @@ def _match_to_out(
     )
 
 
-@router.get("", response_model=list[MatchOut])
+@router.get("", response_model=PaginatedResponse[MatchOut])
 async def list_matches(
     stage: str | None = None,
     group: str | None = None,
+    search: str | None = None,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=20),
     predicted_teams: bool = Query(False, description="Fill knockout TBD teams from your predictions"),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -78,7 +85,19 @@ async def list_matches(
         q = q.filter(Match.stage == stage)
     if group:
         q = q.filter(Match.group_letter == group)
-    matches = q.order_by(Match.kickoff_utc).all()
+    if search and search.strip():
+        term = f"%{search.strip()}%"
+        q = q.filter(
+            Match.home_team.has(Team.name.ilike(term))
+            | Match.away_team.has(Team.name.ilike(term))
+            | Match.home_team.has(Team.fifa_code.ilike(term))
+            | Match.away_team.has(Team.fifa_code.ilike(term))
+            | Match.venue.has(Venue.name.ilike(term))
+            | Match.venue.has(Venue.city.ilike(term))
+        )
+
+    ordered = q.order_by(Match.kickoff_utc).all()
+    paged = paginate_list(ordered, page, page_size)
 
     predicted_map: dict[int, tuple[TeamOut | None, TeamOut | None]] = {}
     bracket_map: dict[int, tuple[str | None, str | None]] = {}
@@ -86,12 +105,37 @@ async def list_matches(
         predicted_map, bracket_map = compute_predicted_knockout_teams(db, user.id)
 
     results = []
-    for m in matches:
+    for m in paged.items:
         temp = await get_match_temperature(m.id, m.venue.city, m.kickoff_utc)
         pair = predicted_map.get(m.match_number)
         slots = bracket_map.get(m.match_number)
         results.append(_match_to_out(m, temp, pair, slots))
-    return results
+    return PaginatedResponse(
+        items=results,
+        total=paged.total,
+        page=paged.page,
+        page_size=paged.page_size,
+        total_pages=paged.total_pages,
+    )
+
+
+@router.get("/next-needing-prediction", response_model=MatchOut | None)
+async def next_match_needing_prediction(
+    predicted_teams: bool = Query(True),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    m = first_match_needing_prediction(db, user.id)
+    if m is None:
+        return None
+    temp = await get_match_temperature(m.id, m.venue.city, m.kickoff_utc)
+    pair = None
+    slots = None
+    if predicted_teams and m.match_number >= 73:
+        pmap, smap = compute_predicted_knockout_teams(db, user.id)
+        pair = pmap.get(m.match_number)
+        slots = smap.get(m.match_number)
+    return _match_to_out(m, temp, pair, slots)
 
 
 @router.get("/by-number/{match_number}", response_model=MatchOut)

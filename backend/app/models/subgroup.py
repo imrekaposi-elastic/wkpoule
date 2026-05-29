@@ -30,6 +30,37 @@ class Subgroup(Base):
         back_populates="subgroup",
         cascade="all, delete-orphan",
     )
+    join_requests: Mapped[list["SubgroupJoinRequest"]] = relationship(
+        back_populates="subgroup",
+        cascade="all, delete-orphan",
+    )
+
+
+class SubgroupJoinRequest(Base):
+    """User-initiated request to join a subgroup; subgroup admin approves or rejects."""
+
+    __tablename__ = "subgroup_join_requests"
+    __table_args__ = (
+        UniqueConstraint("subgroup_id", "user_id", name="uq_subgroup_join_request_user"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    subgroup_id: Mapped[int] = mapped_column(
+        ForeignKey("subgroups.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    decided_by_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+
+    subgroup: Mapped["Subgroup"] = relationship(back_populates="join_requests")
 
 
 class SubgroupMember(Base):

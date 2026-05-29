@@ -4,17 +4,14 @@ import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import ExpertAvatar from "../components/ExpertAvatar";
+import Pagination from "../components/Pagination";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
 import { resolveLocale } from "../i18n/languages";
 import { localizedTeam } from "../i18n/teamNames";
 import { formatStageSlug } from "../utils/formatStage";
 import { funCommentText } from "../utils/funCommentText";
-import {
-  firstMatchNeedingPrediction,
-  isKnockoutStage,
-  isPredictedDraw,
-} from "../utils/predictions";
-import type { Match, MyPrediction, Prediction, VirtualGroupTable } from "../types";
+import { isKnockoutStage, isPredictedDraw } from "../utils/predictions";
+import type { Match, MyPredictionBrief, PaginatedResponse, Prediction, VirtualGroupTable } from "../types";
 
 const PREDICTION_TIP_STORAGE_KEY = "wkpoule_prediction_progress_tip_dismissed";
 
@@ -42,6 +39,9 @@ export default function MatchDetail() {
   const { t, i18n } = useTranslation();
   const [match, setMatch] = useState<Match | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
+  const [predPage, setPredPage] = useState(1);
+  const [predTotalPages, setPredTotalPages] = useState(1);
+  const [predTotal, setPredTotal] = useState(0);
   const [homeScore, setHomeScore] = useState<ScoreInput>("");
   const [awayScore, setAwayScore] = useState<ScoreInput>("");
   const [advanceTeamId, setAdvanceTeamId] = useState<number | null>(null);
@@ -86,13 +86,20 @@ export default function MatchDetail() {
     setAdvanceTeamId(null);
     setVirtualStandings(null);
 
-    const applyPredScores = (rows: Prediction[]) => {
-      const myPred = rows.find((p) => p.user_id === user?.id);
-      if (myPred) {
-        setHomeScore(myPred.home_score);
-        setAwayScore(myPred.away_score);
-        setAdvanceTeamId(myPred.advance_team_id ?? null);
-      } else {
+    const applyMyScoresFromBrief = async (matchId: number) => {
+      try {
+        const briefRes = await api.get<MyPredictionBrief[]>("/predictions/mine/brief");
+        const myPred = briefRes.data.find((b) => b.match_id === matchId);
+        if (myPred) {
+          setHomeScore(myPred.home_score);
+          setAwayScore(myPred.away_score);
+          setAdvanceTeamId(myPred.advance_team_id ?? null);
+        } else {
+          setHomeScore("");
+          setAwayScore("");
+          setAdvanceTeamId(null);
+        }
+      } catch {
         setHomeScore("");
         setAwayScore("");
         setAdvanceTeamId(null);
@@ -118,18 +125,8 @@ export default function MatchDetail() {
         if (cancelled) return;
         setMatch(matchRes.data);
 
-        try {
-          const predRes = await api.get<Prediction[]>(`/predictions/match/${matchRes.data.id}`);
-          if (cancelled) return;
-          setPredictions(predRes.data);
-          applyPredScores(predRes.data);
-        } catch {
-          if (!cancelled) {
-            setPredictions([]);
-            setHomeScore("");
-            setAwayScore("");
-            setAdvanceTeamId(null);
-          }
+        if (!cancelled) {
+          await applyMyScoresFromBrief(matchRes.data.id);
         }
       } catch {
         if (!cancelled) setMatch(null);
@@ -142,6 +139,31 @@ export default function MatchDetail() {
       cancelled = true;
     };
   }, [id, user?.id]);
+
+  useEffect(() => {
+    if (!match?.id || predPage < 1) return;
+    let cancelled = false;
+    api
+      .get<PaginatedResponse<Prediction>>(`/predictions/match/${match.id}`, {
+        params: { page: predPage, page_size: 20 },
+      })
+      .then((r) => {
+        if (cancelled) return;
+        setPredictions(r.data.items);
+        setPredTotalPages(r.data.total_pages);
+        setPredTotal(r.data.total);
+      })
+      .catch(() => {
+        if (!cancelled) setPredictions([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [match?.id, predPage]);
+
+  useEffect(() => {
+    setPredPage(1);
+  }, [match?.id]);
 
   useEffect(() => {
     if (!match?.group_letter) {
@@ -177,19 +199,22 @@ export default function MatchDetail() {
         away_score: awayScore,
         advance_team_id: knockoutDraw ? advanceTeamId : null,
       });
-      const predRes = await api.get<Prediction[]>(`/predictions/match/${match.id}`);
-      setPredictions(predRes.data);
+      await api.get<PaginatedResponse<Prediction>>(`/predictions/match/${match.id}`, {
+        params: { page: predPage, page_size: 20 },
+      }).then((r) => {
+        setPredictions(r.data.items);
+        setPredTotal(r.data.total);
+        setPredTotalPages(r.data.total_pages);
+      });
 
       if (match.group_letter) {
         await loadVirtualStandings(match.group_letter);
       }
 
-      const mineRes = await api.get<MyPrediction[]>("/predictions/mine");
-      const predictedIds = new Set(mineRes.data.map((p) => p.match_id));
-      const allMatches = await api.get<Match[]>("/matches", {
+      const nextRes = await api.get<Match | null>("/matches/next-needing-prediction", {
         params: { predicted_teams: "true" },
       });
-      const nextEmpty = firstMatchNeedingPrediction(allMatches.data, predictedIds);
+      const nextEmpty = nextRes.data;
 
       if (nextEmpty && nextEmpty.match_number !== match.match_number) {
         navigate(`/matches/${nextEmpty.match_number}`, { replace: true });
@@ -625,7 +650,7 @@ export default function MatchDetail() {
 
       <div className="bg-white rounded-xl shadow-md p-6 mt-6">
         <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
-          {t("matchDetail.allPredictions")} ({predictions.length})
+          {t("matchDetail.allPredictions")} ({predTotal})
         </h3>
         {predictions.length === 0 ? (
           <p className="text-gray-500 text-center py-4">{t("matchDetail.noPredictions")}</p>
@@ -689,6 +714,12 @@ export default function MatchDetail() {
             </table>
           </div>
         )}
+        <Pagination
+          page={predPage}
+          totalPages={predTotalPages}
+          total={predTotal}
+          onPageChange={setPredPage}
+        />
       </div>
     </div>
   );
