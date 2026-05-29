@@ -149,7 +149,7 @@ spec:
         detectors: [env]
         timeout: 2s
         override: false
-      # Correlate postgres_exporter metrics with service inventory + map (same service.name as DB spans).
+      # Canonical OTel/APM name for the DB (K8s Deployment/Service and DATABASE_URL host stay "postgres").
       resource/postgres_metrics:
         attributes:
           - action: upsert
