@@ -1,5 +1,6 @@
 # Node + pod container metrics via kubelet (cAdvisor-style). Runs as a DaemonSet on every worker;
 # forwards OTLP metrics to the in-namespace gateway (wkpoule-otel); gateway exports to Elasticsearch (elasticsearch/otel).
+# Also tails wkpoule-prd container stdout (ECS JSON from nginx; API logs stay on OTLP to avoid duplicates).
 #
 # Prereq: OpenTelemetry Operator already installed (same as wkpoule-otel).
 # Apply: oc apply -k openshift/
@@ -61,6 +62,15 @@ spec:
   mode: daemonset
   image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.3.2
   serviceAccount: wkpoule-otel-infra
+  # Read pod log files from the node (CRI writes under /var/log/pods). OpenShift may require hostaccess SCC.
+  volumeMounts:
+    - name: varlogpods
+      mountPath: /var/log/pods
+      readOnly: true
+  volumes:
+    - name: varlogpods
+      hostPath:
+        path: /var/log/pods
   # Schedule on every node (incl. infra masters if tainted).
   tolerations:
     - operator: Exists
@@ -137,6 +147,29 @@ spec:
                 insecure_skip_verify: true
               static_configs:
                 - targets: ["${env:K8S_NODE_IP}:10250"]
+      # wkpoule-prd stdout (frontend nginx ECS JSON). API logs use OTLP — exclude wkpoule-api to avoid duplicates.
+      filelog:
+        include:
+          - /var/log/pods/wkpoule-prd_*/*/*.log
+        exclude:
+          - /var/log/pods/wkpoule-prd_*wkpoule-api*/*/*.log
+          - /var/log/pods/wkpoule-prd_*wkpoule-otel*/*/*.log
+        start_at: end
+        include_file_path: true
+        include_file_name: false
+        operators:
+          - type: container
+            id: container-parser
+          - type: router
+            id: ecs-json-router
+            routes:
+              - expr: body matches "^\\{"
+                output: ecs-json-parser
+          - type: json_parser
+            id: ecs-json-parser
+            parse_from: body
+            parse_to: attributes
+            on_error: send_quiet
 
     processors:
       memory_limiter:
@@ -189,6 +222,33 @@ spec:
         timeout: 5s
         override: false
       batch: {}
+      k8sattributes:
+        auth_type: serviceAccount
+        passthrough: false
+        filter:
+          node_from_env_var: K8S_NODE_NAME
+        extract:
+          metadata:
+            - k8s.namespace.name
+            - k8s.deployment.name
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.container.name
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.uid
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+      # Promote ECS fields from parsed JSON and align service.name with app traces.
+      transform/filelog_ecs:
+        error_mode: silent
+        log_statements:
+          - set(resource.attributes["service.name"], attributes["service.name"]) where attributes["service.name"] != nil
+          - set(resource.attributes["deployment.environment"], attributes["deployment.environment"]) where attributes["deployment.environment"] != nil
+          - set(resource.attributes["service.name"], "wkpoule-frontend") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend" and resource.attributes["service.name"] == nil
+          - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
 
     exporters:
       otlp_http:
@@ -222,4 +282,8 @@ spec:
         metrics/cadvisor:
           receivers: [prometheus/cadvisor]
           processors: [memory_limiter, filter/cadvisor, resource/cadvisor, transform/cadvisor_k8s_attributes, resourcedetection/k8snode, batch]
+          exporters: [otlp_http]
+        logs:
+          receivers: [filelog]
+          processors: [memory_limiter, k8sattributes, resource/infra, transform/filelog_ecs, resourcedetection/k8snode, batch]
           exporters: [otlp_http]

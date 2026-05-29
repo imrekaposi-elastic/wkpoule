@@ -200,6 +200,14 @@ spec:
           - set(resource.attributes["service.instance.id"], "postgresql@wkpoule-prd/postgres") where resource.attributes["k8s.deployment.name"] == "postgres"
           - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "postgres"
           - set(resource.attributes["db.system"], "postgresql") where resource.attributes["k8s.deployment.name"] == "postgres"
+      # DATABASE_URL host is "postgres"; inventory / Postgres OTel service is "postgresql". Link DB client spans.
+      transform/db_peer_service:
+        error_mode: silent
+        trace_statements:
+          - context: span
+            statements:
+              - set(span.attributes["peer.service"], "postgresql") where span.attributes["db.system"] == "postgresql" and resource.attributes["service.name"] == "wkpoule-api"
+              - set(span.attributes["peer.service"], "postgresql") where span.attributes["db.system"] == "postgresql" and span.attributes["server.address"] == "postgres"
       # Enrich OTel spans for Elastic Observability / APM UIs (raw OTel ES export is not enough).
       elasticapm: {}
       # Cluster collector tags logs with collector.role=k8s-cluster. K8s OTel dashboards require
@@ -249,7 +257,7 @@ spec:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [memory_limiter, k8sattributes, resourcedetection/env, batch, elasticapm]
+          processors: [memory_limiter, k8sattributes, resourcedetection/env, transform/db_peer_service, batch, elasticapm]
           exporters: [elasticapm, elasticsearch/otel]
         metrics:
           receivers: [otlp]
@@ -269,5 +277,5 @@ spec:
           exporters: [elasticsearch/otel]
         logs:
           receivers: [otlp]
-          processors: [memory_limiter, k8sattributes, resourcedetection/env, transform/logs_k8s_events_datastream, batch]
+          processors: [memory_limiter, k8sattributes, resourcedetection/env, transform/logs_k8s_events_datastream, batch, elasticapm]
           exporters: [elasticsearch/otel]

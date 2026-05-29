@@ -50,6 +50,17 @@ def register(body: RegisterRequest, db: Session = Depends(get_db)):
     add_user_to_elastic_subgroup(db, user)
     db.commit()
     db.refresh(user)
+    logger.info(
+        "%s registered",
+        user.username,
+        extra={
+            "event.action": "user_register",
+            "event.category": "authentication",
+            "event.outcome": "success",
+            "user.name": user.username,
+            "user.id": user.id,
+        },
+    )
     return user
 
 
@@ -130,5 +141,16 @@ def update_preferred_language(
         user.preferred_language = body.language
         db.commit()
         db.refresh(user)
-        logger.info("user_language user_id=%s language=%s", user.id, body.language)
+        logger.info(
+            "%s updated preferred language",
+            user.username,
+            extra={
+                "event.action": "user_language_update",
+                "event.category": "user",
+                "event.outcome": "success",
+                "user.name": user.username,
+                "user.id": user.id,
+                "user.preferred_language": body.language,
+            },
+        )
     return user

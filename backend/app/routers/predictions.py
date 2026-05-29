@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 
@@ -29,6 +31,7 @@ from app.services.virtual_standings import (
 )
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.get("/milestones", response_model=list[PredictionMilestoneOut])
@@ -73,6 +76,7 @@ def upsert_prediction(
         .filter(Prediction.user_id == user.id, Prediction.match_id == match_id)
         .first()
     )
+    is_update = pred is not None
     if pred:
         pred.home_score = body.home_score
         pred.away_score = body.away_score
@@ -89,6 +93,26 @@ def upsert_prediction(
     db.commit()
     db.refresh(pred)
     record_new_milestones(db, user.id)
+    logger.info(
+        "%s %s prediction for match %s",
+        user.username,
+        "updated" if is_update else "created",
+        match.match_number,
+        extra={
+            "event.action": "prediction_upsert",
+            "event.category": "application",
+            "event.outcome": "success",
+            "event.type": "change",
+            "user.name": user.username,
+            "user.id": user.id,
+            "match.id": match_id,
+            "match.number": match.match_number,
+            "prediction.home_score": body.home_score,
+            "prediction.away_score": body.away_score,
+            "prediction.advance_team_id": advance_team_id,
+            "prediction.is_update": is_update,
+        },
+    )
 
     return PredictionOut(
         id=pred.id,
