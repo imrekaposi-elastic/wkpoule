@@ -17,7 +17,7 @@ def compute_participant_rankings(
     """
     If user_ids is None, rank all users. Otherwise only users in user_ids (must exist).
     """
-    q = db.query(User).filter(User.is_admin.is_(False))
+    q = db.query(User).filter(User.include_in_rankings.is_(True))
     if user_ids is not None:
         if not user_ids:
             return []

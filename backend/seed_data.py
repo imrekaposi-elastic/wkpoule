@@ -623,6 +623,7 @@ def seed():
             email="admin@wkpoule.com",
             password_hash=hash_password("admin123"),
             is_admin=True,
+            include_in_rankings=False,
         )
         db.add(admin)
 

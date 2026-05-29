@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.auth import (
@@ -13,6 +14,7 @@ from app.auth import (
 )
 from app.database import get_db
 from app.models.user import User
+from app.services.elastic_subgroup import add_user_to_elastic_subgroup
 from app.schemas.auth import (
     LoginRequest,
     RefreshRequest,
@@ -31,16 +33,21 @@ logger = logging.getLogger(__name__)
 def register(body: RegisterRequest, db: Session = Depends(get_db)):
     if db.query(User).filter(User.username == body.username).first():
         raise HTTPException(status_code=400, detail="Username already taken")
-    if db.query(User).filter(User.email == body.email).first():
+
+    email = str(body.email).strip().lower()
+    if db.query(User).filter(func.lower(User.email) == email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
 
     user = User(
         username=body.username,
-        email=body.email,
+        email=email,
         password_hash=hash_password(body.password),
         preferred_language=body.preferred_language,
+        is_admin=False,
     )
     db.add(user)
+    db.flush()
+    add_user_to_elastic_subgroup(db, user)
     db.commit()
     db.refresh(user)
     return user

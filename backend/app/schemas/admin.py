@@ -8,14 +8,16 @@ class AdminUserOut(BaseModel):
     username: str
     email: str
     is_admin: bool
+    include_in_rankings: bool
     preferred_language: str
     created_at: datetime
 
     model_config = {"from_attributes": True}
 
 
-class AdminUserRoleIn(BaseModel):
-    is_admin: bool
+class AdminUserPatchIn(BaseModel):
+    is_admin: bool | None = None
+    include_in_rankings: bool | None = None
 
 
 class AdminPasswordResetIn(BaseModel):

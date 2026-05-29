@@ -12,7 +12,7 @@ from app.schemas.admin import (
     AdminSubgroupMemberOut,
     AdminSubgroupOut,
     AdminUserOut,
-    AdminUserRoleIn,
+    AdminUserPatchIn,
 )
 
 router = APIRouter()
@@ -27,9 +27,9 @@ def list_users(
 
 
 @router.patch("/users/{user_id}", response_model=AdminUserOut)
-def update_user_role(
+def update_user(
     user_id: int,
-    body: AdminUserRoleIn,
+    body: AdminUserPatchIn,
     _admin: User = Depends(get_admin_user),
     db: Session = Depends(get_db),
 ):
@@ -37,18 +37,29 @@ def update_user_role(
     if target is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    if body.is_admin == target.is_admin:
+    changed = False
+
+    if body.is_admin is not None and body.is_admin != target.is_admin:
+        if target.is_admin and not body.is_admin:
+            n_admins = db.query(User).filter(User.is_admin.is_(True)).count()
+            if n_admins < 2:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Cannot demote the only administrator",
+                )
+        target.is_admin = body.is_admin
+        changed = True
+
+    if (
+        body.include_in_rankings is not None
+        and body.include_in_rankings != target.include_in_rankings
+    ):
+        target.include_in_rankings = body.include_in_rankings
+        changed = True
+
+    if not changed:
         return target
 
-    if target.is_admin and not body.is_admin:
-        n_admins = db.query(User).filter(User.is_admin.is_(True)).count()
-        if n_admins < 2:
-            raise HTTPException(
-                status_code=400,
-                detail="Cannot demote the only administrator",
-            )
-
-    target.is_admin = body.is_admin
     db.commit()
     db.refresh(target)
     return target

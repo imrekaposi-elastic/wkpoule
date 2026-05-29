@@ -129,6 +129,12 @@ def ensure_schema() -> None:
             )
             conn.execute(
                 text(
+                    "ALTER TABLE users "
+                    "ADD COLUMN IF NOT EXISTS include_in_rankings BOOLEAN NOT NULL DEFAULT TRUE"
+                )
+            )
+            conn.execute(
+                text(
                     "ALTER TABLE subgroup_members "
                     "ADD COLUMN IF NOT EXISTS last_read_message_id INTEGER"
                 )
@@ -182,6 +188,12 @@ def ensure_schema() -> None:
                 conn.execute(
                     text(
                         "ALTER TABLE users ADD COLUMN preferred_language VARCHAR(10) NOT NULL DEFAULT 'en'"
+                    )
+                )
+            if "include_in_rankings" not in user_cols:
+                conn.execute(
+                    text(
+                        "ALTER TABLE users ADD COLUMN include_in_rankings BOOLEAN NOT NULL DEFAULT 1"
                     )
                 )
             cols = {c["name"] for c in insp.get_columns("subgroup_members")}
@@ -259,6 +271,7 @@ def ensure_admin_account(db: Session) -> None:
     row = db.query(User).filter(User.username == "admin").first()
     if row:
         row.is_admin = True
+        row.include_in_rankings = False
         db.commit()
         logger.warning(
             "No administrator was configured; promoted existing user 'admin' to administrator."
@@ -270,6 +283,7 @@ def ensure_admin_account(db: Session) -> None:
             email="admin@wkpoule.com",
             password_hash=hash_password("admin123"),
             is_admin=True,
+            include_in_rankings=False,
         )
     )
     db.commit()
@@ -291,11 +305,13 @@ def apply_bootstrap_admin_password(db: Session) -> None:
                 email="admin@wkpoule.com",
                 password_hash=hash_password(pwd),
                 is_admin=True,
+                include_in_rankings=False,
             )
         )
     else:
         row.password_hash = hash_password(pwd)
         row.is_admin = True
+        row.include_in_rankings = False
     db.commit()
     logger.warning("WKPOULE_BOOTSTRAP_ADMIN_PASSWORD applied: admin password was reset at startup.")
 

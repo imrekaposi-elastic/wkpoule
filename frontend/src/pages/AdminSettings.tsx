@@ -30,6 +30,7 @@ export default function AdminSettings() {
   const [banner, setBanner] = useState<{ ok: boolean; text: string } | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [roleUpdatingId, setRoleUpdatingId] = useState<number | null>(null);
+  const [rankingsUpdatingId, setRankingsUpdatingId] = useState<number | null>(null);
   const [passwordResetFor, setPasswordResetFor] = useState<number | null>(null);
   const [resetPw1, setResetPw1] = useState("");
   const [resetPw2, setResetPw2] = useState("");
@@ -87,6 +88,30 @@ export default function AdminSettings() {
       });
     } finally {
       setRoleUpdatingId(null);
+    }
+  };
+
+  const onRankingsChange = async (u: AdminUserRow, include: boolean) => {
+    setRankingsUpdatingId(u.id);
+    setBanner(null);
+    try {
+      const { data } = await api.patch<AdminUserRow>(`/admin/users/${u.id}`, {
+        include_in_rankings: include,
+      });
+      setRows((prev) => prev.map((row) => (row.id === data.id ? data : row)));
+      setBanner({
+        ok: true,
+        text: include
+          ? t("adminSettings.rankingsIncluded", { username: u.username })
+          : t("adminSettings.rankingsExcluded", { username: u.username }),
+      });
+    } catch (err: unknown) {
+      setBanner({
+        ok: false,
+        text: parseApiDetail(err) ?? t("adminSettings.rankingsUpdateFailed"),
+      });
+    } finally {
+      setRankingsUpdatingId(null);
     }
   };
 
@@ -174,7 +199,7 @@ export default function AdminSettings() {
       <h1 className="text-2xl sm:text-3xl font-bold text-pitch-900 mb-2">
         {t("adminSettings.title")}
       </h1>
-      <p className="text-sm text-gray-600 mb-6">{t("adminSettings.intro")}</p>
+      <p className="text-sm text-gray-600 mb-6 max-w-3xl">{t("adminSettings.intro")}</p>
 
       {banner && (
         <div
@@ -197,6 +222,9 @@ export default function AdminSettings() {
                 <th className="py-3 px-4 font-medium min-w-[18rem]">{t("adminSettings.colEmail")}</th>
                 <th className="py-3 px-4 font-medium">{t("adminSettings.colLanguage")}</th>
                 <th className="py-3 px-4 font-medium">{t("adminSettings.colRole")}</th>
+                <th className="py-3 px-4 font-medium text-center">
+                  {t("adminSettings.colRankings")}
+                </th>
                 <th className="py-3 px-4 font-medium">{t("adminSettings.colJoined")}</th>
                 <th className="py-3 px-4 font-medium text-right">
                   {t("adminSettings.colRoleActions")}
@@ -214,6 +242,7 @@ export default function AdminSettings() {
                 const isSelf = u.id === user?.id;
                 const busy =
                   roleUpdatingId === u.id ||
+                  rankingsUpdatingId === u.id ||
                   deletingId === u.id ||
                   passwordResetSavingId === u.id;
                 return (
@@ -241,6 +270,29 @@ export default function AdminSettings() {
                             {t("adminSettings.rolePlayer")}
                           </span>
                         )}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <label
+                          className={`inline-flex items-center gap-2 cursor-pointer ${
+                            busy ? "opacity-40 cursor-not-allowed" : ""
+                          }`}
+                          title={t("adminSettings.includeInRankings")}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={u.include_in_rankings}
+                            disabled={busy}
+                            onChange={(e) => onRankingsChange(u, e.target.checked)}
+                            className="h-4 w-4 rounded border-gray-300 text-pitch-700 focus:ring-pitch-600"
+                          />
+                          <span className="text-xs text-gray-600 sr-only sm:not-sr-only">
+                            {rankingsUpdatingId === u.id
+                              ? t("adminSettings.rankingsUpdating")
+                              : u.include_in_rankings
+                                ? t("adminSettings.rankingsOn")
+                                : t("adminSettings.rankingsOff")}
+                          </span>
+                        </label>
                       </td>
                       <td className="py-3 px-4 text-gray-600 whitespace-nowrap">
                         {new Date(u.created_at).toLocaleString(locale, {
@@ -305,7 +357,7 @@ export default function AdminSettings() {
                     </tr>
                     {passwordResetFor === u.id && (
                       <tr className="border-b bg-gray-50/90">
-                        <td colSpan={8} className="py-4 px-4">
+                        <td colSpan={9} className="py-4 px-4">
                           <p className="text-xs text-gray-600 mb-3 max-w-xl">
                             {t("adminSettings.resetPasswordHint")}
                           </p>

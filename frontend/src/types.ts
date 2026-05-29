@@ -12,6 +12,7 @@ export interface AdminUserRow {
   username: string;
   email: string;
   is_admin: boolean;
+  include_in_rankings: boolean;
   preferred_language: string;
   created_at: string;
 }

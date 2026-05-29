@@ -1,5 +1,7 @@
 """Integration tests for authentication API flows."""
 
+from app.models.subgroup import Subgroup, SubgroupMember
+
 
 def test_register_login_and_me(client):
     register = client.post(
@@ -30,6 +32,43 @@ def test_register_login_and_me(client):
     )
     assert me.status_code == 200
     assert me.json()["email"] == "player1@example.com"
+
+
+def test_register_elastic_email_joins_elastic_subgroup(client, db):
+    register = client.post(
+        "/api/auth/register",
+        json={
+            "username": "elasticdev",
+            "email": "Dev@Elastic.CO",
+            "password": "secret12",
+        },
+    )
+    assert register.status_code == 201
+    assert register.json()["email"] == "dev@elastic.co"
+    assert register.json()["is_admin"] is False
+
+    user_id = register.json()["id"]
+    sg = db.query(Subgroup).filter(Subgroup.name == "Elastic").one()
+    member = (
+        db.query(SubgroupMember)
+        .filter(
+            SubgroupMember.subgroup_id == sg.id,
+            SubgroupMember.user_id == user_id,
+        )
+        .one()
+    )
+    assert member.role == "member"
+
+    login = client.post(
+        "/api/auth/login",
+        json={"username": "elasticdev", "password": "secret12"},
+    )
+    mine = client.get(
+        "/api/subgroups/mine",
+        headers={"Authorization": f"Bearer {login.json()['access_token']}"},
+    )
+    assert mine.status_code == 200
+    assert any(s["name"] == "Elastic" for s in mine.json())
 
 
 def test_register_rejects_duplicate_username(client):
