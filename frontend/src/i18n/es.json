@@ -287,7 +287,7 @@
     "saveFailed": "No se pudo guardar el pronóstico",
     "locked": "Los pronósticos están bloqueados para este partido.",
     "predictionReadOnly": "Este partido está en directo o el resultado es definitivo — tu pronóstico abajo es solo lectura. Si el partido vuelve a estar próximo, podrás editarlo de nuevo.",
-    "lockedBeforeKickoff": "Los pronósticos están bloqueados — el partido comienza en menos de 4 horas.",
+    "lockedBeforeKickoff": "Los pronósticos están bloqueados — el partido comienza en menos de 30 minutos.",
     "noPredictionBeforeLock": "No guardaste un pronóstico antes del cierre.",
     "allPredictions": "Todos los pronósticos",
     "user": "Usuario",

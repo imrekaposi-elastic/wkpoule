@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.models.match import Match
 
-PREDICTION_LOCK_HOURS_BEFORE_KICKOFF = 4
+PREDICTION_LOCK_MINUTES_BEFORE_KICKOFF = 30
 
 
 def match_accepts_prediction_updates(match: Match) -> bool:
@@ -15,5 +15,5 @@ def match_accepts_prediction_updates(match: Match) -> bool:
     kickoff = match.kickoff_utc
     if kickoff.tzinfo is None:
         kickoff = kickoff.replace(tzinfo=timezone.utc)
-    cutoff = kickoff - timedelta(hours=PREDICTION_LOCK_HOURS_BEFORE_KICKOFF)
+    cutoff = kickoff - timedelta(minutes=PREDICTION_LOCK_MINUTES_BEFORE_KICKOFF)
     return now < cutoff

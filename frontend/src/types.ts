@@ -127,7 +127,7 @@ export interface Match {
   fun_comment: FunComment | null;
   temperature_celsius: number | null;
   expert_prediction: ExpertPrediction | null;
-  /** False when the match is within 4 hours of kickoff or not upcoming */
+  /** False when the match is within 30 minutes of kickoff or not upcoming */
   prediction_editable: boolean;
 }
 

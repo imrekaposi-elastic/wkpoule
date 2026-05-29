@@ -49,7 +49,7 @@ def upsert_prediction(
     if not match_accepts_prediction_updates(match):
         raise HTTPException(
             status_code=400,
-            detail="Predictions cannot be changed within 4 hours of kickoff",
+            detail="Predictions cannot be changed within 30 minutes of kickoff",
         )
 
     home_tid, away_tid = resolve_fixture_team_ids(db, match, user.id)

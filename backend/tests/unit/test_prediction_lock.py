@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.models.match import Match
 from app.services.prediction_lock import (
-    PREDICTION_LOCK_HOURS_BEFORE_KICKOFF,
+    PREDICTION_LOCK_MINUTES_BEFORE_KICKOFF,
     match_accepts_prediction_updates,
 )
 
@@ -21,8 +21,8 @@ def _upcoming_match(kickoff: datetime) -> Match:
     )
 
 
-def test_accepts_updates_more_than_four_hours_before_kickoff():
-    kickoff = datetime.now(timezone.utc) + timedelta(hours=10)
+def test_accepts_updates_more_than_lock_window_before_kickoff():
+    kickoff = datetime.now(timezone.utc) + timedelta(hours=2)
     match = _upcoming_match(kickoff)
 
     assert match_accepts_prediction_updates(match) is True
@@ -30,7 +30,7 @@ def test_accepts_updates_more_than_four_hours_before_kickoff():
 
 def test_rejects_updates_within_lock_window():
     kickoff = datetime.now(timezone.utc) + timedelta(
-        hours=PREDICTION_LOCK_HOURS_BEFORE_KICKOFF - 1
+        minutes=PREDICTION_LOCK_MINUTES_BEFORE_KICKOFF - 1
     )
     match = _upcoming_match(kickoff)
 
@@ -46,7 +46,7 @@ def test_rejects_non_upcoming_matches():
 
 
 def test_naive_kickoff_treated_as_utc():
-    kickoff = datetime.utcnow() + timedelta(hours=10)
+    kickoff = datetime.utcnow() + timedelta(hours=2)
     match = _upcoming_match(kickoff)
 
     assert match_accepts_prediction_updates(match) is True
