@@ -8,6 +8,41 @@ import { resolveLocale } from "../i18n/languages";
 import type { SubgroupDetail as SubgroupDetailType, SubgroupMessage } from "../types";
 import { normalizeRankingsResponse, rankingsItems } from "../utils/rankings";
 
+const AVATAR_PALETTE = [
+  "bg-emerald-600",
+  "bg-sky-600",
+  "bg-violet-600",
+  "bg-amber-600",
+  "bg-rose-600",
+  "bg-teal-600",
+  "bg-indigo-600",
+  "bg-orange-600",
+] as const;
+
+function avatarInitials(username: string): string {
+  const parts = username.trim().split(/[\s._-]+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return username.slice(0, 2).toUpperCase();
+}
+
+function avatarColorClass(username: string): (typeof AVATAR_PALETTE)[number] {
+  let hash = 0;
+  for (let i = 0; i < username.length; i += 1) {
+    hash = username.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
+}
+
+function formatChatTimestamp(iso: string, locale: string): string {
+  const date = new Date(iso);
+  const now = new Date();
+  const sameDay =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+  return date.toLocaleString(locale, sameDay ? { timeStyle: "short" } : { dateStyle: "short", timeStyle: "short" });
+}
+
 export default function SubgroupDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -357,52 +392,120 @@ export default function SubgroupDetail() {
         </div>
       </section>
 
-      <section className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-        <h2 className="text-lg font-semibold text-pitch-800 mb-1">{t("subgroups.chatTitle")}</h2>
-        <p className="text-xs text-gray-500 mb-3">{t("subgroups.chatMaxNote")}</p>
-        <div className="border border-gray-200 rounded-lg h-64 overflow-y-auto p-3 bg-gray-50 mb-3 text-sm space-y-2">
-          {messages.map((m) => (
-            <div key={m.id} className="text-gray-800 group">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <span className="font-medium text-pitch-800">{m.username}</span>
-                  <span className="text-xs text-gray-400 ml-2">
-                    {new Date(m.created_at).toLocaleString(locale, {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    })}
-                  </span>
-                  <p className="mt-0.5 whitespace-pre-wrap break-words">{m.body}</p>
-                </div>
-                {detail.my_role === "admin" && (
-                  <button
-                    type="button"
-                    onClick={() => onDeleteMessage(m.id)}
-                    className="shrink-0 text-xs text-red-600 hover:text-red-800 px-1"
-                  >
-                    {t("subgroups.deleteMessage")}
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-          <div ref={chatEndRef} />
+      <section className="overflow-hidden rounded-2xl border border-pitch-800/10 bg-white shadow-lg ring-1 ring-black/5">
+        <div className="flex items-center justify-between gap-3 border-b border-pitch-800/10 bg-gradient-to-r from-pitch-800 to-pitch-700 px-4 py-3 sm:px-5">
+          <div>
+            <h2 className="text-base font-semibold text-white sm:text-lg">{t("subgroups.chatTitle")}</h2>
+            <p className="text-xs text-pitch-50/80">{t("subgroups.chatMaxNote")}</p>
+          </div>
+          {messages.length > 0 && (
+            <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+              {messages.length}
+            </span>
+          )}
         </div>
-        <form onSubmit={onSendMessage} className="flex flex-col sm:flex-row gap-2">
-          <textarea
-            value={msgBody}
-            onChange={(e) => setMsgBody(e.target.value)}
-            placeholder={t("subgroups.chatPlaceholder")}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm min-h-[4rem] w-full min-w-0"
-            maxLength={2000}
-          />
-          <button
-            type="submit"
-            disabled={!msgBody.trim()}
-            className="sm:self-end shrink-0 bg-pitch-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 touch-manipulation min-h-[44px]"
-          >
-            {t("subgroups.send")}
-          </button>
+
+        <div
+          className="relative max-h-[min(28rem,55vh)] min-h-[16rem] overflow-y-auto scroll-smooth bg-gradient-to-b from-pitch-50/80 via-white to-gray-50/90 px-3 py-4 sm:px-5"
+          aria-live="polite"
+        >
+          {messages.length === 0 ? (
+            <div className="flex h-full min-h-[12rem] flex-col items-center justify-center px-4 text-center">
+              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-pitch-50 text-2xl shadow-inner ring-1 ring-pitch-600/10">
+                💬
+              </div>
+              <p className="text-sm font-medium text-pitch-900">{t("subgroups.chatPlaceholder")}</p>
+              <p className="mt-1 max-w-xs text-xs text-gray-500">{t("subgroups.chatMaxNote")}</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {messages.map((m) => {
+                const isOwn = m.user_id === user?.id;
+                return (
+                  <div
+                    key={m.id}
+                    className={`group flex gap-2.5 ${isOwn ? "flex-row-reverse" : "flex-row"}`}
+                  >
+                    {!isOwn && (
+                      <div
+                        className={`mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm ${avatarColorClass(m.username)}`}
+                        aria-hidden
+                      >
+                        {avatarInitials(m.username)}
+                      </div>
+                    )}
+                    <div
+                      className={`relative max-w-[85%] sm:max-w-[75%] ${isOwn ? "items-end" : "items-start"} flex flex-col`}
+                    >
+                      <div
+                        className={`flex items-baseline gap-2 ${isOwn ? "flex-row-reverse" : "flex-row"}`}
+                      >
+                        {!isOwn && (
+                          <span className="text-xs font-semibold text-pitch-800">{m.username}</span>
+                        )}
+                        <time
+                          className="text-[11px] text-gray-400 tabular-nums"
+                          dateTime={m.created_at}
+                        >
+                          {formatChatTimestamp(m.created_at, locale)}
+                        </time>
+                      </div>
+                      <div
+                        className={`relative mt-1 rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm ${
+                          isOwn
+                            ? "rounded-tr-md bg-pitch-700 text-white"
+                            : "rounded-tl-md border border-gray-100 bg-white text-gray-800"
+                        }`}
+                      >
+                        <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                        {detail.my_role === "admin" && (
+                          <button
+                            type="button"
+                            onClick={() => onDeleteMessage(m.id)}
+                            className={`absolute -top-2 rounded-full border bg-white px-2 py-0.5 text-[10px] font-medium text-red-600 opacity-0 shadow-sm transition-opacity hover:bg-red-50 group-hover:opacity-100 ${
+                              isOwn ? "-left-2" : "-right-2"
+                            }`}
+                          >
+                            {t("subgroups.deleteMessage")}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          <div ref={chatEndRef} className="h-1" />
+        </div>
+
+        <form
+          onSubmit={onSendMessage}
+          className="border-t border-gray-100 bg-gray-50/80 p-3 sm:p-4"
+        >
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <div className="relative flex-1">
+              <textarea
+                value={msgBody}
+                onChange={(e) => setMsgBody(e.target.value)}
+                placeholder={t("subgroups.chatPlaceholder")}
+                rows={2}
+                className="w-full min-h-[4.5rem] resize-none rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm shadow-sm transition-shadow placeholder:text-gray-400 focus:border-pitch-600 focus:outline-none focus:ring-2 focus:ring-pitch-600/20"
+                maxLength={2000}
+              />
+              <span className="pointer-events-none absolute bottom-2 right-2 text-[10px] tabular-nums text-gray-400">
+                {msgBody.length}/2000
+              </span>
+            </div>
+            <button
+              type="submit"
+              disabled={!msgBody.trim()}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-pitch-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-pitch-800 disabled:cursor-not-allowed disabled:opacity-45 sm:min-h-[44px] touch-manipulation"
+            >
+              <span aria-hidden>➤</span>
+              {t("subgroups.send")}
+            </button>
+          </div>
         </form>
       </section>
     </div>
