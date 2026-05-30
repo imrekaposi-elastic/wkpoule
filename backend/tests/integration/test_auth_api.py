@@ -81,10 +81,40 @@ def test_register_rejects_duplicate_username(client):
 
     second = client.post(
         "/api/auth/register",
-        json={**payload, "email": "second@example.com"},
+        json={**payload, "email": "second@example.com", "username": "DupUser"},
     )
     assert second.status_code == 400
     assert "Username" in second.json()["detail"]
+
+
+def test_login_is_case_insensitive(client):
+    client.post(
+        "/api/auth/register",
+        json={
+            "username": "Imre.Kaposi",
+            "email": "imre@example.com",
+            "password": "secret12",
+        },
+    )
+
+    login = client.post(
+        "/api/auth/login",
+        json={"username": "iMre.KAPOsi", "password": "secret12"},
+    )
+    assert login.status_code == 200
+
+
+def test_register_stores_lowercase_username(client):
+    register = client.post(
+        "/api/auth/register",
+        json={
+            "username": "Mixed.Case",
+            "email": "mixed@example.com",
+            "password": "secret12",
+        },
+    )
+    assert register.status_code == 201
+    assert register.json()["username"] == "mixed.case"
 
 
 def test_login_rejects_invalid_credentials(client):

@@ -66,7 +66,10 @@ export default function Register() {
               minLength={3}
               maxLength={50}
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => setUsername(e.target.value.toLowerCase())}
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pitch-600 focus:border-transparent outline-none transition"
             />
           </div>

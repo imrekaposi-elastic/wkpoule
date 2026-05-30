@@ -14,6 +14,7 @@ from app.auth import (
 )
 from app.database import get_db
 from app.models.user import User
+from app.username import get_user_by_username
 from app.services.elastic_subgroup import add_user_to_elastic_subgroup
 from app.schemas.auth import (
     LoginRequest,
@@ -31,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register(body: RegisterRequest, db: Session = Depends(get_db)):
-    if db.query(User).filter(User.username == body.username).first():
+    if get_user_by_username(db, body.username):
         raise HTTPException(status_code=400, detail="Username already taken")
 
     email = str(body.email).strip().lower()
@@ -69,7 +70,7 @@ def self_service_reset_password(
     body: SelfServicePasswordResetIn,
     db: Session = Depends(get_db),
 ):
-    user = db.query(User).filter(User.username == body.username).first()
+    user = get_user_by_username(db, body.username)
     email_norm = body.email.strip().lower()
     if user is None or (user.email or "").strip().lower() != email_norm:
         raise HTTPException(
@@ -83,7 +84,7 @@ def self_service_reset_password(
 
 @router.post("/login", response_model=TokenResponse)
 def login(body: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == body.username).first()
+    user = get_user_by_username(db, body.username)
     if not user or not verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     logger.info(
@@ -105,24 +106,25 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 
 @router.post("/refresh", response_model=TokenResponse)
 def refresh(body: RefreshRequest, db: Session = Depends(get_db)):
-    username = _decode_token(body.refresh_token, "refresh")
-    user = db.query(User).filter(User.username == username).first()
+    token_username = _decode_token(body.refresh_token, "refresh")
+    user = get_user_by_username(db, token_username)
+    canonical_username = user.username if user is not None else token_username
     extra = {
         "event.action": "session_refresh",
         "event.category": "authentication",
         "event.outcome": "success",
-        "user.name": username,
+        "user.name": canonical_username,
     }
     if user is not None:
         extra["user.id"] = user.id
     logger.info(
         "%s has refreshed their session successfully",
-        username,
+        canonical_username,
         extra=extra,
     )
     return TokenResponse(
-        access_token=create_access_token(username),
-        refresh_token=create_refresh_token(username),
+        access_token=create_access_token(canonical_username),
+        refresh_token=create_refresh_token(canonical_username),
     )
 
 

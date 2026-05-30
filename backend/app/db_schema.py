@@ -117,6 +117,38 @@ def _backfill_venue_es_it(conn) -> None:
         )
 
 
+def _normalize_user_usernames(conn) -> None:
+    """Store usernames in lowercase; resolve case-only duplicates by keeping the oldest account."""
+    rows = conn.execute(text("SELECT id, username FROM users ORDER BY id")).fetchall()
+    by_lower: dict[str, list[tuple[int, str]]] = {}
+    for uid, uname in rows:
+        key = (uname or "").strip().lower()
+        by_lower.setdefault(key, []).append((uid, uname))
+
+    for key, group in by_lower.items():
+        group.sort(key=lambda item: item[0])
+        keep_id, keep_name = group[0]
+        if keep_name != key:
+            conn.execute(
+                text("UPDATE users SET username = :username WHERE id = :id"),
+                {"username": key, "id": keep_id},
+            )
+        for uid, uname in group[1:]:
+            renamed = f"{key}_{uid}"
+            logger.warning(
+                "Renaming duplicate username id=%s from %r to %r (kept id=%s as %r)",
+                uid,
+                uname,
+                renamed,
+                keep_id,
+                key,
+            )
+            conn.execute(
+                text("UPDATE users SET username = :username WHERE id = :id"),
+                {"username": renamed, "id": uid},
+            )
+
+
 def ensure_schema() -> None:
     dialect = engine.dialect.name
     with engine.begin() as conn:
@@ -290,6 +322,7 @@ def ensure_schema() -> None:
         _backfill_venue_hebrew(conn)
         _backfill_venue_es_it(conn)
         _backfill_fun_comment_it_es(conn)
+        _normalize_user_usernames(conn)
 
         conn.execute(
             text(
