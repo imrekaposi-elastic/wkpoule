@@ -216,7 +216,14 @@
     "openSubgroup": "Abrir",
     "unreadSubgroupTitle": "Chat de subgrupo sin leer",
     "viewSubgroups": "Subgrupos",
-    "noUnreadSubgroup": "No hay mensajes sin leer en tus subgrupos."
+    "noUnreadSubgroup": "No hay mensajes sin leer en tus subgrupos.",
+    "matchCalendar": "Calendario de partidos",
+    "previousDay": "Día anterior",
+    "nextDay": "Día siguiente",
+    "today": "Hoy",
+    "noMatchesOnDay": "No hay partidos programados para este día.",
+    "timesInTimezone": "Horarios en {{tz}}",
+    "viewSchedule": "Calendario completo"
   },
   "matches": {
     "title": "Calendario de partidos",

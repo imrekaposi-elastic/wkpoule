@@ -216,7 +216,14 @@
     "openSubgroup": "Open",
     "unreadSubgroupTitle": "Unread subgroup chat",
     "viewSubgroups": "Subgroups",
-    "noUnreadSubgroup": "No unread messages in your subgroups."
+    "noUnreadSubgroup": "No unread messages in your subgroups.",
+    "matchCalendar": "Match calendar",
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
+    "today": "Today",
+    "noMatchesOnDay": "No matches scheduled on this day.",
+    "timesInTimezone": "Times shown in {{tz}}",
+    "viewSchedule": "Full schedule"
   },
   "matches": {
     "title": "Match Schedule",

@@ -215,7 +215,14 @@
     "openSubgroup": "פתח",
     "unreadSubgroupTitle": "צ'אט תת-קבוצה שלא נקרא",
     "viewSubgroups": "תת-קבוצה",
-    "noUnreadSubgroup": "אין הודעות שלא נקראו בתת-הקבוצות שלך."
+    "noUnreadSubgroup": "אין הודעות שלא נקראו בתת-הקבוצות שלך.",
+    "matchCalendar": "לוח משחקים",
+    "previousDay": "יום קודם",
+    "nextDay": "יום הבא",
+    "today": "היום",
+    "noMatchesOnDay": "אין משחקים מתוכננים ליום זה.",
+    "timesInTimezone": "שעות מוצגות ב-{{tz}}",
+    "viewSchedule": "לוח משחקים מלא"
   },
   "matches": {
     "title": "לוח משחקים",

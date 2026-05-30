@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 
@@ -11,6 +13,7 @@ from app.schemas.match import ExpertPrediction, FunCommentOut, MatchOut, ScoreUp
 from app.schemas.pagination import DEFAULT_PAGE_SIZE, PaginatedResponse, paginate_list
 from app.services.bracket_resolver import compute_predicted_knockout_teams
 from app.services.expert import generate_expert_prediction
+from app.services.match_calendar import utc_bounds_for_local_day
 from app.services.next_match_prediction import first_match_needing_prediction
 from app.services.prediction_lock import match_accepts_prediction_updates
 from app.services.scoring import recalculate_points
@@ -167,6 +170,48 @@ async def get_match_by_match_number(
         pair = pmap.get(m.match_number)
         slots = smap.get(m.match_number)
     return _match_to_out(m, temp, pair, slots)
+
+
+@router.get("/by-day", response_model=list[MatchOut])
+async def matches_by_day(
+    date: date = Query(..., description="Local calendar date (YYYY-MM-DD)"),
+    tz: str = Query(..., min_length=1, max_length=64, description="IANA timezone"),
+    predicted_teams: bool = Query(True, description="Fill knockout TBD teams from your predictions"),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        start_utc, end_utc = utc_bounds_for_local_day(date, tz)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    rows = (
+        db.query(Match)
+        .options(
+            joinedload(Match.home_team),
+            joinedload(Match.away_team),
+            joinedload(Match.venue),
+            joinedload(Match.fun_comment),
+        )
+        .filter(Match.kickoff_utc >= start_utc, Match.kickoff_utc <= end_utc)
+        .order_by(Match.kickoff_utc)
+        .all()
+    )
+
+    predicted_map: dict[int, tuple[TeamOut | None, TeamOut | None]] = {}
+    bracket_map: dict[int, tuple[str | None, str | None]] = {}
+    if predicted_teams:
+        predicted_map, bracket_map = compute_predicted_knockout_teams(db, user.id)
+
+    return [
+        _match_to_out(
+            m,
+            None,
+            predicted_map.get(m.match_number),
+            bracket_map.get(m.match_number),
+        )
+        for m in rows
+    ]
 
 
 @router.get("/{match_id}", response_model=MatchOut)

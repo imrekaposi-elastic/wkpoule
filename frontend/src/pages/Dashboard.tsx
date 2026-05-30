@@ -2,13 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import MatchDayCalendar from "../components/MatchDayCalendar";
 import { useAuth } from "../context/AuthContext";
 import { resolveLocale } from "../i18n/languages";
-import { localizedTeamName } from "../i18n/teamNames";
 import type {
   Match,
-  MyPrediction,
-  PaginatedResponse,
   ParticipantRanking,
   SubgroupDetail,
   SubgroupMine,
@@ -22,7 +20,6 @@ export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const [matchToPredict, setMatchToPredict] = useState<Match | null>(null);
   const [myRank, setMyRank] = useState<ParticipantRanking | null>(null);
-  const [recentPredictions, setRecentPredictions] = useState<MyPrediction[]>([]);
   const [subgroupMine, setSubgroupMine] = useState<SubgroupMine[]>([]);
   const [subgroupRankings, setSubgroupRankings] = useState<SubgroupDetail[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,15 +58,11 @@ export default function Dashboard() {
         params: { predicted_teams: "true" },
       }),
       api.get<ParticipantRanking | null>("/rankings/me"),
-      api.get<PaginatedResponse<MyPrediction>>("/predictions/mine", {
-        params: { page: 1, page_size: 5 },
-      }),
       api.get<SubgroupMine[]>("/subgroups/mine").catch(() => ({ data: [] as SubgroupMine[] })),
     ])
-      .then(([nextRes, myRankRes, predsRes, subRes]) => {
+      .then(([nextRes, myRankRes, subRes]) => {
         setMatchToPredict(nextRes.data);
         setMyRank(myRankRes.data);
-        setRecentPredictions(predsRes.data.items);
         setSubgroupMine(subRes.data);
         return loadSubgroupRankings(subRes.data);
       })
@@ -329,67 +322,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Predictions */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-lg font-semibold mb-4">{t("dashboard.recentPredictions")}</h2>
-        {recentPredictions.length === 0 ? (
-          <p className="text-gray-500">
-            {t("dashboard.noPredictions")}{" "}
-            <Link to="/matches" className="text-pitch-600 hover:underline">
-              {t("dashboard.startPredicting")}
-            </Link>
-          </p>
-        ) : (
-          <div className="overflow-x-auto overscroll-x-contain">
-            <table className="w-full text-sm min-w-[28rem]">
-              <thead>
-                <tr className="text-left text-gray-500 border-b">
-                  <th className="pb-2 font-medium">#</th>
-                  <th className="pb-2 font-medium">{t("dashboard.matchCol")}</th>
-                  <th className="pb-2 font-medium">{t("dashboard.yourPrediction")}</th>
-                  <th className="pb-2 font-medium">{t("dashboard.statusCol")}</th>
-                  <th className="pb-2 font-medium">{t("dashboard.pointsCol")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentPredictions.map((p) => (
-                  <tr key={p.match_id} className="border-b last:border-0">
-                    <td className="py-2.5">{p.match_number}</td>
-                    <td className="py-2.5">
-                      {p.home_team
-                        ? localizedTeamName(p.home_team_code, p.home_team, i18n.language)
-                        : t("dashboard.tbd")}{" "}
-                      vs{" "}
-                      {p.away_team
-                        ? localizedTeamName(p.away_team_code, p.away_team, i18n.language)
-                        : t("dashboard.tbd")}
-                    </td>
-                    <td className="py-2.5 font-mono">
-                      {p.home_score} - {p.away_score}
-                    </td>
-                    <td className="py-2.5">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                          p.match_status === "completed"
-                            ? "bg-green-100 text-green-700"
-                            : p.match_status === "in_progress"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-blue-100 text-blue-700"
-                        }`}
-                      >
-                        {t(`matches.${p.match_status}`, p.match_status)}
-                      </span>
-                    </td>
-                    <td className="py-2.5 font-semibold">
-                      {p.points !== null ? p.points : "-"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      <MatchDayCalendar />
     </div>
   );
 }

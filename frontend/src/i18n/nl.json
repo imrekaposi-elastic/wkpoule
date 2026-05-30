@@ -216,7 +216,14 @@
     "openSubgroup": "Openen",
     "unreadSubgroupTitle": "Ongelezen subgroep-chat",
     "viewSubgroups": "Subgroep",
-    "noUnreadSubgroup": "Geen ongelezen berichten in je subgroepen."
+    "noUnreadSubgroup": "Geen ongelezen berichten in je subgroepen.",
+    "matchCalendar": "Wedstrijdkalender",
+    "previousDay": "Vorige dag",
+    "nextDay": "Volgende dag",
+    "today": "Vandaag",
+    "noMatchesOnDay": "Geen wedstrijden gepland op deze dag.",
+    "timesInTimezone": "Tijden weergegeven in {{tz}}",
+    "viewSchedule": "Volledig schema"
   },
   "matches": {
     "title": "Wedstrijdschema",
