@@ -49,6 +49,19 @@ export function browserTimeZone(): string {
   }
 }
 
+export function kickoffToLocalDateKey(iso: string, timeZone: string): string {
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date(iso));
+  } catch {
+    return iso.slice(0, 10);
+  }
+}
+
 export function formatTimeZoneLabel(tz: string, locale: string): string {
   try {
     const parts = new Intl.DateTimeFormat(locale, {

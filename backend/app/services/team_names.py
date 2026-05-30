@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import unicodedata
+from types import SimpleNamespace
+
 from babel import Locale
 from babel.core import UnknownLocaleError
 
@@ -96,6 +99,10 @@ def _locale_for(language: str) -> Locale:
     return _locale_cache[base]
 
 
+def _normalize_search_text(value: str) -> str:
+    return unicodedata.normalize("NFKC", value).strip().casefold()
+
+
 def localized_team_name(fifa_code: str, fallback_name: str, language: str) -> str:
     base = _base_language(language)
     subdivision = SUBDIVISION_NAMES.get(fifa_code, {}).get(base)
@@ -111,16 +118,20 @@ def localized_team_name(fifa_code: str, fallback_name: str, language: str) -> st
 
 
 def team_search_aliases(team: Team) -> set[str]:
-    aliases = {team.name.lower(), team.fifa_code.lower()}
+    aliases = {_normalize_search_text(team.name), _normalize_search_text(team.fifa_code)}
     for lang in SUPPORTED_SEARCH_LANGUAGES:
-        aliases.add(localized_team_name(team.fifa_code, team.name, lang).lower())
+        aliases.add(_normalize_search_text(localized_team_name(team.fifa_code, team.name, lang)))
     return aliases
 
 
 def team_matches_search(team: Team | None, term: str) -> bool:
     if team is None:
         return False
-    needle = term.strip().lower()
+    needle = _normalize_search_text(term)
     if not needle:
         return True
     return any(needle in alias for alias in team_search_aliases(team))
+
+
+def team_out_matches_search(fifa_code: str, name: str, term: str) -> bool:
+    return team_matches_search(SimpleNamespace(fifa_code=fifa_code, name=name), term)

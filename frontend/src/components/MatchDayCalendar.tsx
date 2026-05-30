@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { resolveLocale } from "../i18n/languages";
 import { localizedTeam } from "../i18n/teamNames";
-import type { Match, MyPredictionBrief } from "../types";
+import type { Match, MyPredictionBrief, PaginatedResponse } from "../types";
 import { formatStageSlug } from "../utils/formatStage";
 import {
   browserTimeZone,
@@ -13,6 +13,7 @@ import {
   formatCalendarDayHeader,
   formatMatchTime,
   formatTimeZoneLabel,
+  kickoffToLocalDateKey,
   shiftLocalDateKey,
   todayLocalDateKey,
 } from "../utils/matchCalendar";
@@ -34,7 +35,7 @@ export default function MatchDayCalendar() {
   const { t, i18n } = useTranslation();
   const locale = resolveLocale(i18n.language);
   const timeZone = browserTimeZone();
-  const [selectedDate, setSelectedDate] = useState(todayLocalDateKey);
+  const [selectedDate, setSelectedDate] = useState(() => todayLocalDateKey());
   const [firstMatchLocalDate, setFirstMatchLocalDate] = useState<string | null>(null);
   const [matches, setMatches] = useState<Match[]>([]);
   const [myPredByMatchId, setMyPredByMatchId] = useState<
@@ -43,15 +44,48 @@ export default function MatchDayCalendar() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api
-      .get<CalendarMeta>("/matches/calendar-meta", { params: { tz: timeZone } })
-      .then((r) => setFirstMatchLocalDate(r.data.first_match_local_date))
-      .catch(() => setFirstMatchLocalDate(null));
+    let cancelled = false;
+
+    async function loadFirstMatchDate() {
+      try {
+        const meta = await api.get<CalendarMeta>("/matches/calendar-meta", {
+          params: { tz: timeZone },
+        });
+        if (!cancelled) {
+          setFirstMatchLocalDate(meta.data.first_match_local_date);
+        }
+        return;
+      } catch {
+        // Fall back when calendar-meta is unavailable on older deployments.
+      }
+
+      try {
+        const schedule = await api.get<PaginatedResponse<Match>>("/matches", {
+          params: { page: 1, page_size: 1 },
+        });
+        const first = schedule.data.items[0];
+        if (!cancelled && first) {
+          setFirstMatchLocalDate(kickoffToLocalDateKey(first.kickoff_utc, timeZone));
+        }
+      } catch {
+        if (!cancelled) setFirstMatchLocalDate(null);
+      }
+    }
+
+    loadFirstMatchDate();
 
     api
       .get<MyPredictionBrief[]>("/predictions/mine/brief")
-      .then((r) => setMyPredByMatchId(predictionsByMatchId(r.data)))
-      .catch(() => setMyPredByMatchId({}));
+      .then((r) => {
+        if (!cancelled) setMyPredByMatchId(predictionsByMatchId(r.data));
+      })
+      .catch(() => {
+        if (!cancelled) setMyPredByMatchId({});
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [timeZone]);
 
   const loadDay = useCallback(
@@ -82,6 +116,12 @@ export default function MatchDayCalendar() {
     firstMatchLocalDate && compareLocalDateKeys(selectedDate, firstMatchLocalDate) < 0
       ? daysUntilLocalDate(selectedDate, firstMatchLocalDate)
       : null;
+  const countdownLabel =
+    daysUntilStart === 1
+      ? t("dashboard.worldCupCountdown_one", { count: daysUntilStart })
+      : daysUntilStart && daysUntilStart > 1
+        ? t("dashboard.worldCupCountdown_other", { count: daysUntilStart })
+        : null;
 
   const statusClass = (status: string) => {
     if (status === "completed") return "bg-green-100 text-green-700";
@@ -147,14 +187,12 @@ export default function MatchDayCalendar() {
         </button>
       </div>
 
-      {daysUntilStart !== null && daysUntilStart > 0 && (
+      {countdownLabel && (
         <div className="rounded-xl border border-pitch-200 bg-gradient-to-br from-pitch-50 to-green-50 px-4 py-5 text-center mb-5">
           <span className="text-3xl" aria-hidden>
             ⚽
           </span>
-          <p className="mt-2 text-base font-semibold text-pitch-900">
-            {t("dashboard.worldCupCountdown", { count: daysUntilStart })}
-          </p>
+          <p className="mt-2 text-base font-semibold text-pitch-900">{countdownLabel}</p>
           {firstMatchLocalDate && (
             <p className="mt-1 text-sm text-gray-600">
               {t("dashboard.worldCupStartsOn", {

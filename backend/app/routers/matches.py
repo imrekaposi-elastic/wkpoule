@@ -24,22 +24,31 @@ from app.services.match_calendar import local_date_for_utc_instant, utc_bounds_f
 from app.services.next_match_prediction import first_match_needing_prediction
 from app.services.prediction_lock import match_accepts_prediction_updates
 from app.services.scoring import recalculate_points
-from app.services.team_names import team_matches_search
+from app.services.team_names import team_matches_search, team_out_matches_search
 from app.services.weather import get_match_temperature
 
 router = APIRouter()
 
 
-def _match_matches_search(m: Match, term: str) -> bool:
-    needle = term.strip().lower()
+def _match_matches_search(
+    m: Match,
+    term: str,
+    predicted_pair: tuple[TeamOut | None, TeamOut | None] | None = None,
+) -> bool:
+    needle = term.strip()
     if not needle:
         return True
     if team_matches_search(m.home_team, needle) or team_matches_search(m.away_team, needle):
         return True
+    if predicted_pair:
+        for team in predicted_pair:
+            if team and team_out_matches_search(team.fifa_code, team.name, needle):
+                return True
     venue = m.venue
     if venue is None:
         return False
-    return needle in venue.name.lower() or needle in venue.city.lower()
+    normalized = needle.casefold()
+    return normalized in venue.name.casefold() or normalized in venue.city.casefold()
 
 
 def _match_to_out(
@@ -110,14 +119,22 @@ async def list_matches(
         q = q.filter(Match.group_letter == group)
 
     ordered = q.order_by(Match.kickoff_utc).all()
-    if search and search.strip():
-        ordered = [m for m in ordered if _match_matches_search(m, search)]
-
-    paged = paginate_list(ordered, page, page_size)
 
     predicted_map: dict[int, tuple[TeamOut | None, TeamOut | None]] = {}
     bracket_map: dict[int, tuple[str | None, str | None]] = {}
-    if predicted_teams:
+    if predicted_teams or (search and search.strip()):
+        predicted_map, bracket_map = compute_predicted_knockout_teams(db, user.id)
+
+    if search and search.strip():
+        ordered = [
+            m
+            for m in ordered
+            if _match_matches_search(m, search, predicted_map.get(m.match_number))
+        ]
+
+    paged = paginate_list(ordered, page, page_size)
+
+    if predicted_teams and not predicted_map:
         predicted_map, bracket_map = compute_predicted_knockout_teams(db, user.id)
 
     results = []
@@ -132,6 +149,25 @@ async def list_matches(
         page=paged.page,
         page_size=paged.page_size,
         total_pages=paged.total_pages,
+    )
+
+
+@router.get("/calendar-meta", response_model=CalendarMetaOut)
+def calendar_meta(
+    tz: str = Query(..., min_length=1, max_length=64, description="IANA timezone"),
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+):
+    first_kickoff = db.query(func.min(Match.kickoff_utc)).scalar()
+    if first_kickoff is None:
+        raise HTTPException(status_code=404, detail="No matches scheduled")
+    try:
+        first_local = local_date_for_utc_instant(first_kickoff, tz)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return CalendarMetaOut(
+        first_kickoff_utc=first_kickoff,
+        first_match_local_date=first_local,
     )
 
 
@@ -183,25 +219,6 @@ async def get_match_by_match_number(
         pair = pmap.get(m.match_number)
         slots = smap.get(m.match_number)
     return _match_to_out(m, temp, pair, slots)
-
-
-@router.get("/calendar-meta", response_model=CalendarMetaOut)
-def calendar_meta(
-    tz: str = Query(..., min_length=1, max_length=64, description="IANA timezone"),
-    db: Session = Depends(get_db),
-    _user: User = Depends(get_current_user),
-):
-    first_kickoff = db.query(func.min(Match.kickoff_utc)).scalar()
-    if first_kickoff is None:
-        raise HTTPException(status_code=404, detail="No matches scheduled")
-    try:
-        first_local = local_date_for_utc_instant(first_kickoff, tz)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    return CalendarMetaOut(
-        first_kickoff_utc=first_kickoff,
-        first_match_local_date=first_local,
-    )
 
 
 @router.get("/by-day", response_model=list[MatchOut])
