@@ -222,7 +222,12 @@
     "today": "Hoje",
     "noMatchesOnDay": "Nenhum jogo agendado para este dia.",
     "timesInTimezone": "Horários em {{tz}}",
-    "viewSchedule": "Calendário completo"
+    "viewSchedule": "Calendário completo",
+    "worldCupCountdown_one": "A Copa do Mundo começa em {{count}} dia",
+    "worldCupCountdown_other": "A Copa do Mundo começa em {{count}} dias",
+    "worldCupStartsOn": "Primeiro dia de jogos: {{date}}",
+    "yourPredictionScore": "A sua previsão: {{home}} – {{away}}",
+    "noPredictionYet": "Ainda não fez previsão"
   },
   "matches": {
     "title": "Calendário de Jogos",

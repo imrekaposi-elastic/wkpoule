@@ -1,25 +1,45 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
 from app.auth import get_admin_user, get_current_user
 from app.database import get_db
 from app.models.match import Match
 from app.models.user import User
-from app.models.team import Team
-from app.models.venue import Venue
-from app.schemas.match import ExpertPrediction, FunCommentOut, MatchOut, ScoreUpdate, VenueOut, TeamOut
+from app.schemas.match import (
+    CalendarMetaOut,
+    ExpertPrediction,
+    FunCommentOut,
+    MatchOut,
+    ScoreUpdate,
+    VenueOut,
+    TeamOut,
+)
 from app.schemas.pagination import DEFAULT_PAGE_SIZE, PaginatedResponse, paginate_list
 from app.services.bracket_resolver import compute_predicted_knockout_teams
 from app.services.expert import generate_expert_prediction
-from app.services.match_calendar import utc_bounds_for_local_day
+from app.services.match_calendar import local_date_for_utc_instant, utc_bounds_for_local_day
 from app.services.next_match_prediction import first_match_needing_prediction
 from app.services.prediction_lock import match_accepts_prediction_updates
 from app.services.scoring import recalculate_points
+from app.services.team_names import team_matches_search
 from app.services.weather import get_match_temperature
 
 router = APIRouter()
+
+
+def _match_matches_search(m: Match, term: str) -> bool:
+    needle = term.strip().lower()
+    if not needle:
+        return True
+    if team_matches_search(m.home_team, needle) or team_matches_search(m.away_team, needle):
+        return True
+    venue = m.venue
+    if venue is None:
+        return False
+    return needle in venue.name.lower() or needle in venue.city.lower()
 
 
 def _match_to_out(
@@ -88,18 +108,11 @@ async def list_matches(
         q = q.filter(Match.stage == stage)
     if group:
         q = q.filter(Match.group_letter == group)
-    if search and search.strip():
-        term = f"%{search.strip()}%"
-        q = q.filter(
-            Match.home_team.has(Team.name.ilike(term))
-            | Match.away_team.has(Team.name.ilike(term))
-            | Match.home_team.has(Team.fifa_code.ilike(term))
-            | Match.away_team.has(Team.fifa_code.ilike(term))
-            | Match.venue.has(Venue.name.ilike(term))
-            | Match.venue.has(Venue.city.ilike(term))
-        )
 
     ordered = q.order_by(Match.kickoff_utc).all()
+    if search and search.strip():
+        ordered = [m for m in ordered if _match_matches_search(m, search)]
+
     paged = paginate_list(ordered, page, page_size)
 
     predicted_map: dict[int, tuple[TeamOut | None, TeamOut | None]] = {}
@@ -170,6 +183,25 @@ async def get_match_by_match_number(
         pair = pmap.get(m.match_number)
         slots = smap.get(m.match_number)
     return _match_to_out(m, temp, pair, slots)
+
+
+@router.get("/calendar-meta", response_model=CalendarMetaOut)
+def calendar_meta(
+    tz: str = Query(..., min_length=1, max_length=64, description="IANA timezone"),
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+):
+    first_kickoff = db.query(func.min(Match.kickoff_utc)).scalar()
+    if first_kickoff is None:
+        raise HTTPException(status_code=404, detail="No matches scheduled")
+    try:
+        first_local = local_date_for_utc_instant(first_kickoff, tz)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return CalendarMetaOut(
+        first_kickoff_utc=first_kickoff,
+        first_match_local_date=first_local,
+    )
 
 
 @router.get("/by-day", response_model=list[MatchOut])

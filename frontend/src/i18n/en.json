@@ -223,7 +223,12 @@
     "today": "Today",
     "noMatchesOnDay": "No matches scheduled on this day.",
     "timesInTimezone": "Times shown in {{tz}}",
-    "viewSchedule": "Full schedule"
+    "viewSchedule": "Full schedule",
+    "worldCupCountdown_one": "World Cup starts in {{count}} day",
+    "worldCupCountdown_other": "World Cup starts in {{count}} days",
+    "worldCupStartsOn": "Opening match day: {{date}}",
+    "yourPredictionScore": "Your prediction: {{home}} – {{away}}",
+    "noPredictionYet": "No prediction entered yet"
   },
   "matches": {
     "title": "Match Schedule",

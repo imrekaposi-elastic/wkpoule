@@ -223,7 +223,12 @@
     "today": "Vandaag",
     "noMatchesOnDay": "Geen wedstrijden gepland op deze dag.",
     "timesInTimezone": "Tijden weergegeven in {{tz}}",
-    "viewSchedule": "Volledig schema"
+    "viewSchedule": "Volledig schema",
+    "worldCupCountdown_one": "Het WK begint over {{count}} dag",
+    "worldCupCountdown_other": "Het WK begint over {{count}} dagen",
+    "worldCupStartsOn": "Eerste speeldag: {{date}}",
+    "yourPredictionScore": "Jouw voorspelling: {{home}} – {{away}}",
+    "noPredictionYet": "Nog geen voorspelling ingevuld"
   },
   "matches": {
     "title": "Wedstrijdschema",

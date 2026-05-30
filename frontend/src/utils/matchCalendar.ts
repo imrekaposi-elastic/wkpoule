@@ -60,3 +60,15 @@ export function formatTimeZoneLabel(tz: string, locale: string): string {
     return tz;
   }
 }
+
+export function daysUntilLocalDate(fromKey: string, toKey: string): number {
+  const from = parseLocalDateKey(fromKey);
+  const to = parseLocalDateKey(toKey);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.round((to.getTime() - from.getTime()) / msPerDay);
+}
+
+export function compareLocalDateKeys(a: string, b: string): number {
+  if (a === b) return 0;
+  return a < b ? -1 : 1;
+}

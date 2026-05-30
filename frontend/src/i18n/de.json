@@ -223,7 +223,12 @@
     "today": "Heute",
     "noMatchesOnDay": "An diesem Tag sind keine Spiele geplant.",
     "timesInTimezone": "Zeiten in {{tz}}",
-    "viewSchedule": "Gesamter Spielplan"
+    "viewSchedule": "Gesamter Spielplan",
+    "worldCupCountdown_one": "Die WM beginnt in {{count}} Tag",
+    "worldCupCountdown_other": "Die WM beginnt in {{count}} Tagen",
+    "worldCupStartsOn": "Erster Spieltag: {{date}}",
+    "yourPredictionScore": "Dein Tipp: {{home}} – {{away}}",
+    "noPredictionYet": "Noch kein Tipp abgegeben"
   },
   "matches": {
     "title": "Spielplan",

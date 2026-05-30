@@ -223,7 +223,12 @@
     "today": "Hoy",
     "noMatchesOnDay": "No hay partidos programados para este día.",
     "timesInTimezone": "Horarios en {{tz}}",
-    "viewSchedule": "Calendario completo"
+    "viewSchedule": "Calendario completo",
+    "worldCupCountdown_one": "El Mundial empieza en {{count}} día",
+    "worldCupCountdown_other": "El Mundial empieza en {{count}} días",
+    "worldCupStartsOn": "Primer día de partidos: {{date}}",
+    "yourPredictionScore": "Tu pronóstico: {{home}} – {{away}}",
+    "noPredictionYet": "Aún no has hecho pronóstico"
   },
   "matches": {
     "title": "Calendario de partidos",

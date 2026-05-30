@@ -222,7 +222,12 @@
     "today": "היום",
     "noMatchesOnDay": "אין משחקים מתוכננים ליום זה.",
     "timesInTimezone": "שעות מוצגות ב-{{tz}}",
-    "viewSchedule": "לוח משחקים מלא"
+    "viewSchedule": "לוח משחקים מלא",
+    "worldCupCountdown_one": "המונדיאל מתחיל בעוד יום {{count}}",
+    "worldCupCountdown_other": "המונדיאל מתחיל בעוד {{count}} ימים",
+    "worldCupStartsOn": "יום פתיחה: {{date}}",
+    "yourPredictionScore": "התחזית שלך: {{home}} – {{away}}",
+    "noPredictionYet": "טרם הוזנה תחזית"
   },
   "matches": {
     "title": "לוח משחקים",

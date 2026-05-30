@@ -115,6 +115,11 @@ class MatchOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class CalendarMetaOut(BaseModel):
+    first_kickoff_utc: datetime
+    first_match_local_date: date
+
+
 class ScoreUpdate(BaseModel):
     home_score: int = Field(ge=0, le=30)
     away_score: int = Field(ge=0, le=30)

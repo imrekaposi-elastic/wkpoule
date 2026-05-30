@@ -2,7 +2,7 @@ from datetime import date, datetime, timezone
 
 import pytest
 
-from app.services.match_calendar import utc_bounds_for_local_day
+from app.services.match_calendar import local_date_for_utc_instant, utc_bounds_for_local_day
 
 
 def test_utc_bounds_for_local_day_europe_amsterdam():
@@ -20,3 +20,9 @@ def test_utc_bounds_for_local_day_utc():
 def test_utc_bounds_rejects_invalid_timezone():
     with pytest.raises(ValueError, match="Invalid timezone"):
         utc_bounds_for_local_day(date(2026, 6, 11), "Not/A/Timezone")
+
+
+def test_local_date_for_utc_instant_europe_amsterdam():
+    instant = datetime(2026, 6, 11, 19, 0, tzinfo=timezone.utc)
+    assert local_date_for_utc_instant(instant, "Europe/Amsterdam") == date(2026, 6, 11)
+    assert local_date_for_utc_instant(instant, "America/Los_Angeles") == date(2026, 6, 11)

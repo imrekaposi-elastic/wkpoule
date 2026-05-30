@@ -57,6 +57,8 @@ const SUBDIVISION_NAMES: Record<string, Record<string, string>> = {
     pt: "Inglaterra",
     de: "England",
     he: "אנגליה",
+    it: "Inghilterra",
+    es: "Inglaterra",
   },
   SCO: {
     en: "Scotland",
@@ -64,6 +66,8 @@ const SUBDIVISION_NAMES: Record<string, Record<string, string>> = {
     pt: "Escócia",
     de: "Schottland",
     he: "סקוטלנד",
+    it: "Scozia",
+    es: "Escocia",
   },
 };
 
