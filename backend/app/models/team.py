@@ -36,6 +36,7 @@ class Team(Base):
     weaknesses_es: Mapped[str | None] = mapped_column(Text, nullable=True)
     weaknesses_it: Mapped[str | None] = mapped_column(Text, nullable=True)
     weaknesses_he: Mapped[str | None] = mapped_column(Text, nullable=True)
+    qualification_data_json: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     players = relationship(
         "TeamPlayer",

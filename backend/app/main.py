@@ -44,7 +44,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Worldcup 2026 game",
-    version="2.1.0",
+    version="2.1.1",
     description="World Cup 2026 prediction game",
     lifespan=lifespan,
 )

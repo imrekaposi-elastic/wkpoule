@@ -3,17 +3,10 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const wikiPath =
-  process.argv[2] ||
-  join(
-    __dirname,
-    "..",
-    ".cursor",
-    "projects",
-    "c-Users-ImreKaposi-OneDrive-kaposi-net-Documenten-wkpoule",
-    "agent-tools",
-    "b0279c37-64dd-45dd-bafa-81a746f70f63.txt",
-  );
+const wikiPath = process.argv[2] || join(
+  process.env.USERPROFILE || "",
+  ".cursor/projects/c-Users-ImreKaposi-OneDrive-kaposi-net-Documenten-wkpoule/agent-tools/87dc2146-ef0c-4d29-9472-a464faf355fc.txt",
+);
 const outPath = join(__dirname, "..", "backend", "app", "data", "team_squads_data.py");
 
 const NAME_TO_CODE = {
@@ -69,7 +62,7 @@ const NAME_TO_CODE = {
 
 const POS_MAP = { "1 GK": "GK", "2 DF": "DF", "3 MF": "MF", "4 FW": "FW" };
 const ROW_RE =
-  /^\|\s*(?:(\d+)\s*\|)?\s*(1 GK|2 DF|3 MF|4 FW)\s*\|\s*(.+?)\s*\|\s*\([^)]+\)[^|]*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(.+?)\s*\|\s*$/;
+  /^\|\s*(?:(\d+)\s*\|)?\s*(1 GK|2 DF|3 MF|4 FW)\s*\|\s*(.+?)\s*\|\s*\((\d{4}-\d{2}-\d{2})\)[^|]*\(aged (\d+)\)[^|]*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(.+?)\s*\|\s*$/;
 
 function cleanName(raw) {
   return raw.replace("(captain)", "").replace(/\[\d+\]/g, "").trim();
@@ -81,12 +74,14 @@ function parsePlayers(text) {
   for (const line of text.split("\n")) {
     const m = line.trim().match(ROW_RE);
     if (!m) continue;
-    const [, numStr, posKey, nameRaw, caps, , club] = m;
+    const [, numStr, posKey, nameRaw, dob, ageStr, caps, , club] = m;
     players.push({
       name: cleanName(nameRaw),
       position: POS_MAP[posKey],
       shirt_number: numStr ? parseInt(numStr, 10) : sortOrder + 1,
       club: club.trim(),
+      date_of_birth: dob,
+      age: parseInt(ageStr, 10),
       height_cm: 0,
       weight_kg: 0,
       caps: parseInt(caps, 10),

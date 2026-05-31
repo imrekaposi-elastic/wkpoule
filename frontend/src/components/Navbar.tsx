@@ -153,7 +153,7 @@ export default function Navbar() {
 
             {user && (
               <div className="hidden lg:flex items-center justify-center flex-1 min-w-0 px-2">
-                <div className="flex items-center gap-0.5 flex-wrap justify-center">
+                <div className="flex items-center gap-0.5 justify-center">
                   {NAV_ITEMS.map((item) => (
                     <Link
                       key={item.to}
@@ -177,12 +177,49 @@ export default function Navbar() {
                       )}
                     </Link>
                   ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+              <div className="relative" ref={helpWrapRef}>
+                <button
+                  type="button"
+                  onClick={() => setHelpOpen((o) => !o)}
+                  className="px-2 sm:px-3 py-2 rounded-md text-sm font-medium text-green-100 hover:bg-pitch-700 transition-colors"
+                  aria-expanded={helpOpen}
+                  aria-haspopup="true"
+                >
+                  {t("navbar.help")}
+                </button>
+                {helpOpen && (
+                  <div
+                    className="absolute right-0 mt-1 py-1 min-w-[10rem] bg-white text-gray-900 rounded-md shadow-lg z-50 border border-gray-100"
+                    role="menu"
+                  >
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                      onClick={() => {
+                        setAboutOpen(true);
+                        setHelpOpen(false);
+                      }}
+                    >
+                      {t("navbar.about")}
+                    </button>
+                  </div>
+                )}
+              </div>
+              <LanguageSwitcher />
+              {user && (
+                <>
                   {user.is_admin && (
-                    <div className="relative" ref={adminWrapRef}>
+                    <div className="relative hidden lg:block" ref={adminWrapRef}>
                       <button
                         type="button"
                         onClick={() => setAdminOpen((o) => !o)}
-                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${
+                        className={`px-2.5 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${
                           location.pathname.startsWith("/admin")
                             ? "bg-amber-500 text-black"
                             : "text-amber-200 hover:bg-pitch-700"
@@ -197,7 +234,7 @@ export default function Navbar() {
                       </button>
                       {adminOpen && (
                         <div
-                          className="absolute left-0 mt-1 py-1 min-w-[12rem] bg-white text-gray-900 rounded-md shadow-lg z-50 border border-gray-100"
+                          className="absolute right-0 mt-1 py-1 min-w-[12rem] bg-white text-gray-900 rounded-md shadow-lg z-50 border border-gray-100"
                           role="menu"
                         >
                           <NavLink
@@ -240,56 +277,21 @@ export default function Navbar() {
                       )}
                     </div>
                   )}
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-              <div className="relative" ref={helpWrapRef}>
-                <button
-                  type="button"
-                  onClick={() => setHelpOpen((o) => !o)}
-                  className="px-2 sm:px-3 py-2 rounded-md text-sm font-medium text-green-100 hover:bg-pitch-700 transition-colors"
-                  aria-expanded={helpOpen}
-                  aria-haspopup="true"
-                >
-                  {t("navbar.help")}
-                </button>
-                {helpOpen && (
-                  <div
-                    className="absolute right-0 mt-1 py-1 min-w-[10rem] bg-white text-gray-900 rounded-md shadow-lg z-50 border border-gray-100"
-                    role="menu"
-                  >
-                    <button
-                      type="button"
-                      role="menuitem"
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                      onClick={() => {
-                        setAboutOpen(true);
-                        setHelpOpen(false);
-                      }}
-                    >
-                      {t("navbar.about")}
-                    </button>
-                  </div>
-                )}
-              </div>
-              <LanguageSwitcher />
-              {user && (
-                <>
-                  <div className="hidden lg:flex items-center gap-2 ml-1">
-                    <span className="text-sm text-green-200 max-w-[10rem] truncate">
-                      {user.username}
+                  <div className="hidden lg:flex flex-col items-end ml-1 pl-2 border-l border-pitch-700/80 min-w-0">
+                    <div className="flex items-center gap-1.5 max-w-[9rem]">
+                      <span className="text-sm text-green-100 truncate font-medium">
+                        {user.username}
+                      </span>
                       {user.is_admin && (
-                        <span className="ml-1 text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                        <span className="text-[10px] bg-yellow-500 text-black px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0 font-semibold">
                           {t("navbar.admin")}
                         </span>
                       )}
-                    </span>
+                    </div>
                     <button
                       type="button"
                       onClick={logout}
-                      className="text-sm bg-pitch-900 hover:bg-red-700 px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
+                      className="text-xs text-green-300/90 hover:text-white transition-colors mt-0.5"
                     >
                       {t("navbar.logout")}
                     </button>
@@ -397,24 +399,26 @@ export default function Navbar() {
                   >
                     {t("navbar.about")}
                   </button>
-                  <div className="text-sm text-green-200">
-                    <span className="font-medium">{user.username}</span>
-                    {user.is_admin && (
-                      <span className="ml-2 text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded-full">
-                        {t("navbar.admin")}
-                      </span>
-                    )}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2 text-sm text-green-200">
+                      <span className="font-medium">{user.username}</span>
+                      {user.is_admin && (
+                        <span className="text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded-full">
+                          {t("navbar.admin")}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileOpen(false);
+                        logout();
+                      }}
+                      className="text-left text-sm text-green-300 hover:text-white py-1 touch-manipulation"
+                    >
+                      {t("navbar.logout")}
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileOpen(false);
-                      logout();
-                    }}
-                    className="w-full text-sm bg-pitch-800 hover:bg-red-700 border border-pitch-700 py-2.5 rounded-md transition-colors touch-manipulation"
-                  >
-                    {t("navbar.logout")}
-                  </button>
                 </div>
               </div>
             </div>

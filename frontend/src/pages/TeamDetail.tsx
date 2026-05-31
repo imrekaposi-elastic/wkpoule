@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
-import PlayerCard from "../components/PlayerCard";
 import QualificationTables from "../components/QualificationTables";
+import SquadTable from "../components/SquadTable";
 import { localizedTeamName } from "../i18n/teamNames";
 import {
   localizedTeamProfileField,
@@ -88,14 +88,20 @@ export default function TeamDetailPage() {
         <div className="p-4 sm:p-6 space-y-6">
           <section>
             <h2 className="text-lg font-bold text-pitch-900 mb-2">{t("teams.qualification")}</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">{qualification}</p>
-            {team.qualification_data ? (
+            <p className="text-gray-700 leading-relaxed">{qualification}</p>
+          </section>
+
+          {team.qualification_data ? (
+            <section>
+              <h2 className="text-lg font-bold text-pitch-900 mb-2">
+                {t("teams.qualificationHistory")}
+              </h2>
               <QualificationTables
                 data={team.qualification_data}
                 highlightCode={team.fifa_code}
               />
-            ) : null}
-          </section>
+            </section>
+          ) : null}
 
           <div className="grid md:grid-cols-2 gap-6">
             <section>
@@ -133,22 +139,7 @@ export default function TeamDetailPage() {
           <h2 className="text-xl font-bold text-pitch-900">{t("teams.squad")}</h2>
           <p className="text-xs text-gray-500 max-w-md">{t("teams.squadNote")}</p>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-          {team.players.map((player) => (
-            <PlayerCard
-              key={player.id}
-              player={player}
-              flagUrl={team.flag_url}
-              positionLabel={t(`teams.player.position.${player.position}`, {
-                defaultValue: player.position,
-              })}
-              heightLabel={t("teams.player.height")}
-              weightLabel={t("teams.player.weight")}
-              capsLabel={t("teams.player.caps")}
-              clubLabel={t("teams.player.club")}
-            />
-          ))}
-        </div>
+        <SquadTable players={team.players} />
       </section>
     </div>
   );

@@ -7,8 +7,10 @@ class TeamPlayerOut(BaseModel):
     position: str
     shirt_number: int
     club: str
-    height_cm: int
-    weight_kg: int
+    date_of_birth: str | None = None
+    age: int | None = None
+    height_cm: int | None = None
+    weight_kg: int | None = None
     caps: int
 
     model_config = {"from_attributes": True}

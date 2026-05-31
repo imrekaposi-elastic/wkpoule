@@ -278,8 +278,10 @@ export interface TeamPlayer {
   position: string;
   shirt_number: number;
   club: string;
-  height_cm: number;
-  weight_kg: number;
+  date_of_birth: string | null;
+  age: number | null;
+  height_cm: number | null;
+  weight_kg: number | null;
   caps: number;
 }
 

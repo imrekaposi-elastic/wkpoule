@@ -307,6 +307,14 @@ def ensure_schema() -> None:
                     "ON team_players (team_id)"
                 )
             )
+            for col in ("date_of_birth",):
+                conn.execute(
+                    text(f"ALTER TABLE team_players ADD COLUMN IF NOT EXISTS {col} VARCHAR(10)")
+                )
+            for col in ("age",):
+                conn.execute(
+                    text(f"ALTER TABLE team_players ADD COLUMN IF NOT EXISTS {col} INTEGER")
+                )
         elif dialect == "sqlite":
             insp = inspect(engine)
             user_cols = {c["name"] for c in insp.get_columns("users")}
@@ -436,6 +444,14 @@ def ensure_schema() -> None:
                         "ON team_players (team_id)"
                     )
                 )
+            else:
+                tp_cols = {c["name"] for c in insp.get_columns("team_players")}
+                for col, ddl in (
+                    ("date_of_birth", "VARCHAR(10)"),
+                    ("age", "INTEGER"),
+                ):
+                    if col not in tp_cols:
+                        conn.execute(text(f"ALTER TABLE team_players ADD COLUMN {col} {ddl}"))
 
         _backfill_venue_hebrew(conn)
         _backfill_venue_es_it(conn)

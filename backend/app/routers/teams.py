@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 
+from app.data.team_qualification_data import build_qualification_data
 from app.database import get_db
 from app.models.team import Team
 from app.routers.auth import get_current_user
-from app.schemas.team import TeamDetailOut, TeamSummaryOut
+from app.schemas.team import QualificationDataOut, TeamDetailOut, TeamSummaryOut
 
 router = APIRouter(prefix="/teams", tags=["teams"])
 
@@ -28,4 +29,10 @@ def get_team(fifa_code: str, db: Session = Depends(get_db), _=Depends(get_curren
     )
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
-    return team
+
+    detail = TeamDetailOut.model_validate(team)
+    if detail.qualification_data is None:
+        raw = build_qualification_data(team.fifa_code)
+        if raw:
+            detail.qualification_data = QualificationDataOut.model_validate(raw)
+    return detail
