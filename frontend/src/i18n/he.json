@@ -486,9 +486,6 @@
       "name": "שחקן",
       "positionLabel": "עמדה",
       "club": "מועדון",
-      "age": "גיל",
-      "height": "גובה",
-      "weight": "משקל",
       "caps": "הופעות",
       "position": {
         "GK": "שוער",

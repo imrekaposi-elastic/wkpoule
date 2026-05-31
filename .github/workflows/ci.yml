@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
       - name: pytest (unit)
-        run: pytest tests/unit -v --cov=app --cov-report=term-missing
+        run: pytest tests/unit -v --cov=app --cov-report=term-missing --cov-fail-under=70
 
   backend-integration:
     name: Backend integration tests

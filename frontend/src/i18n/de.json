@@ -487,9 +487,6 @@
       "name": "Spieler",
       "positionLabel": "Position",
       "club": "Verein",
-      "age": "Alter",
-      "height": "Größe",
-      "weight": "Gewicht",
       "caps": "Länderspiele",
       "position": {
         "GK": "Torwart",

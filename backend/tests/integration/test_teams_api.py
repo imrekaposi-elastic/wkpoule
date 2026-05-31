@@ -52,7 +52,6 @@ def test_get_team_returns_players_and_localized_profile(client, db, auth_headers
     assert len(body["players"]) >= 20
     player_names = {player["name"] for player in body["players"]}
     assert "Virgil van Dijk" in player_names
-    assert body["players"][0]["age"] is not None
     assert body["players"][0]["position"] in {"GK", "DF", "MF", "FW"}
     assert body["qualification_data"] is not None
     assert body["qualification_data"]["standings"]

@@ -487,9 +487,6 @@
       "name": "Giocatore",
       "positionLabel": "Ruolo",
       "club": "Club",
-      "age": "Età",
-      "height": "Altezza",
-      "weight": "Peso",
       "caps": "Presenze",
       "position": {
         "GK": "Portiere",

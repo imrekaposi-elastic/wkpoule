@@ -487,9 +487,6 @@
       "name": "Speler",
       "positionLabel": "Positie",
       "club": "Club",
-      "age": "Leeftijd",
-      "height": "Lengte",
-      "weight": "Gewicht",
       "caps": "Interlands",
       "position": {
         "GK": "Keeper",

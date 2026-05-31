@@ -28,7 +28,7 @@ backend:unit:
     - pip install -r backend/requirements-dev.txt
   script:
     - cd backend
-    - pytest tests/unit -v --cov=app --cov-report=term-missing --cov-fail-under=0
+    - pytest tests/unit -v --cov=app --cov-report=term-missing --cov-fail-under=70
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH

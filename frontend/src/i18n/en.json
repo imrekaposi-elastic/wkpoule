@@ -487,9 +487,6 @@
       "name": "Player",
       "positionLabel": "Position",
       "club": "Club",
-      "age": "Age",
-      "height": "Height",
-      "weight": "Weight",
       "caps": "Caps",
       "position": {
         "GK": "Goalkeeper",
