@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -28,6 +28,10 @@ from app.schemas.auth import (
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+
+def _client_ip(request: Request) -> str | None:
+    return request.client.host if request.client else None
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -83,10 +87,24 @@ def self_service_reset_password(
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(body: LoginRequest, db: Session = Depends(get_db)):
+def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
     user = get_user_by_username(db, body.username)
     if not user or not verify_password(body.password, user.password_hash):
+        client_ip = _client_ip(request)
+        logger.info(
+            "Failed login for %s",
+            body.username,
+            extra={
+                "event.action": "user_login_failure",
+                "event.category": "authentication",
+                "event.outcome": "failure",
+                "user.name": body.username,
+                "client.ip": client_ip,
+                "source.ip": client_ip,
+            },
+        )
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    client_ip = _client_ip(request)
     logger.info(
         "%s has logged on successfully",
         user.username,
@@ -96,6 +114,8 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
             "event.outcome": "success",
             "user.name": user.username,
             "user.id": user.id,
+            "client.ip": client_ip,
+            "source.ip": client_ip,
         },
     )
     return TokenResponse(

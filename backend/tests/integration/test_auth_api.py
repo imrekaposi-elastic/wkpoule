@@ -1,5 +1,7 @@
 """Integration tests for authentication API flows."""
 
+import logging
+
 from app.models.subgroup import Subgroup, SubgroupMember
 
 
@@ -117,7 +119,7 @@ def test_register_stores_lowercase_username(client):
     assert register.json()["username"] == "mixed.case"
 
 
-def test_login_rejects_invalid_credentials(client):
+def test_login_rejects_invalid_credentials(client, caplog):
     client.post(
         "/api/auth/register",
         json={
@@ -127,11 +129,20 @@ def test_login_rejects_invalid_credentials(client):
         },
     )
 
-    response = client.post(
-        "/api/auth/login",
-        json={"username": "lockedout", "password": "wrong-password"},
-    )
+    with caplog.at_level(logging.INFO, logger="app.routers.auth"):
+        response = client.post(
+            "/api/auth/login",
+            json={"username": "lockedout", "password": "wrong-password"},
+        )
     assert response.status_code == 401
+    failure_logs = [
+        r for r in caplog.records if r.__dict__.get("event.action") == "user_login_failure"
+    ]
+    assert len(failure_logs) == 1
+    record = failure_logs[0]
+    assert record.getMessage() == "Failed login for lockedout"
+    assert record.__dict__["event.outcome"] == "failure"
+    assert record.__dict__["user.name"] == "lockedout"
 
 
 def test_refresh_issues_new_tokens(client):
