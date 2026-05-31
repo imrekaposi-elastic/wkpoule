@@ -1,6 +1,53 @@
-import axios from "axios";
+import axios, { type InternalAxiosRequestConfig } from "axios";
 
 const api = axios.create({ baseURL: "/api" });
+
+let refreshPromise: Promise<string> | null = null;
+let redirectingToLogin = false;
+
+function shouldAttemptRefresh(url: string | undefined): boolean {
+  if (!url) return true;
+  return (
+    !url.includes("/auth/login") &&
+    !url.includes("/auth/register") &&
+    !url.includes("/auth/refresh")
+  );
+}
+
+function refreshAccessToken(): Promise<string> {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  const refresh = localStorage.getItem("refresh_token");
+  if (!refresh) {
+    return Promise.reject(new Error("No refresh token"));
+  }
+
+  refreshPromise = axios
+    .post<{ access_token: string; refresh_token: string }>("/api/auth/refresh", {
+      refresh_token: refresh,
+    })
+    .then(({ data }) => {
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+      return data.access_token;
+    })
+    .finally(() => {
+      refreshPromise = null;
+    });
+
+  return refreshPromise;
+}
+
+function clearSessionAndRedirectToLogin(): void {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+  if (!redirectingToLogin) {
+    redirectingToLogin = true;
+    window.location.href = "/login";
+  }
+}
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
@@ -13,28 +60,27 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (r) => r,
   async (error) => {
-    const original = error.config;
-    if (error.response?.status === 401 && !original._retry) {
+    const original = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
+    if (
+      error.response?.status === 401 &&
+      original &&
+      !original._retry &&
+      shouldAttemptRefresh(original.url)
+    ) {
       original._retry = true;
-      const refresh = localStorage.getItem("refresh_token");
-      if (refresh) {
-        try {
-          const { data } = await axios.post("/api/auth/refresh", {
-            refresh_token: refresh,
-          });
-          localStorage.setItem("access_token", data.access_token);
-          localStorage.setItem("refresh_token", data.refresh_token);
-          original.headers.Authorization = `Bearer ${data.access_token}`;
-          return api(original);
-        } catch {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-          window.location.href = "/login";
-        }
+      if (!localStorage.getItem("refresh_token")) {
+        return Promise.reject(error);
+      }
+      try {
+        const accessToken = await refreshAccessToken();
+        original.headers.Authorization = `Bearer ${accessToken}`;
+        return api(original);
+      } catch {
+        clearSessionAndRedirectToLogin();
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
