@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { firstMatchNeedingPrediction } from "./predictions";
+import { firstMatchNeedingPrediction, isKnockoutStage, isPredictedDraw, isSecondKnockoutRoundOnwards } from "./predictions";
 import type { Match } from "../types";
 
 function match(
@@ -42,5 +42,20 @@ describe("firstMatchNeedingPrediction", () => {
   it("returns null when all editable upcoming matches are predicted", () => {
     const matches = [match(1, 1), match(2, 2)];
     expect(firstMatchNeedingPrediction(matches, new Set([1, 2]))).toBeNull();
+  });
+});
+
+describe("knockout helpers", () => {
+  it("detects knockout stages", () => {
+    expect(isKnockoutStage("group")).toBe(false);
+    expect(isKnockoutStage("round_of_16")).toBe(true);
+    expect(isSecondKnockoutRoundOnwards("round_of_16")).toBe(true);
+    expect(isSecondKnockoutRoundOnwards("round_of_32")).toBe(false);
+  });
+
+  it("detects predicted draws", () => {
+    expect(isPredictedDraw(1, 1)).toBe(true);
+    expect(isPredictedDraw(2, 1)).toBe(false);
+    expect(isPredictedDraw("", 1)).toBe(false);
   });
 });

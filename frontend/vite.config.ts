@@ -9,6 +9,29 @@ export default defineConfig({
     globals: true,
     setupFiles: "./src/test/setup.ts",
     include: ["src/**/*.test.{ts,tsx}"],
+    coverage: {
+      provider: "v8",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/**/*.test.{ts,tsx}",
+        "src/test/**",
+        "src/main.tsx",
+        "src/apm-entry.ts",
+        "src/vite-env.d.ts",
+        "src/types.ts",
+        // Large route screens covered better by integration/e2e tests.
+        "src/pages/MatchDetail.tsx",
+        "src/pages/SubgroupDetail.tsx",
+        "src/pages/AdminSettings.tsx",
+        "src/components/Navbar.tsx",
+      ],
+      thresholds: {
+        lines: 50,
+        statements: 50,
+        branches: 45,
+        functions: 45,
+      },
+    },
   },
   server: {
     proxy: {

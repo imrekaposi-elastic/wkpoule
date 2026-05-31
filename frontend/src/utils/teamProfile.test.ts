@@ -63,6 +63,34 @@ describe("localizedTeamProfileField", () => {
     );
   });
 
+  it("returns empty string when no profile text exists", () => {
+    const team = {
+      ...sampleDetail(),
+      qualification_en: null,
+      qualification_nl: null,
+      qualification_pt: null,
+      qualification_de: null,
+      qualification_es: null,
+      qualification_it: null,
+      qualification_he: null,
+      strengths_en: null,
+      strengths_nl: null,
+      strengths_pt: null,
+      strengths_de: null,
+      strengths_es: null,
+      strengths_it: null,
+      strengths_he: null,
+      weaknesses_en: null,
+      weaknesses_nl: null,
+      weaknesses_pt: null,
+      weaknesses_de: null,
+      weaknesses_es: null,
+      weaknesses_it: null,
+      weaknesses_he: null,
+    };
+    expect(localizedTeamProfileField(team, "qualification", "de")).toBe("");
+  });
+
   it("reads strengths and weaknesses from detail records", () => {
     const team = sampleDetail();
     expect(localizedTeamProfileField(team, "strengths", "it")).toBe(
