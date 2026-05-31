@@ -1,6 +1,6 @@
-import type { SupportedLanguageCode } from "./languages";
+import type { SupportedLanguageCode } from "../i18n/languages";
+import type { TeamDetail, TeamSummary } from "../types";
 
-const PROFILE_FIELDS = ["qualification", "strengths", "weaknesses"] as const;
 const PROFILE_LANGS: SupportedLanguageCode[] = [
   "en",
   "nl",
@@ -11,24 +11,29 @@ const PROFILE_LANGS: SupportedLanguageCode[] = [
   "es",
 ];
 
-export type TeamProfileField = (typeof PROFILE_FIELDS)[number];
+export type TeamProfileField = "qualification" | "strengths" | "weaknesses";
 
-type TeamProfileRecord = Record<string, string | null | undefined>;
+function profileValue(
+  team: TeamSummary | TeamDetail,
+  key: string,
+): string | null | undefined {
+  return (team as Record<string, string | null | undefined>)[key];
+}
 
-/** Pick localized team profile text with en → nl fallback chain. */
+/** Pick localized team profile text with fallback across supported languages. */
 export function localizedTeamProfileField(
-  team: TeamProfileRecord,
+  team: TeamSummary | TeamDetail,
   field: TeamProfileField,
   language: string,
 ): string {
   const base = language.split("-")[0] as SupportedLanguageCode;
   const preferred = `${field}_${base}`;
-  if (team[preferred]) return team[preferred] as string;
+  const direct = profileValue(team, preferred);
+  if (direct) return direct;
 
   for (const lang of PROFILE_LANGS) {
-    const key = `${field}_${lang}`;
-    const value = team[key];
-    if (value) return value as string;
+    const value = profileValue(team, `${field}_${lang}`);
+    if (value) return value;
   }
   return "";
 }
