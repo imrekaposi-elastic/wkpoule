@@ -1,0 +1,6522 @@
+{
+  "MEX": {
+    "competition": {
+      "en": "2026 FIFA World Cup – automatic qualification as co-host",
+      "nl": "WK 2026 – automatische kwalificatie als gastland",
+      "de": "WM 2026 – automatische Qualifikation als Gastgeber",
+      "es": "Copa Mundial 2026 – clasificación automática como anfitrión",
+      "fr": "Coupe du monde 2026 – qualification automatique comme co-organisateur",
+      "it": "Mondiale 2026 – qualificazione automatica come co-ospite",
+      "pt": "Copa do Mundo 2026 – qualificação automática como co-anfitrião",
+      "he": "מונדיאל 2026 – התמקדות אוטומטית כמארח משותף"
+    },
+    "standings": [],
+    "results": []
+  },
+  "USA": {
+    "competition": {
+      "en": "2026 FIFA World Cup – automatic qualification as co-host",
+      "nl": "WK 2026 – automatische kwalificatie als gastland",
+      "de": "WM 2026 – automatische Qualifikation als Gastgeber",
+      "es": "Copa Mundial 2026 – clasificación automática como anfitrión",
+      "fr": "Coupe du monde 2026 – qualification automatique comme co-organisateur",
+      "it": "Mondiale 2026 – qualificazione automatica come co-ospite",
+      "pt": "Copa do Mundo 2026 – qualificação automática como co-anfitrião",
+      "he": "מונדיאל 2026 – התמקדות אוטומטית כמארח משותף"
+    },
+    "standings": [],
+    "results": []
+  },
+  "CAN": {
+    "competition": {
+      "en": "2026 FIFA World Cup – automatic qualification as co-host",
+      "nl": "WK 2026 – automatische kwalificatie als gastland",
+      "de": "WM 2026 – automatische Qualifikation als Gastgeber",
+      "es": "Copa Mundial 2026 – clasificación automática como anfitrión",
+      "fr": "Coupe du monde 2026 – qualification automatique comme co-organisateur",
+      "it": "Mondiale 2026 – qualificazione automatica come co-ospite",
+      "pt": "Copa do Mundo 2026 – qualificação automática como co-anfitrião",
+      "he": "מונדיאל 2026 – התמקדות אוטומטית כמארח משותף"
+    },
+    "standings": [],
+    "results": []
+  },
+  "GER": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group A",
+      "nl": "UEFA WK 2026-kwalificatie – Groep A",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe A",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo A",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe A",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone A",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo A",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית A"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "GER",
+        "name": "Germany",
+        "p": 6,
+        "w": 5,
+        "d": 0,
+        "l": 1,
+        "gf": 16,
+        "ga": 3,
+        "gd": 13,
+        "pts": 15,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "SVK",
+        "name": "Slovakia",
+        "p": 6,
+        "w": 4,
+        "d": 0,
+        "l": 2,
+        "gf": 6,
+        "ga": 8,
+        "gd": -2,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "NIR",
+        "name": "Northern Ireland",
+        "p": 6,
+        "w": 3,
+        "d": 0,
+        "l": 3,
+        "gf": 7,
+        "ga": 6,
+        "gd": 1,
+        "pts": 9,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "LUX",
+        "name": "Luxembourg",
+        "p": 6,
+        "w": 0,
+        "d": 0,
+        "l": 6,
+        "gf": 1,
+        "ga": 13,
+        "gd": -12,
+        "pts": 0,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-09-04",
+        "home": "LUX",
+        "away": "NIR",
+        "score": "2-3"
+      },
+      {
+        "date": "2025-09-04",
+        "home": "SVK",
+        "away": "GER",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-09-07",
+        "home": "LUX",
+        "away": "SVK",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-09-07",
+        "home": "GER",
+        "away": "NIR",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "NIR",
+        "away": "SVK",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "GER",
+        "away": "LUX",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "NIR",
+        "away": "GER",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "SVK",
+        "away": "LUX",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-11-14",
+        "home": "LUX",
+        "away": "GER",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-11-14",
+        "home": "SVK",
+        "away": "NIR",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-11-17",
+        "home": "NIR",
+        "away": "LUX",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-11-17",
+        "home": "GER",
+        "away": "SVK",
+        "score": "6-0"
+      }
+    ]
+  },
+  "SUI": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group B",
+      "nl": "UEFA WK 2026-kwalificatie – Groep B",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe B",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo B",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe B",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone B",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo B",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית B"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "SUI",
+        "name": "Switzerland",
+        "p": 6,
+        "w": 4,
+        "d": 2,
+        "l": 0,
+        "gf": 14,
+        "ga": 2,
+        "gd": 12,
+        "pts": 14,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "KOS",
+        "name": "Kosovo",
+        "p": 6,
+        "w": 3,
+        "d": 2,
+        "l": 1,
+        "gf": 6,
+        "ga": 5,
+        "gd": 1,
+        "pts": 11,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "SVN",
+        "name": "Slovenia",
+        "p": 6,
+        "w": 0,
+        "d": 4,
+        "l": 2,
+        "gf": 3,
+        "ga": 8,
+        "gd": -5,
+        "pts": 4,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "SWE",
+        "name": "Sweden",
+        "p": 6,
+        "w": 0,
+        "d": 2,
+        "l": 4,
+        "gf": 4,
+        "ga": 12,
+        "gd": -8,
+        "pts": 2,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-09-05",
+        "home": "SVN",
+        "away": "SWE",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "SUI",
+        "away": "KOS",
+        "score": "4-1"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "KOS",
+        "away": "SWE",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "SUI",
+        "away": "SVN",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "KOS",
+        "away": "SVN",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "SWE",
+        "away": "SUI",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "SVN",
+        "away": "SUI",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "SWE",
+        "away": "KOS",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "SVN",
+        "away": "KOS",
+        "score": "1-2"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "SUI",
+        "away": "SWE",
+        "score": "4-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "KOS",
+        "away": "SUI",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "SWE",
+        "away": "SVN",
+        "score": "1-1"
+      }
+    ]
+  },
+  "SCO": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group C",
+      "nl": "UEFA WK 2026-kwalificatie – Groep C",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe C",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo C",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe C",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone C",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo C",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית C"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "SCO",
+        "name": "Scotland",
+        "p": 6,
+        "w": 4,
+        "d": 1,
+        "l": 1,
+        "gf": 12,
+        "ga": 6,
+        "gd": 6,
+        "pts": 13,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "DEN",
+        "name": "Denmark",
+        "p": 6,
+        "w": 3,
+        "d": 2,
+        "l": 1,
+        "gf": 10,
+        "ga": 7,
+        "gd": 3,
+        "pts": 11,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "GRE",
+        "name": "Greece",
+        "p": 6,
+        "w": 2,
+        "d": 1,
+        "l": 3,
+        "gf": 6,
+        "ga": 8,
+        "gd": -2,
+        "pts": 7,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "BLR",
+        "name": "Belarus",
+        "p": 6,
+        "w": 0,
+        "d": 2,
+        "l": 4,
+        "gf": 4,
+        "ga": 11,
+        "gd": -7,
+        "pts": 2,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-09-05",
+        "home": "SCO",
+        "away": "GRE",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "DEN",
+        "away": "BLR",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "BLR",
+        "away": "SCO",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "GRE",
+        "away": "DEN",
+        "score": "0-3"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "SCO",
+        "away": "BLR",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "GRE",
+        "away": "SCO",
+        "score": "2-3"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "BLR",
+        "away": "DEN",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "DEN",
+        "away": "SCO",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "BLR",
+        "away": "GRE",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "SCO",
+        "away": "DEN",
+        "score": "4-2"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "DEN",
+        "away": "GRE",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "GRE",
+        "away": "BLR",
+        "score": "2-0"
+      }
+    ]
+  },
+  "FRA": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group D",
+      "nl": "UEFA WK 2026-kwalificatie – Groep D",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe D",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo D",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe D",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone D",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo D",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית D"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "FRA",
+        "name": "France",
+        "p": 6,
+        "w": 5,
+        "d": 1,
+        "l": 0,
+        "gf": 16,
+        "ga": 4,
+        "gd": 12,
+        "pts": 16,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "UKR",
+        "name": "Ukraine",
+        "p": 6,
+        "w": 3,
+        "d": 1,
+        "l": 2,
+        "gf": 10,
+        "ga": 11,
+        "gd": -1,
+        "pts": 10,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "ISL",
+        "name": "Iceland",
+        "p": 6,
+        "w": 2,
+        "d": 1,
+        "l": 3,
+        "gf": 13,
+        "ga": 11,
+        "gd": 2,
+        "pts": 7,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "AZE",
+        "name": "Azerbaijan",
+        "p": 6,
+        "w": 0,
+        "d": 1,
+        "l": 5,
+        "gf": 3,
+        "ga": 16,
+        "gd": -13,
+        "pts": 1,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-09-05",
+        "home": "AZE",
+        "away": "UKR",
+        "score": "1-2"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "FRA",
+        "away": "ISL",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "ISL",
+        "away": "AZE",
+        "score": "5-1"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "UKR",
+        "away": "FRA",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "FRA",
+        "away": "AZE",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "ISL",
+        "away": "UKR",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "AZE",
+        "away": "FRA",
+        "score": "0-3"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "UKR",
+        "away": "ISL",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "AZE",
+        "away": "ISL",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "FRA",
+        "away": "UKR",
+        "score": "4-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "ISL",
+        "away": "FRA",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "UKR",
+        "away": "AZE",
+        "score": "2-0"
+      }
+    ]
+  },
+  "ESP": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group E",
+      "nl": "UEFA WK 2026-kwalificatie – Groep E",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe E",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo E",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe E",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone E",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo E",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית E"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "ESP",
+        "name": "Spain",
+        "p": 6,
+        "w": 5,
+        "d": 1,
+        "l": 0,
+        "gf": 21,
+        "ga": 2,
+        "gd": 19,
+        "pts": 16,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "TUR",
+        "name": "Turkey",
+        "p": 6,
+        "w": 4,
+        "d": 1,
+        "l": 1,
+        "gf": 17,
+        "ga": 12,
+        "gd": 5,
+        "pts": 13,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "GEO",
+        "name": "Georgia",
+        "p": 6,
+        "w": 1,
+        "d": 0,
+        "l": 5,
+        "gf": 7,
+        "ga": 15,
+        "gd": -8,
+        "pts": 3,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "BUL",
+        "name": "Bulgaria",
+        "p": 6,
+        "w": 1,
+        "d": 0,
+        "l": 5,
+        "gf": 3,
+        "ga": 19,
+        "gd": -16,
+        "pts": 3,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-09-05",
+        "home": "GEO",
+        "away": "ESP",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "TUR",
+        "away": "BUL",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "BUL",
+        "away": "GEO",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "ESP",
+        "away": "TUR",
+        "score": "6-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "BUL",
+        "away": "ESP",
+        "score": "0-3"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "TUR",
+        "away": "GEO",
+        "score": "4-1"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "GEO",
+        "away": "TUR",
+        "score": "2-3"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "ESP",
+        "away": "BUL",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "BUL",
+        "away": "TUR",
+        "score": "1-6"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "GEO",
+        "away": "BUL",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "ESP",
+        "away": "GEO",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "TUR",
+        "away": "ESP",
+        "score": "0-1"
+      }
+    ]
+  },
+  "POR": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group F",
+      "nl": "UEFA WK 2026-kwalificatie – Groep F",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe F",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo F",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe F",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone F",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo F",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית F"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "POR",
+        "name": "Portugal",
+        "p": 6,
+        "w": 4,
+        "d": 1,
+        "l": 1,
+        "gf": 13,
+        "ga": 5,
+        "gd": 8,
+        "pts": 13,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "IRL",
+        "name": "Republic of Ireland",
+        "p": 6,
+        "w": 3,
+        "d": 1,
+        "l": 2,
+        "gf": 8,
+        "ga": 6,
+        "gd": 2,
+        "pts": 10,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "HUN",
+        "name": "Hungary",
+        "p": 6,
+        "w": 2,
+        "d": 2,
+        "l": 2,
+        "gf": 8,
+        "ga": 8,
+        "gd": 0,
+        "pts": 8,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "ARM",
+        "name": "Armenia",
+        "p": 6,
+        "w": 1,
+        "d": 0,
+        "l": 5,
+        "gf": 3,
+        "ga": 13,
+        "gd": -10,
+        "pts": 3,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-09-05",
+        "home": "ARM",
+        "away": "POR",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "HUN",
+        "away": "IRL",
+        "score": "2-3"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "IRL",
+        "away": "ARM",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "POR",
+        "away": "HUN",
+        "score": "3-2"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "ARM",
+        "away": "HUN",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "IRL",
+        "away": "POR",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "HUN",
+        "away": "POR",
+        "score": "2-3"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "ARM",
+        "away": "IRL",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "POR",
+        "away": "ARM",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "HUN",
+        "away": "ARM",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "IRL",
+        "away": "HUN",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "ARM",
+        "away": "POR",
+        "score": "0-1"
+      }
+    ]
+  },
+  "NED": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group G",
+      "nl": "UEFA WK 2026-kwalificatie – Groep G",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe G",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo G",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe G",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone G",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo G",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית G"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "NED",
+        "name": "Netherlands",
+        "p": 8,
+        "w": 6,
+        "d": 2,
+        "l": 0,
+        "gf": 27,
+        "ga": 4,
+        "gd": 23,
+        "pts": 20,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "POL",
+        "name": "Poland",
+        "p": 8,
+        "w": 5,
+        "d": 2,
+        "l": 1,
+        "gf": 14,
+        "ga": 7,
+        "gd": 7,
+        "pts": 17,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "FIN",
+        "name": "Finland",
+        "p": 8,
+        "w": 3,
+        "d": 1,
+        "l": 4,
+        "gf": 8,
+        "ga": 14,
+        "gd": -6,
+        "pts": 10,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "MLTA",
+        "name": "Malta",
+        "p": 8,
+        "w": 1,
+        "d": 2,
+        "l": 5,
+        "gf": 4,
+        "ga": 19,
+        "gd": -15,
+        "pts": 5,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "LTU",
+        "name": "Lithuania",
+        "p": 8,
+        "w": 0,
+        "d": 3,
+        "l": 5,
+        "gf": 6,
+        "ga": 15,
+        "gd": -9,
+        "pts": 3,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-03-21",
+        "home": "MLTA",
+        "away": "FIN",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-03-21",
+        "home": "POL",
+        "away": "LTU",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "LTU",
+        "away": "FIN",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "POL",
+        "away": "MLTA",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-06-07",
+        "home": "MLTA",
+        "away": "LTU",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-06-07",
+        "home": "FIN",
+        "away": "NED",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "FIN",
+        "away": "POL",
+        "score": "2-3"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "NED",
+        "away": "MLTA",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-09-04",
+        "home": "LTU",
+        "away": "MLTA",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-09-04",
+        "home": "NED",
+        "away": "POL",
+        "score": "5-2"
+      },
+      {
+        "date": "2025-09-07",
+        "home": "LTU",
+        "away": "NED",
+        "score": "1-4"
+      },
+      {
+        "date": "2025-09-07",
+        "home": "POL",
+        "away": "FIN",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-10-09",
+        "home": "FIN",
+        "away": "LTU",
+        "score": "3-2"
+      },
+      {
+        "date": "2025-10-09",
+        "home": "MLTA",
+        "away": "NED",
+        "score": "1-5"
+      },
+      {
+        "date": "2025-10-12",
+        "home": "NED",
+        "away": "FIN",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-10-12",
+        "home": "LTU",
+        "away": "POL",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-11-14",
+        "home": "FIN",
+        "away": "MLTA",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-11-14",
+        "home": "POL",
+        "away": "NED",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-11-17",
+        "home": "MLTA",
+        "away": "POL",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-11-17",
+        "home": "NED",
+        "away": "LTU",
+        "score": "7-0"
+      }
+    ]
+  },
+  "AUT": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group H",
+      "nl": "UEFA WK 2026-kwalificatie – Groep H",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe H",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo H",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe H",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone H",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo H",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית H"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "AUT",
+        "name": "Austria",
+        "p": 8,
+        "w": 6,
+        "d": 1,
+        "l": 1,
+        "gf": 22,
+        "ga": 7,
+        "gd": 15,
+        "pts": 19,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "BIH",
+        "name": "Bosnia and Herzegovina",
+        "p": 8,
+        "w": 5,
+        "d": 1,
+        "l": 2,
+        "gf": 14,
+        "ga": 8,
+        "gd": 6,
+        "pts": 16,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "ROU",
+        "name": "Romania",
+        "p": 8,
+        "w": 4,
+        "d": 0,
+        "l": 4,
+        "gf": 11,
+        "ga": 12,
+        "gd": -1,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "CYP",
+        "name": "Cyprus",
+        "p": 8,
+        "w": 2,
+        "d": 2,
+        "l": 4,
+        "gf": 10,
+        "ga": 15,
+        "gd": -5,
+        "pts": 8,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "SMR",
+        "name": "San Marino",
+        "p": 8,
+        "w": 0,
+        "d": 0,
+        "l": 8,
+        "gf": 3,
+        "ga": 28,
+        "gd": -25,
+        "pts": 0,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-03-21",
+        "home": "CYP",
+        "away": "SMR",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-03-21",
+        "home": "ROU",
+        "away": "BIH",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "BIH",
+        "away": "CYP",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "SMR",
+        "away": "ROU",
+        "score": "0-5"
+      },
+      {
+        "date": "2025-06-07",
+        "home": "BIH",
+        "away": "SMR",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-06-07",
+        "home": "AUT",
+        "away": "ROU",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "ROU",
+        "away": "CYP",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "SMR",
+        "away": "AUT",
+        "score": "0-6"
+      },
+      {
+        "date": "2025-09-06",
+        "home": "AUT",
+        "away": "CYP",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-09-06",
+        "home": "SMR",
+        "away": "BIH",
+        "score": "0-6"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "BIH",
+        "away": "AUT",
+        "score": "1-2"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "CYP",
+        "away": "ROU",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-10-09",
+        "home": "AUT",
+        "away": "SMR",
+        "score": "5-0"
+      },
+      {
+        "date": "2025-10-09",
+        "home": "CYP",
+        "away": "BIH",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-10-12",
+        "home": "SMR",
+        "away": "CYP",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-10-12",
+        "home": "ROU",
+        "away": "AUT",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "CYP",
+        "away": "AUT",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "BIH",
+        "away": "ROU",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "AUT",
+        "away": "BIH",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "ROU",
+        "away": "SMR",
+        "score": "7-0"
+      }
+    ]
+  },
+  "BIH": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group H + UEFA play-offs (Path A)",
+      "nl": "UEFA WK 2026-kwalificatie – Groep H + UEFA play-offs (Path A)",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe H + UEFA play-offs (Path A)",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo H + UEFA play-offs (Path A)",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe H + UEFA play-offs (Path A)",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone H + UEFA play-offs (Path A)",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo H + UEFA play-offs (Path A)",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית H + UEFA play-offs (Path A)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "AUT",
+        "name": "Austria",
+        "p": 8,
+        "w": 6,
+        "d": 1,
+        "l": 1,
+        "gf": 22,
+        "ga": 7,
+        "gd": 15,
+        "pts": 19,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "BIH",
+        "name": "Bosnia and Herzegovina",
+        "p": 8,
+        "w": 5,
+        "d": 1,
+        "l": 2,
+        "gf": 14,
+        "ga": 8,
+        "gd": 6,
+        "pts": 16,
+        "highlight": true
+      },
+      {
+        "pos": 3,
+        "code": "ROU",
+        "name": "Romania",
+        "p": 8,
+        "w": 4,
+        "d": 0,
+        "l": 4,
+        "gf": 11,
+        "ga": 12,
+        "gd": -1,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "CYP",
+        "name": "Cyprus",
+        "p": 8,
+        "w": 2,
+        "d": 2,
+        "l": 4,
+        "gf": 10,
+        "ga": 15,
+        "gd": -5,
+        "pts": 8,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "SMR",
+        "name": "San Marino",
+        "p": 8,
+        "w": 0,
+        "d": 0,
+        "l": 8,
+        "gf": 3,
+        "ga": 28,
+        "gd": -25,
+        "pts": 0,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-03-21",
+        "home": "CYP",
+        "away": "SMR",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-03-21",
+        "home": "ROU",
+        "away": "BIH",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "BIH",
+        "away": "CYP",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "SMR",
+        "away": "ROU",
+        "score": "0-5"
+      },
+      {
+        "date": "2025-06-07",
+        "home": "BIH",
+        "away": "SMR",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-06-07",
+        "home": "AUT",
+        "away": "ROU",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "ROU",
+        "away": "CYP",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "SMR",
+        "away": "AUT",
+        "score": "0-6"
+      },
+      {
+        "date": "2025-09-06",
+        "home": "AUT",
+        "away": "CYP",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-09-06",
+        "home": "SMR",
+        "away": "BIH",
+        "score": "0-6"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "BIH",
+        "away": "AUT",
+        "score": "1-2"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "CYP",
+        "away": "ROU",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-10-09",
+        "home": "AUT",
+        "away": "SMR",
+        "score": "5-0"
+      },
+      {
+        "date": "2025-10-09",
+        "home": "CYP",
+        "away": "BIH",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-10-12",
+        "home": "SMR",
+        "away": "CYP",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-10-12",
+        "home": "ROU",
+        "away": "AUT",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "CYP",
+        "away": "AUT",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "BIH",
+        "away": "ROU",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "AUT",
+        "away": "BIH",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "ROU",
+        "away": "SMR",
+        "score": "7-0"
+      },
+      {
+        "date": "2026-03-26",
+        "home": "WAL",
+        "away": "BIH",
+        "score": "1-1"
+      },
+      {
+        "date": "2026-03-31",
+        "home": "BIH",
+        "away": "ITA",
+        "score": "1-1"
+      }
+    ]
+  },
+  "NOR": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group I",
+      "nl": "UEFA WK 2026-kwalificatie – Groep I",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe I",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo I",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe I",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone I",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo I",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית I"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "NOR",
+        "name": "Norway",
+        "p": 8,
+        "w": 8,
+        "d": 0,
+        "l": 0,
+        "gf": 37,
+        "ga": 5,
+        "gd": 32,
+        "pts": 24,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "ITA",
+        "name": "Italy",
+        "p": 8,
+        "w": 6,
+        "d": 0,
+        "l": 2,
+        "gf": 21,
+        "ga": 12,
+        "gd": 9,
+        "pts": 18,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "ISR",
+        "name": "Israel",
+        "p": 8,
+        "w": 4,
+        "d": 0,
+        "l": 4,
+        "gf": 19,
+        "ga": 20,
+        "gd": -1,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "EST",
+        "name": "Estonia",
+        "p": 8,
+        "w": 1,
+        "d": 1,
+        "l": 6,
+        "gf": 8,
+        "ga": 21,
+        "gd": -13,
+        "pts": 4,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "MDA",
+        "name": "Moldova",
+        "p": 8,
+        "w": 0,
+        "d": 1,
+        "l": 7,
+        "gf": 5,
+        "ga": 32,
+        "gd": -27,
+        "pts": 1,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-03-22",
+        "home": "MDA",
+        "away": "NOR",
+        "score": "0-5"
+      },
+      {
+        "date": "2025-03-22",
+        "home": "ISR",
+        "away": "EST",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "MDA",
+        "away": "EST",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "ISR",
+        "away": "NOR",
+        "score": "1-5"
+      },
+      {
+        "date": "2025-06-06",
+        "home": "EST",
+        "away": "ISR",
+        "score": "1-3"
+      },
+      {
+        "date": "2025-06-06",
+        "home": "NOR",
+        "away": "ITA",
+        "score": "3-0"
+      },
+      {
+        "date": "2025-06-09",
+        "home": "EST",
+        "away": "NOR",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-06-09",
+        "home": "ITA",
+        "away": "MDA",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "MDA",
+        "away": "ISR",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "ITA",
+        "away": "EST",
+        "score": "5-0"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "ISR",
+        "away": "ITA",
+        "score": "1-5"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "NOR",
+        "away": "MDA",
+        "score": "6-0"
+      },
+      {
+        "date": "2025-10-11",
+        "home": "NOR",
+        "away": "ISR",
+        "score": "5-0"
+      },
+      {
+        "date": "2025-10-11",
+        "home": "EST",
+        "away": "ITA",
+        "score": "0-3"
+      },
+      {
+        "date": "2025-10-14",
+        "home": "EST",
+        "away": "MDA",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-10-14",
+        "home": "ITA",
+        "away": "ISR",
+        "score": "3-0"
+      },
+      {
+        "date": "2025-11-13",
+        "home": "NOR",
+        "away": "EST",
+        "score": "4-1"
+      },
+      {
+        "date": "2025-11-13",
+        "home": "MDA",
+        "away": "ITA",
+        "score": "1-2"
+      },
+      {
+        "date": "2025-11-16",
+        "home": "ISR",
+        "away": "MDA",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-11-16",
+        "home": "ITA",
+        "away": "NOR",
+        "score": "1-4"
+      }
+    ]
+  },
+  "BEL": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group J",
+      "nl": "UEFA WK 2026-kwalificatie – Groep J",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe J",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo J",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe J",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone J",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo J",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית J"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "BEL",
+        "name": "Belgium",
+        "p": 8,
+        "w": 6,
+        "d": 0,
+        "l": 2,
+        "gf": 24,
+        "ga": 8,
+        "gd": 16,
+        "pts": 18,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "WAL",
+        "name": "Wales",
+        "p": 8,
+        "w": 5,
+        "d": 1,
+        "l": 2,
+        "gf": 14,
+        "ga": 8,
+        "gd": 6,
+        "pts": 16,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "MKD",
+        "name": "North Macedonia",
+        "p": 8,
+        "w": 4,
+        "d": 1,
+        "l": 3,
+        "gf": 12,
+        "ga": 14,
+        "gd": -2,
+        "pts": 13,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "KAZ",
+        "name": "Kazakhstan",
+        "p": 8,
+        "w": 2,
+        "d": 2,
+        "l": 4,
+        "gf": 8,
+        "ga": 14,
+        "gd": -6,
+        "pts": 8,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "LIE",
+        "name": "Liechtenstein",
+        "p": 8,
+        "w": 0,
+        "d": 0,
+        "l": 8,
+        "gf": 2,
+        "ga": 26,
+        "gd": -24,
+        "pts": 0,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-03-21",
+        "home": "KAZ",
+        "away": "WAL",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-03-21",
+        "home": "LIE",
+        "away": "MKD",
+        "score": "0-3"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "WAL",
+        "away": "KAZ",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "MKD",
+        "away": "LIE",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-06-06",
+        "home": "BEL",
+        "away": "WAL",
+        "score": "4-3"
+      },
+      {
+        "date": "2025-06-06",
+        "home": "KAZ",
+        "away": "MKD",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-06-09",
+        "home": "WAL",
+        "away": "LIE",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-06-09",
+        "home": "MKD",
+        "away": "BEL",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "LIE",
+        "away": "BEL",
+        "score": "0-8"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "WAL",
+        "away": "MKD",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "BEL",
+        "away": "KAZ",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "MKD",
+        "away": "WAL",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "KAZ",
+        "away": "LIE",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "BEL",
+        "away": "MKD",
+        "score": "3-0"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "LIE",
+        "away": "KAZ",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "WAL",
+        "away": "BEL",
+        "score": "2-4"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "KAZ",
+        "away": "BEL",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "MKD",
+        "away": "KAZ",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "BEL",
+        "away": "LIE",
+        "score": "8-0"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "MKD",
+        "away": "WAL",
+        "score": "1-1"
+      }
+    ]
+  },
+  "ENG": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group K",
+      "nl": "UEFA WK 2026-kwalificatie – Groep K",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe K",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo K",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe K",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone K",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo K",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית K"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "ENG",
+        "name": "England",
+        "p": 8,
+        "w": 8,
+        "d": 0,
+        "l": 0,
+        "gf": 28,
+        "ga": 3,
+        "gd": 25,
+        "pts": 24,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "ALB",
+        "name": "Albania",
+        "p": 8,
+        "w": 4,
+        "d": 2,
+        "l": 2,
+        "gf": 13,
+        "ga": 9,
+        "gd": 4,
+        "pts": 14,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "SRB",
+        "name": "Serbia",
+        "p": 8,
+        "w": 4,
+        "d": 1,
+        "l": 3,
+        "gf": 12,
+        "ga": 11,
+        "gd": 1,
+        "pts": 13,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "LAT",
+        "name": "Latvia",
+        "p": 8,
+        "w": 1,
+        "d": 2,
+        "l": 5,
+        "gf": 6,
+        "ga": 17,
+        "gd": -11,
+        "pts": 5,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "AND",
+        "name": "Andorra",
+        "p": 8,
+        "w": 0,
+        "d": 1,
+        "l": 7,
+        "gf": 4,
+        "ga": 23,
+        "gd": -19,
+        "pts": 1,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-03-21",
+        "home": "LAT",
+        "away": "AND",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-03-21",
+        "home": "SRB",
+        "away": "ALB",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "ALB",
+        "away": "AND",
+        "score": "3-0"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "ENG",
+        "away": "LAT",
+        "score": "3-0"
+      },
+      {
+        "date": "2025-06-06",
+        "home": "AND",
+        "away": "ENG",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-06-06",
+        "home": "LAT",
+        "away": "SRB",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-06-09",
+        "home": "ALB",
+        "away": "SRB",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-06-09",
+        "home": "ENG",
+        "away": "AND",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "SRB",
+        "away": "ENG",
+        "score": "0-5"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "LAT",
+        "away": "ALB",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "AND",
+        "away": "LAT",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "ENG",
+        "away": "SRB",
+        "score": "3-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "ALB",
+        "away": "LAT",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "AND",
+        "away": "SRB",
+        "score": "1-3"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "SRB",
+        "away": "AND",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "LAT",
+        "away": "ENG",
+        "score": "0-5"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "ALB",
+        "away": "ENG",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "SRB",
+        "away": "LAT",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "ENG",
+        "away": "ALB",
+        "score": "3-0"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "LAT",
+        "away": "AND",
+        "score": "1-1"
+      }
+    ]
+  },
+  "CRO": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group L",
+      "nl": "UEFA WK 2026-kwalificatie – Groep L",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe L",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo L",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe L",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone L",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo L",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית L"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "CRO",
+        "name": "Croatia",
+        "p": 8,
+        "w": 7,
+        "d": 1,
+        "l": 0,
+        "gf": 26,
+        "ga": 4,
+        "gd": 22,
+        "pts": 22,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "CZE",
+        "name": "Czech Republic",
+        "p": 8,
+        "w": 5,
+        "d": 1,
+        "l": 2,
+        "gf": 18,
+        "ga": 8,
+        "gd": 10,
+        "pts": 16,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "FRO",
+        "name": "Faroe Islands",
+        "p": 8,
+        "w": 4,
+        "d": 0,
+        "l": 4,
+        "gf": 11,
+        "ga": 9,
+        "gd": 2,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "MNE",
+        "name": "Montenegro",
+        "p": 8,
+        "w": 3,
+        "d": 0,
+        "l": 5,
+        "gf": 8,
+        "ga": 17,
+        "gd": -9,
+        "pts": 9,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "GIB",
+        "name": "Gibraltar",
+        "p": 8,
+        "w": 0,
+        "d": 0,
+        "l": 8,
+        "gf": 3,
+        "ga": 28,
+        "gd": -25,
+        "pts": 0,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-03-21",
+        "home": "GIB",
+        "away": "CRO",
+        "score": "0-7"
+      },
+      {
+        "date": "2025-03-21",
+        "home": "MNE",
+        "away": "FRO",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "CRO",
+        "away": "FRO",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "CZE",
+        "away": "GIB",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-06-06",
+        "home": "FRO",
+        "away": "CRO",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-06-06",
+        "home": "GIB",
+        "away": "MNE",
+        "score": "0-3"
+      },
+      {
+        "date": "2025-06-09",
+        "home": "CRO",
+        "away": "CZE",
+        "score": "5-1"
+      },
+      {
+        "date": "2025-06-09",
+        "home": "MNE",
+        "away": "GIB",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "FRO",
+        "away": "GIB",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "CZE",
+        "away": "MNE",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "GIB",
+        "away": "FRO",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "MNE",
+        "away": "CRO",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "CRO",
+        "away": "GIB",
+        "score": "7-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "CZE",
+        "away": "FRO",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "FRO",
+        "away": "MNE",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "GIB",
+        "away": "CZE",
+        "score": "0-6"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "MNE",
+        "away": "CZE",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "CRO",
+        "away": "FRO",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "FRO",
+        "away": "CZE",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "CRO",
+        "away": "MNE",
+        "score": "3-0"
+      }
+    ]
+  },
+  "CZE": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group L + UEFA play-offs (Path D)",
+      "nl": "UEFA WK 2026-kwalificatie – Groep L + UEFA play-offs (Path D)",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe L + UEFA play-offs (Path D)",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo L + UEFA play-offs (Path D)",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe L + UEFA play-offs (Path D)",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone L + UEFA play-offs (Path D)",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo L + UEFA play-offs (Path D)",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית L + UEFA play-offs (Path D)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "CRO",
+        "name": "Croatia",
+        "p": 8,
+        "w": 7,
+        "d": 1,
+        "l": 0,
+        "gf": 26,
+        "ga": 4,
+        "gd": 22,
+        "pts": 22,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "CZE",
+        "name": "Czech Republic",
+        "p": 8,
+        "w": 5,
+        "d": 1,
+        "l": 2,
+        "gf": 18,
+        "ga": 8,
+        "gd": 10,
+        "pts": 16,
+        "highlight": true
+      },
+      {
+        "pos": 3,
+        "code": "FRO",
+        "name": "Faroe Islands",
+        "p": 8,
+        "w": 4,
+        "d": 0,
+        "l": 4,
+        "gf": 11,
+        "ga": 9,
+        "gd": 2,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "MNE",
+        "name": "Montenegro",
+        "p": 8,
+        "w": 3,
+        "d": 0,
+        "l": 5,
+        "gf": 8,
+        "ga": 17,
+        "gd": -9,
+        "pts": 9,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "GIB",
+        "name": "Gibraltar",
+        "p": 8,
+        "w": 0,
+        "d": 0,
+        "l": 8,
+        "gf": 3,
+        "ga": 28,
+        "gd": -25,
+        "pts": 0,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-03-21",
+        "home": "GIB",
+        "away": "CRO",
+        "score": "0-7"
+      },
+      {
+        "date": "2025-03-21",
+        "home": "MNE",
+        "away": "FRO",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "CRO",
+        "away": "FRO",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "CZE",
+        "away": "GIB",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-06-06",
+        "home": "FRO",
+        "away": "CRO",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-06-06",
+        "home": "GIB",
+        "away": "MNE",
+        "score": "0-3"
+      },
+      {
+        "date": "2025-06-09",
+        "home": "CRO",
+        "away": "CZE",
+        "score": "5-1"
+      },
+      {
+        "date": "2025-06-09",
+        "home": "MNE",
+        "away": "GIB",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "FRO",
+        "away": "GIB",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "CZE",
+        "away": "MNE",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "GIB",
+        "away": "FRO",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "MNE",
+        "away": "CRO",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "CRO",
+        "away": "GIB",
+        "score": "7-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "CZE",
+        "away": "FRO",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "FRO",
+        "away": "MNE",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "GIB",
+        "away": "CZE",
+        "score": "0-6"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "MNE",
+        "away": "CZE",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "CRO",
+        "away": "FRO",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "FRO",
+        "away": "CZE",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "CRO",
+        "away": "MNE",
+        "score": "3-0"
+      },
+      {
+        "date": "2026-03-26",
+        "home": "CZE",
+        "away": "IRL",
+        "score": "2-2"
+      },
+      {
+        "date": "2026-03-31",
+        "home": "CZE",
+        "away": "DEN",
+        "score": "2-2"
+      }
+    ]
+  },
+  "TUR": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group E + UEFA play-offs (Path C)",
+      "nl": "UEFA WK 2026-kwalificatie – Groep E + UEFA play-offs (Path C)",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe E + UEFA play-offs (Path C)",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo E + UEFA play-offs (Path C)",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe E + UEFA play-offs (Path C)",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone E + UEFA play-offs (Path C)",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo E + UEFA play-offs (Path C)",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית E + UEFA play-offs (Path C)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "ESP",
+        "name": "Spain",
+        "p": 6,
+        "w": 5,
+        "d": 1,
+        "l": 0,
+        "gf": 21,
+        "ga": 2,
+        "gd": 19,
+        "pts": 16,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "TUR",
+        "name": "Turkey",
+        "p": 6,
+        "w": 4,
+        "d": 1,
+        "l": 1,
+        "gf": 17,
+        "ga": 12,
+        "gd": 5,
+        "pts": 13,
+        "highlight": true
+      },
+      {
+        "pos": 3,
+        "code": "GEO",
+        "name": "Georgia",
+        "p": 6,
+        "w": 1,
+        "d": 0,
+        "l": 5,
+        "gf": 7,
+        "ga": 15,
+        "gd": -8,
+        "pts": 3,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "BUL",
+        "name": "Bulgaria",
+        "p": 6,
+        "w": 1,
+        "d": 0,
+        "l": 5,
+        "gf": 3,
+        "ga": 19,
+        "gd": -16,
+        "pts": 3,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-09-05",
+        "home": "GEO",
+        "away": "ESP",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "TUR",
+        "away": "BUL",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "BUL",
+        "away": "GEO",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "ESP",
+        "away": "TUR",
+        "score": "6-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "BUL",
+        "away": "ESP",
+        "score": "0-3"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "TUR",
+        "away": "GEO",
+        "score": "4-1"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "GEO",
+        "away": "TUR",
+        "score": "2-3"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "ESP",
+        "away": "BUL",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "BUL",
+        "away": "TUR",
+        "score": "1-6"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "GEO",
+        "away": "BUL",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "ESP",
+        "away": "GEO",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "TUR",
+        "away": "ESP",
+        "score": "0-1"
+      },
+      {
+        "date": "2026-03-26",
+        "home": "TUR",
+        "away": "ROU",
+        "score": "1-0"
+      },
+      {
+        "date": "2026-03-31",
+        "home": "KOS",
+        "away": "TUR",
+        "score": "0-1"
+      }
+    ]
+  },
+  "SWE": {
+    "competition": {
+      "en": "UEFA World Cup 2026 Qualifiers – Group B + UEFA play-offs (Path B)",
+      "nl": "UEFA WK 2026-kwalificatie – Groep B + UEFA play-offs (Path B)",
+      "de": "UEFA WM 2026-Qualifikation – Gruppe B + UEFA play-offs (Path B)",
+      "es": "Clasificatoria UEFA al Mundial 2026 – Grupo B + UEFA play-offs (Path B)",
+      "fr": "Qualifications UEFA pour la Coupe du monde 2026 – Groupe B + UEFA play-offs (Path B)",
+      "it": "Qualificazioni UEFA ai Mondiali 2026 – Girone B + UEFA play-offs (Path B)",
+      "pt": "Qualificação UEFA para a Copa de 2026 – Grupo B + UEFA play-offs (Path B)",
+      "he": "מוקדמות UEFA למונדיאל 2026 – בית B + UEFA play-offs (Path B)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "SUI",
+        "name": "Switzerland",
+        "p": 6,
+        "w": 4,
+        "d": 2,
+        "l": 0,
+        "gf": 14,
+        "ga": 2,
+        "gd": 12,
+        "pts": 14,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "KOS",
+        "name": "Kosovo",
+        "p": 6,
+        "w": 3,
+        "d": 2,
+        "l": 1,
+        "gf": 6,
+        "ga": 5,
+        "gd": 1,
+        "pts": 11,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "SVN",
+        "name": "Slovenia",
+        "p": 6,
+        "w": 0,
+        "d": 4,
+        "l": 2,
+        "gf": 3,
+        "ga": 8,
+        "gd": -5,
+        "pts": 4,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "SWE",
+        "name": "Sweden",
+        "p": 6,
+        "w": 0,
+        "d": 2,
+        "l": 4,
+        "gf": 4,
+        "ga": 12,
+        "gd": -8,
+        "pts": 2,
+        "highlight": true
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-09-05",
+        "home": "SVN",
+        "away": "SWE",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-09-05",
+        "home": "SUI",
+        "away": "KOS",
+        "score": "4-1"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "KOS",
+        "away": "SWE",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-09-08",
+        "home": "SUI",
+        "away": "SVN",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "KOS",
+        "away": "SVN",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "SWE",
+        "away": "SUI",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "SVN",
+        "away": "SUI",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-10-13",
+        "home": "SWE",
+        "away": "KOS",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "SVN",
+        "away": "KOS",
+        "score": "1-2"
+      },
+      {
+        "date": "2025-11-15",
+        "home": "SUI",
+        "away": "SWE",
+        "score": "4-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "KOS",
+        "away": "SUI",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "SWE",
+        "away": "SVN",
+        "score": "1-1"
+      },
+      {
+        "date": "2026-03-26",
+        "home": "UKR",
+        "away": "SWE",
+        "score": "1-3"
+      },
+      {
+        "date": "2026-03-31",
+        "home": "SWE",
+        "away": "POL",
+        "score": "3-2"
+      }
+    ]
+  },
+  "BRA": {
+    "competition": {
+      "en": "CONMEBOL World Cup 2026 Qualifiers – single round-robin (18 matchdays)",
+      "nl": "CONMEBOL WK 2026-kwalificatie – enkelvoudige competitie (18 speeldagen)",
+      "de": "CONMEBOL WM 2026-Qualifikation – Einfache Round-Robin-Runde (18 Spieltage)",
+      "es": "Clasificatoria CONMEBOL al Mundial 2026 – todos contra todos (18 fechas)",
+      "fr": "Qualifications CONMEBOL pour la Coupe du monde 2026 – championnat unique (18 journées)",
+      "it": "Qualificazioni CONMEBOL ai Mondiali 2026 – girone unico (18 giornate)",
+      "pt": "Qualificação CONMEBOL para a Copa de 2026 – turno único (18 rodadas)",
+      "he": "מוקדמות CONMEBOL למונדיאל 2026 – ליגה ביתית-חוץ (18 מחזורים)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "ARG",
+        "name": "Argentina",
+        "p": 18,
+        "w": 12,
+        "d": 2,
+        "l": 4,
+        "gf": 31,
+        "ga": 10,
+        "gd": 21,
+        "pts": 38,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "ECU",
+        "name": "Ecuador",
+        "p": 18,
+        "w": 8,
+        "d": 5,
+        "l": 5,
+        "gf": 14,
+        "ga": 5,
+        "gd": 9,
+        "pts": 29,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "COL",
+        "name": "Colombia",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 28,
+        "ga": 18,
+        "gd": 10,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "URU",
+        "name": "Uruguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 22,
+        "ga": 12,
+        "gd": 10,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "BRA",
+        "name": "Brazil",
+        "p": 18,
+        "w": 8,
+        "d": 4,
+        "l": 6,
+        "gf": 24,
+        "ga": 17,
+        "gd": 7,
+        "pts": 28,
+        "highlight": true
+      },
+      {
+        "pos": 6,
+        "code": "PAR",
+        "name": "Paraguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 14,
+        "ga": 10,
+        "gd": 4,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 7,
+        "code": "BOL",
+        "name": "Bolivia",
+        "p": 18,
+        "w": 6,
+        "d": 2,
+        "l": 10,
+        "gf": 17,
+        "ga": 35,
+        "gd": -18,
+        "pts": 20,
+        "highlight": false
+      },
+      {
+        "pos": 8,
+        "code": "VEN",
+        "name": "Venezuela",
+        "p": 18,
+        "w": 4,
+        "d": 6,
+        "l": 8,
+        "gf": 18,
+        "ga": 28,
+        "gd": -10,
+        "pts": 18,
+        "highlight": false
+      },
+      {
+        "pos": 9,
+        "code": "PER",
+        "name": "Peru",
+        "p": 18,
+        "w": 2,
+        "d": 6,
+        "l": 10,
+        "gf": 6,
+        "ga": 21,
+        "gd": -15,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 10,
+        "code": "CHI",
+        "name": "Chile",
+        "p": 18,
+        "w": 2,
+        "d": 5,
+        "l": 11,
+        "gf": 9,
+        "ga": 27,
+        "gd": -18,
+        "pts": 11,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2023-09-12",
+        "home": "PER",
+        "away": "BRA",
+        "score": "0-1"
+      },
+      {
+        "date": "2023-10-12",
+        "home": "URU",
+        "away": "BRA",
+        "score": "2-0"
+      },
+      {
+        "date": "2023-10-17",
+        "home": "BRA",
+        "away": "VEN",
+        "score": "1-1"
+      },
+      {
+        "date": "2023-11-16",
+        "home": "BRA",
+        "away": "COL",
+        "score": "0-1"
+      },
+      {
+        "date": "2024-09-10",
+        "home": "BRA",
+        "away": "ECU",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-09-10",
+        "home": "COL",
+        "away": "BRA",
+        "score": "2-1"
+      },
+      {
+        "date": "2024-10-10",
+        "home": "CHI",
+        "away": "BRA",
+        "score": "1-2"
+      },
+      {
+        "date": "2024-11-14",
+        "home": "BRA",
+        "away": "URU",
+        "score": "1-1"
+      },
+      {
+        "date": "2024-11-19",
+        "home": "VEN",
+        "away": "BRA",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "BRA",
+        "away": "ARG",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-06-05",
+        "home": "ECU",
+        "away": "BRA",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "BRA",
+        "away": "PAR",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-09-04",
+        "home": "BRA",
+        "away": "CHI",
+        "score": "3-0"
+      }
+    ]
+  },
+  "ARG": {
+    "competition": {
+      "en": "CONMEBOL World Cup 2026 Qualifiers – single round-robin (18 matchdays)",
+      "nl": "CONMEBOL WK 2026-kwalificatie – enkelvoudige competitie (18 speeldagen)",
+      "de": "CONMEBOL WM 2026-Qualifikation – Einfache Round-Robin-Runde (18 Spieltage)",
+      "es": "Clasificatoria CONMEBOL al Mundial 2026 – todos contra todos (18 fechas)",
+      "fr": "Qualifications CONMEBOL pour la Coupe du monde 2026 – championnat unique (18 journées)",
+      "it": "Qualificazioni CONMEBOL ai Mondiali 2026 – girone unico (18 giornate)",
+      "pt": "Qualificação CONMEBOL para a Copa de 2026 – turno único (18 rodadas)",
+      "he": "מוקדמות CONMEBOL למונדיאל 2026 – ליגה ביתית-חוץ (18 מחזורים)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "ARG",
+        "name": "Argentina",
+        "p": 18,
+        "w": 12,
+        "d": 2,
+        "l": 4,
+        "gf": 31,
+        "ga": 10,
+        "gd": 21,
+        "pts": 38,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "ECU",
+        "name": "Ecuador",
+        "p": 18,
+        "w": 8,
+        "d": 5,
+        "l": 5,
+        "gf": 14,
+        "ga": 5,
+        "gd": 9,
+        "pts": 29,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "COL",
+        "name": "Colombia",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 28,
+        "ga": 18,
+        "gd": 10,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "URU",
+        "name": "Uruguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 22,
+        "ga": 12,
+        "gd": 10,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "BRA",
+        "name": "Brazil",
+        "p": 18,
+        "w": 8,
+        "d": 4,
+        "l": 6,
+        "gf": 24,
+        "ga": 17,
+        "gd": 7,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "PAR",
+        "name": "Paraguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 14,
+        "ga": 10,
+        "gd": 4,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 7,
+        "code": "BOL",
+        "name": "Bolivia",
+        "p": 18,
+        "w": 6,
+        "d": 2,
+        "l": 10,
+        "gf": 17,
+        "ga": 35,
+        "gd": -18,
+        "pts": 20,
+        "highlight": false
+      },
+      {
+        "pos": 8,
+        "code": "VEN",
+        "name": "Venezuela",
+        "p": 18,
+        "w": 4,
+        "d": 6,
+        "l": 8,
+        "gf": 18,
+        "ga": 28,
+        "gd": -10,
+        "pts": 18,
+        "highlight": false
+      },
+      {
+        "pos": 9,
+        "code": "PER",
+        "name": "Peru",
+        "p": 18,
+        "w": 2,
+        "d": 6,
+        "l": 10,
+        "gf": 6,
+        "ga": 21,
+        "gd": -15,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 10,
+        "code": "CHI",
+        "name": "Chile",
+        "p": 18,
+        "w": 2,
+        "d": 5,
+        "l": 11,
+        "gf": 9,
+        "ga": 27,
+        "gd": -18,
+        "pts": 11,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2023-09-12",
+        "home": "ECU",
+        "away": "ARG",
+        "score": "0-1"
+      },
+      {
+        "date": "2023-10-12",
+        "home": "ARG",
+        "away": "PAR",
+        "score": "1-0"
+      },
+      {
+        "date": "2023-10-12",
+        "home": "BOL",
+        "away": "ARG",
+        "score": "2-1"
+      },
+      {
+        "date": "2023-11-16",
+        "home": "ARG",
+        "away": "URU",
+        "score": "0-2"
+      },
+      {
+        "date": "2024-09-10",
+        "home": "ARG",
+        "away": "CHI",
+        "score": "3-0"
+      },
+      {
+        "date": "2024-10-10",
+        "home": "VEN",
+        "away": "ARG",
+        "score": "1-1"
+      },
+      {
+        "date": "2024-11-14",
+        "home": "ARG",
+        "away": "PER",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-03-20",
+        "home": "URU",
+        "away": "ARG",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "BRA",
+        "away": "ARG",
+        "score": "0-4"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "ARG",
+        "away": "COL",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-09-04",
+        "home": "ARG",
+        "away": "VEN",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "ECU",
+        "away": "ARG",
+        "score": "1-1"
+      }
+    ]
+  },
+  "URU": {
+    "competition": {
+      "en": "CONMEBOL World Cup 2026 Qualifiers – single round-robin (18 matchdays)",
+      "nl": "CONMEBOL WK 2026-kwalificatie – enkelvoudige competitie (18 speeldagen)",
+      "de": "CONMEBOL WM 2026-Qualifikation – Einfache Round-Robin-Runde (18 Spieltage)",
+      "es": "Clasificatoria CONMEBOL al Mundial 2026 – todos contra todos (18 fechas)",
+      "fr": "Qualifications CONMEBOL pour la Coupe du monde 2026 – championnat unique (18 journées)",
+      "it": "Qualificazioni CONMEBOL ai Mondiali 2026 – girone unico (18 giornate)",
+      "pt": "Qualificação CONMEBOL para a Copa de 2026 – turno único (18 rodadas)",
+      "he": "מוקדמות CONMEBOL למונדיאל 2026 – ליגה ביתית-חוץ (18 מחזורים)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "ARG",
+        "name": "Argentina",
+        "p": 18,
+        "w": 12,
+        "d": 2,
+        "l": 4,
+        "gf": 31,
+        "ga": 10,
+        "gd": 21,
+        "pts": 38,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "ECU",
+        "name": "Ecuador",
+        "p": 18,
+        "w": 8,
+        "d": 5,
+        "l": 5,
+        "gf": 14,
+        "ga": 5,
+        "gd": 9,
+        "pts": 29,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "COL",
+        "name": "Colombia",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 28,
+        "ga": 18,
+        "gd": 10,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "URU",
+        "name": "Uruguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 22,
+        "ga": 12,
+        "gd": 10,
+        "pts": 28,
+        "highlight": true
+      },
+      {
+        "pos": 5,
+        "code": "BRA",
+        "name": "Brazil",
+        "p": 18,
+        "w": 8,
+        "d": 4,
+        "l": 6,
+        "gf": 24,
+        "ga": 17,
+        "gd": 7,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "PAR",
+        "name": "Paraguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 14,
+        "ga": 10,
+        "gd": 4,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 7,
+        "code": "BOL",
+        "name": "Bolivia",
+        "p": 18,
+        "w": 6,
+        "d": 2,
+        "l": 10,
+        "gf": 17,
+        "ga": 35,
+        "gd": -18,
+        "pts": 20,
+        "highlight": false
+      },
+      {
+        "pos": 8,
+        "code": "VEN",
+        "name": "Venezuela",
+        "p": 18,
+        "w": 4,
+        "d": 6,
+        "l": 8,
+        "gf": 18,
+        "ga": 28,
+        "gd": -10,
+        "pts": 18,
+        "highlight": false
+      },
+      {
+        "pos": 9,
+        "code": "PER",
+        "name": "Peru",
+        "p": 18,
+        "w": 2,
+        "d": 6,
+        "l": 10,
+        "gf": 6,
+        "ga": 21,
+        "gd": -15,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 10,
+        "code": "CHI",
+        "name": "Chile",
+        "p": 18,
+        "w": 2,
+        "d": 5,
+        "l": 11,
+        "gf": 9,
+        "ga": 27,
+        "gd": -18,
+        "pts": 11,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2023-09-07",
+        "home": "URU",
+        "away": "CHI",
+        "score": "3-1"
+      },
+      {
+        "date": "2023-10-12",
+        "home": "URU",
+        "away": "BRA",
+        "score": "2-0"
+      },
+      {
+        "date": "2023-11-16",
+        "home": "COL",
+        "away": "URU",
+        "score": "2-2"
+      },
+      {
+        "date": "2023-11-16",
+        "home": "ARG",
+        "away": "URU",
+        "score": "0-2"
+      },
+      {
+        "date": "2024-09-05",
+        "home": "URU",
+        "away": "PAR",
+        "score": "0-0"
+      },
+      {
+        "date": "2024-11-14",
+        "home": "BRA",
+        "away": "URU",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-03-20",
+        "home": "URU",
+        "away": "ARG",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "CHI",
+        "away": "URU",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-06-05",
+        "home": "PAR",
+        "away": "URU",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-09-04",
+        "home": "URU",
+        "away": "PER",
+        "score": "3-0"
+      }
+    ]
+  },
+  "COL": {
+    "competition": {
+      "en": "CONMEBOL World Cup 2026 Qualifiers – single round-robin (18 matchdays)",
+      "nl": "CONMEBOL WK 2026-kwalificatie – enkelvoudige competitie (18 speeldagen)",
+      "de": "CONMEBOL WM 2026-Qualifikation – Einfache Round-Robin-Runde (18 Spieltage)",
+      "es": "Clasificatoria CONMEBOL al Mundial 2026 – todos contra todos (18 fechas)",
+      "fr": "Qualifications CONMEBOL pour la Coupe du monde 2026 – championnat unique (18 journées)",
+      "it": "Qualificazioni CONMEBOL ai Mondiali 2026 – girone unico (18 giornate)",
+      "pt": "Qualificação CONMEBOL para a Copa de 2026 – turno único (18 rodadas)",
+      "he": "מוקדמות CONMEBOL למונדיאל 2026 – ליגה ביתית-חוץ (18 מחזורים)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "ARG",
+        "name": "Argentina",
+        "p": 18,
+        "w": 12,
+        "d": 2,
+        "l": 4,
+        "gf": 31,
+        "ga": 10,
+        "gd": 21,
+        "pts": 38,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "ECU",
+        "name": "Ecuador",
+        "p": 18,
+        "w": 8,
+        "d": 5,
+        "l": 5,
+        "gf": 14,
+        "ga": 5,
+        "gd": 9,
+        "pts": 29,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "COL",
+        "name": "Colombia",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 28,
+        "ga": 18,
+        "gd": 10,
+        "pts": 28,
+        "highlight": true
+      },
+      {
+        "pos": 4,
+        "code": "URU",
+        "name": "Uruguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 22,
+        "ga": 12,
+        "gd": 10,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "BRA",
+        "name": "Brazil",
+        "p": 18,
+        "w": 8,
+        "d": 4,
+        "l": 6,
+        "gf": 24,
+        "ga": 17,
+        "gd": 7,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "PAR",
+        "name": "Paraguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 14,
+        "ga": 10,
+        "gd": 4,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 7,
+        "code": "BOL",
+        "name": "Bolivia",
+        "p": 18,
+        "w": 6,
+        "d": 2,
+        "l": 10,
+        "gf": 17,
+        "ga": 35,
+        "gd": -18,
+        "pts": 20,
+        "highlight": false
+      },
+      {
+        "pos": 8,
+        "code": "VEN",
+        "name": "Venezuela",
+        "p": 18,
+        "w": 4,
+        "d": 6,
+        "l": 8,
+        "gf": 18,
+        "ga": 28,
+        "gd": -10,
+        "pts": 18,
+        "highlight": false
+      },
+      {
+        "pos": 9,
+        "code": "PER",
+        "name": "Peru",
+        "p": 18,
+        "w": 2,
+        "d": 6,
+        "l": 10,
+        "gf": 6,
+        "ga": 21,
+        "gd": -15,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 10,
+        "code": "CHI",
+        "name": "Chile",
+        "p": 18,
+        "w": 2,
+        "d": 5,
+        "l": 11,
+        "gf": 9,
+        "ga": 27,
+        "gd": -18,
+        "pts": 11,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2023-09-07",
+        "home": "COL",
+        "away": "VEN",
+        "score": "0-0"
+      },
+      {
+        "date": "2023-10-17",
+        "home": "CHI",
+        "away": "COL",
+        "score": "0-0"
+      },
+      {
+        "date": "2023-11-16",
+        "home": "COL",
+        "away": "URU",
+        "score": "2-2"
+      },
+      {
+        "date": "2023-11-16",
+        "home": "BRA",
+        "away": "COL",
+        "score": "0-1"
+      },
+      {
+        "date": "2023-11-21",
+        "home": "PAR",
+        "away": "COL",
+        "score": "0-0"
+      },
+      {
+        "date": "2024-09-10",
+        "home": "COL",
+        "away": "BRA",
+        "score": "2-1"
+      },
+      {
+        "date": "2024-10-15",
+        "home": "BOL",
+        "away": "COL",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-11-14",
+        "home": "COL",
+        "away": "ECU",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "COL",
+        "away": "PAR",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "ARG",
+        "away": "COL",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "COL",
+        "away": "BOL",
+        "score": "3-1"
+      }
+    ]
+  },
+  "ECU": {
+    "competition": {
+      "en": "CONMEBOL World Cup 2026 Qualifiers – single round-robin (18 matchdays)",
+      "nl": "CONMEBOL WK 2026-kwalificatie – enkelvoudige competitie (18 speeldagen)",
+      "de": "CONMEBOL WM 2026-Qualifikation – Einfache Round-Robin-Runde (18 Spieltage)",
+      "es": "Clasificatoria CONMEBOL al Mundial 2026 – todos contra todos (18 fechas)",
+      "fr": "Qualifications CONMEBOL pour la Coupe du monde 2026 – championnat unique (18 journées)",
+      "it": "Qualificazioni CONMEBOL ai Mondiali 2026 – girone unico (18 giornate)",
+      "pt": "Qualificação CONMEBOL para a Copa de 2026 – turno único (18 rodadas)",
+      "he": "מוקדמות CONMEBOL למונדיאל 2026 – ליגה ביתית-חוץ (18 מחזורים)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "ARG",
+        "name": "Argentina",
+        "p": 18,
+        "w": 12,
+        "d": 2,
+        "l": 4,
+        "gf": 31,
+        "ga": 10,
+        "gd": 21,
+        "pts": 38,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "ECU",
+        "name": "Ecuador",
+        "p": 18,
+        "w": 8,
+        "d": 5,
+        "l": 5,
+        "gf": 14,
+        "ga": 5,
+        "gd": 9,
+        "pts": 29,
+        "highlight": true
+      },
+      {
+        "pos": 3,
+        "code": "COL",
+        "name": "Colombia",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 28,
+        "ga": 18,
+        "gd": 10,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "URU",
+        "name": "Uruguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 22,
+        "ga": 12,
+        "gd": 10,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "BRA",
+        "name": "Brazil",
+        "p": 18,
+        "w": 8,
+        "d": 4,
+        "l": 6,
+        "gf": 24,
+        "ga": 17,
+        "gd": 7,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "PAR",
+        "name": "Paraguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 14,
+        "ga": 10,
+        "gd": 4,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 7,
+        "code": "BOL",
+        "name": "Bolivia",
+        "p": 18,
+        "w": 6,
+        "d": 2,
+        "l": 10,
+        "gf": 17,
+        "ga": 35,
+        "gd": -18,
+        "pts": 20,
+        "highlight": false
+      },
+      {
+        "pos": 8,
+        "code": "VEN",
+        "name": "Venezuela",
+        "p": 18,
+        "w": 4,
+        "d": 6,
+        "l": 8,
+        "gf": 18,
+        "ga": 28,
+        "gd": -10,
+        "pts": 18,
+        "highlight": false
+      },
+      {
+        "pos": 9,
+        "code": "PER",
+        "name": "Peru",
+        "p": 18,
+        "w": 2,
+        "d": 6,
+        "l": 10,
+        "gf": 6,
+        "ga": 21,
+        "gd": -15,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 10,
+        "code": "CHI",
+        "name": "Chile",
+        "p": 18,
+        "w": 2,
+        "d": 5,
+        "l": 11,
+        "gf": 9,
+        "ga": 27,
+        "gd": -18,
+        "pts": 11,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2023-09-12",
+        "home": "ECU",
+        "away": "ARG",
+        "score": "0-1"
+      },
+      {
+        "date": "2023-10-17",
+        "home": "PER",
+        "away": "ECU",
+        "score": "0-2"
+      },
+      {
+        "date": "2023-11-21",
+        "home": "VEN",
+        "away": "ECU",
+        "score": "1-0"
+      },
+      {
+        "date": "2023-11-21",
+        "home": "CHI",
+        "away": "ECU",
+        "score": "0-0"
+      },
+      {
+        "date": "2024-09-05",
+        "home": "ECU",
+        "away": "PER",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-09-10",
+        "home": "BRA",
+        "away": "ECU",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-10-15",
+        "home": "ECU",
+        "away": "BOL",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-11-14",
+        "home": "COL",
+        "away": "ECU",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-03-20",
+        "home": "ECU",
+        "away": "VEN",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-06-05",
+        "home": "ECU",
+        "away": "BRA",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "PER",
+        "away": "ECU",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "ECU",
+        "away": "ARG",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "PAR",
+        "away": "ECU",
+        "score": "1-0"
+      }
+    ]
+  },
+  "PAR": {
+    "competition": {
+      "en": "CONMEBOL World Cup 2026 Qualifiers – single round-robin (18 matchdays)",
+      "nl": "CONMEBOL WK 2026-kwalificatie – enkelvoudige competitie (18 speeldagen)",
+      "de": "CONMEBOL WM 2026-Qualifikation – Einfache Round-Robin-Runde (18 Spieltage)",
+      "es": "Clasificatoria CONMEBOL al Mundial 2026 – todos contra todos (18 fechas)",
+      "fr": "Qualifications CONMEBOL pour la Coupe du monde 2026 – championnat unique (18 journées)",
+      "it": "Qualificazioni CONMEBOL ai Mondiali 2026 – girone unico (18 giornate)",
+      "pt": "Qualificação CONMEBOL para a Copa de 2026 – turno único (18 rodadas)",
+      "he": "מוקדמות CONMEBOL למונדיאל 2026 – ליגה ביתית-חוץ (18 מחזורים)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "ARG",
+        "name": "Argentina",
+        "p": 18,
+        "w": 12,
+        "d": 2,
+        "l": 4,
+        "gf": 31,
+        "ga": 10,
+        "gd": 21,
+        "pts": 38,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "ECU",
+        "name": "Ecuador",
+        "p": 18,
+        "w": 8,
+        "d": 5,
+        "l": 5,
+        "gf": 14,
+        "ga": 5,
+        "gd": 9,
+        "pts": 29,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "COL",
+        "name": "Colombia",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 28,
+        "ga": 18,
+        "gd": 10,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "URU",
+        "name": "Uruguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 22,
+        "ga": 12,
+        "gd": 10,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "BRA",
+        "name": "Brazil",
+        "p": 18,
+        "w": 8,
+        "d": 4,
+        "l": 6,
+        "gf": 24,
+        "ga": 17,
+        "gd": 7,
+        "pts": 28,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "PAR",
+        "name": "Paraguay",
+        "p": 18,
+        "w": 7,
+        "d": 7,
+        "l": 4,
+        "gf": 14,
+        "ga": 10,
+        "gd": 4,
+        "pts": 28,
+        "highlight": true
+      },
+      {
+        "pos": 7,
+        "code": "BOL",
+        "name": "Bolivia",
+        "p": 18,
+        "w": 6,
+        "d": 2,
+        "l": 10,
+        "gf": 17,
+        "ga": 35,
+        "gd": -18,
+        "pts": 20,
+        "highlight": false
+      },
+      {
+        "pos": 8,
+        "code": "VEN",
+        "name": "Venezuela",
+        "p": 18,
+        "w": 4,
+        "d": 6,
+        "l": 8,
+        "gf": 18,
+        "ga": 28,
+        "gd": -10,
+        "pts": 18,
+        "highlight": false
+      },
+      {
+        "pos": 9,
+        "code": "PER",
+        "name": "Peru",
+        "p": 18,
+        "w": 2,
+        "d": 6,
+        "l": 10,
+        "gf": 6,
+        "ga": 21,
+        "gd": -15,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 10,
+        "code": "CHI",
+        "name": "Chile",
+        "p": 18,
+        "w": 2,
+        "d": 5,
+        "l": 11,
+        "gf": 9,
+        "ga": 27,
+        "gd": -18,
+        "pts": 11,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2023-09-07",
+        "home": "PAR",
+        "away": "PER",
+        "score": "0-0"
+      },
+      {
+        "date": "2023-09-12",
+        "home": "VEN",
+        "away": "PAR",
+        "score": "1-0"
+      },
+      {
+        "date": "2023-10-12",
+        "home": "ARG",
+        "away": "PAR",
+        "score": "1-0"
+      },
+      {
+        "date": "2023-11-21",
+        "home": "PAR",
+        "away": "COL",
+        "score": "0-0"
+      },
+      {
+        "date": "2024-09-05",
+        "home": "URU",
+        "away": "PAR",
+        "score": "0-0"
+      },
+      {
+        "date": "2024-10-10",
+        "home": "PAR",
+        "away": "VEN",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-11-19",
+        "home": "CHI",
+        "away": "PAR",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-11-19",
+        "home": "BOL",
+        "away": "PAR",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "COL",
+        "away": "PAR",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-06-05",
+        "home": "PAR",
+        "away": "URU",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "BRA",
+        "away": "PAR",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "PAR",
+        "away": "ECU",
+        "score": "1-0"
+      }
+    ]
+  },
+  "IRN": {
+    "competition": {
+      "en": "AFC World Cup 2026 Qualifiers – third round (+ later rounds where applicable)",
+      "nl": "AFC WK 2026-kwalificatie – derde ronde (+ latere rondes indien van toepassing)",
+      "de": "AFC WM 2026-Qualifikation – dritte Runde (+ spätere Runden)",
+      "es": "Clasificatoria AFC al Mundial 2026 – tercera ronda (+ rondas posteriores)",
+      "fr": "Qualifications AFC – troisième tour (+ tours suivants le cas échéant)",
+      "it": "Qualificazioni AFC – terzo turno (+ turni successivi)",
+      "pt": "Qualificação AFC – terceira fase (+ fases posteriores)",
+      "he": "מוקדמות AFC – סיבוב שלישי (+ סיבובים נוספים לפי הצורך)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "IRN",
+        "name": "Iran",
+        "p": 10,
+        "w": 7,
+        "d": 2,
+        "l": 1,
+        "gf": 19,
+        "ga": 8,
+        "gd": 11,
+        "pts": 23,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "UZB",
+        "name": "Uzbekistan",
+        "p": 10,
+        "w": 6,
+        "d": 3,
+        "l": 1,
+        "gf": 17,
+        "ga": 8,
+        "gd": 9,
+        "pts": 21,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "UAE",
+        "name": "United Arab Emirates",
+        "p": 10,
+        "w": 4,
+        "d": 3,
+        "l": 3,
+        "gf": 12,
+        "ga": 10,
+        "gd": 2,
+        "pts": 15,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "QAT",
+        "name": "Qatar",
+        "p": 10,
+        "w": 3,
+        "d": 4,
+        "l": 3,
+        "gf": 12,
+        "ga": 12,
+        "gd": 0,
+        "pts": 13,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "KGZ",
+        "name": "Kyrgyzstan",
+        "p": 10,
+        "w": 2,
+        "d": 2,
+        "l": 6,
+        "gf": 8,
+        "ga": 15,
+        "gd": -7,
+        "pts": 8,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "PRK",
+        "name": "North Korea",
+        "p": 10,
+        "w": 1,
+        "d": 0,
+        "l": 9,
+        "gf": 6,
+        "ga": 25,
+        "gd": -19,
+        "pts": 3,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-09-05",
+        "home": "KGZ",
+        "away": "IRN",
+        "score": "0-1"
+      },
+      {
+        "date": "2024-10-10",
+        "home": "IRN",
+        "away": "QAT",
+        "score": "4-1"
+      },
+      {
+        "date": "2024-11-14",
+        "home": "IRN",
+        "away": "PRK",
+        "score": "3-2"
+      },
+      {
+        "date": "2025-03-20",
+        "home": "IRN",
+        "away": "UAE",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-06-05",
+        "home": "UZB",
+        "away": "IRN",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-10-14",
+        "home": "IRN",
+        "away": "UZB",
+        "score": "2-0"
+      }
+    ]
+  },
+  "UZB": {
+    "competition": {
+      "en": "AFC World Cup 2026 Qualifiers – third round (+ later rounds where applicable)",
+      "nl": "AFC WK 2026-kwalificatie – derde ronde (+ latere rondes indien van toepassing)",
+      "de": "AFC WM 2026-Qualifikation – dritte Runde (+ spätere Runden)",
+      "es": "Clasificatoria AFC al Mundial 2026 – tercera ronda (+ rondas posteriores)",
+      "fr": "Qualifications AFC – troisième tour (+ tours suivants le cas échéant)",
+      "it": "Qualificazioni AFC – terzo turno (+ turni successivi)",
+      "pt": "Qualificação AFC – terceira fase (+ fases posteriores)",
+      "he": "מוקדמות AFC – סיבוב שלישי (+ סיבובים נוספים לפי הצורך)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "IRN",
+        "name": "Iran",
+        "p": 10,
+        "w": 7,
+        "d": 2,
+        "l": 1,
+        "gf": 19,
+        "ga": 8,
+        "gd": 11,
+        "pts": 23,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "UZB",
+        "name": "Uzbekistan",
+        "p": 10,
+        "w": 6,
+        "d": 3,
+        "l": 1,
+        "gf": 17,
+        "ga": 8,
+        "gd": 9,
+        "pts": 21,
+        "highlight": true
+      },
+      {
+        "pos": 3,
+        "code": "UAE",
+        "name": "United Arab Emirates",
+        "p": 10,
+        "w": 4,
+        "d": 3,
+        "l": 3,
+        "gf": 12,
+        "ga": 10,
+        "gd": 2,
+        "pts": 15,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "QAT",
+        "name": "Qatar",
+        "p": 10,
+        "w": 3,
+        "d": 4,
+        "l": 3,
+        "gf": 12,
+        "ga": 12,
+        "gd": 0,
+        "pts": 13,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "KGZ",
+        "name": "Kyrgyzstan",
+        "p": 10,
+        "w": 2,
+        "d": 2,
+        "l": 6,
+        "gf": 8,
+        "ga": 15,
+        "gd": -7,
+        "pts": 8,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "PRK",
+        "name": "North Korea",
+        "p": 10,
+        "w": 1,
+        "d": 0,
+        "l": 9,
+        "gf": 6,
+        "ga": 25,
+        "gd": -19,
+        "pts": 3,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-09-05",
+        "home": "UZB",
+        "away": "PRK",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-10-15",
+        "home": "UAE",
+        "away": "UZB",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "UZB",
+        "away": "QAT",
+        "score": "3-2"
+      },
+      {
+        "date": "2025-06-05",
+        "home": "UZB",
+        "away": "IRN",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "KGZ",
+        "away": "UZB",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-10-14",
+        "home": "IRN",
+        "away": "UZB",
+        "score": "2-0"
+      }
+    ]
+  },
+  "QAT": {
+    "competition": {
+      "en": "AFC World Cup 2026 Qualifiers – third round (+ later rounds where applicable)",
+      "nl": "AFC WK 2026-kwalificatie – derde ronde (+ latere rondes indien van toepassing)",
+      "de": "AFC WM 2026-Qualifikation – dritte Runde (+ spätere Runden)",
+      "es": "Clasificatoria AFC al Mundial 2026 – tercera ronda (+ rondas posteriores)",
+      "fr": "Qualifications AFC – troisième tour (+ tours suivants le cas échéant)",
+      "it": "Qualificazioni AFC – terzo turno (+ turni successivi)",
+      "pt": "Qualificação AFC – terceira fase (+ fases posteriores)",
+      "he": "מוקדמות AFC – סיבוב שלישי (+ סיבובים נוספים לפי הצורך)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "IRN",
+        "name": "Iran",
+        "p": 10,
+        "w": 7,
+        "d": 2,
+        "l": 1,
+        "gf": 19,
+        "ga": 8,
+        "gd": 11,
+        "pts": 23,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "UZB",
+        "name": "Uzbekistan",
+        "p": 10,
+        "w": 6,
+        "d": 3,
+        "l": 1,
+        "gf": 17,
+        "ga": 8,
+        "gd": 9,
+        "pts": 21,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "UAE",
+        "name": "United Arab Emirates",
+        "p": 10,
+        "w": 4,
+        "d": 3,
+        "l": 3,
+        "gf": 12,
+        "ga": 10,
+        "gd": 2,
+        "pts": 15,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "QAT",
+        "name": "Qatar",
+        "p": 10,
+        "w": 3,
+        "d": 4,
+        "l": 3,
+        "gf": 12,
+        "ga": 12,
+        "gd": 0,
+        "pts": 13,
+        "highlight": true
+      },
+      {
+        "pos": 5,
+        "code": "KGZ",
+        "name": "Kyrgyzstan",
+        "p": 10,
+        "w": 2,
+        "d": 2,
+        "l": 6,
+        "gf": 8,
+        "ga": 15,
+        "gd": -7,
+        "pts": 8,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "PRK",
+        "name": "North Korea",
+        "p": 10,
+        "w": 1,
+        "d": 0,
+        "l": 9,
+        "gf": 6,
+        "ga": 25,
+        "gd": -19,
+        "pts": 3,
+        "highlight": false
+      },
+      {
+        "pos": 1,
+        "code": "QAT",
+        "name": "Qatar",
+        "p": 2,
+        "w": 1,
+        "d": 1,
+        "l": 0,
+        "gf": 4,
+        "ga": 3,
+        "gd": 1,
+        "pts": 4,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "UAE",
+        "name": "United Arab Emirates",
+        "p": 2,
+        "w": 1,
+        "d": 0,
+        "l": 1,
+        "gf": 3,
+        "ga": 2,
+        "gd": 1,
+        "pts": 3,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "OMA",
+        "name": "Oman",
+        "p": 2,
+        "w": 0,
+        "d": 1,
+        "l": 1,
+        "gf": 1,
+        "ga": 3,
+        "gd": -2,
+        "pts": 1,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-10",
+        "home": "IRN",
+        "away": "QAT",
+        "score": "4-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "UZB",
+        "away": "QAT",
+        "score": "3-2"
+      },
+      {
+        "date": "2025-10-15",
+        "home": "OMA",
+        "away": "QAT",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-10-15",
+        "home": "QAT",
+        "away": "UAE",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "QAT",
+        "away": "UAE",
+        "score": "1-1"
+      }
+    ]
+  },
+  "KOR": {
+    "competition": {
+      "en": "AFC World Cup 2026 Qualifiers – third round (+ later rounds where applicable)",
+      "nl": "AFC WK 2026-kwalificatie – derde ronde (+ latere rondes indien van toepassing)",
+      "de": "AFC WM 2026-Qualifikation – dritte Runde (+ spätere Runden)",
+      "es": "Clasificatoria AFC al Mundial 2026 – tercera ronda (+ rondas posteriores)",
+      "fr": "Qualifications AFC – troisième tour (+ tours suivants le cas échéant)",
+      "it": "Qualificazioni AFC – terzo turno (+ turni successivi)",
+      "pt": "Qualificação AFC – terceira fase (+ fases posteriores)",
+      "he": "מוקדמות AFC – סיבוב שלישי (+ סיבובים נוספים לפי הצורך)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "KOR",
+        "name": "South Korea",
+        "p": 10,
+        "w": 7,
+        "d": 1,
+        "l": 2,
+        "gf": 22,
+        "ga": 8,
+        "gd": 14,
+        "pts": 22,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "JOR",
+        "name": "Jordan",
+        "p": 10,
+        "w": 5,
+        "d": 1,
+        "l": 4,
+        "gf": 14,
+        "ga": 10,
+        "gd": 4,
+        "pts": 16,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "IRQ",
+        "name": "Iraq",
+        "p": 10,
+        "w": 4,
+        "d": 3,
+        "l": 3,
+        "gf": 15,
+        "ga": 12,
+        "gd": 3,
+        "pts": 15,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "OMA",
+        "name": "Oman",
+        "p": 10,
+        "w": 3,
+        "d": 2,
+        "l": 5,
+        "gf": 10,
+        "ga": 14,
+        "gd": -4,
+        "pts": 11,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "PLE",
+        "name": "Palestine",
+        "p": 10,
+        "w": 3,
+        "d": 1,
+        "l": 6,
+        "gf": 10,
+        "ga": 16,
+        "gd": -6,
+        "pts": 10,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "KUW",
+        "name": "Kuwait",
+        "p": 10,
+        "w": 1,
+        "d": 1,
+        "l": 8,
+        "gf": 6,
+        "ga": 22,
+        "gd": -16,
+        "pts": 4,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-09-05",
+        "home": "KOR",
+        "away": "PLE",
+        "score": "5-0"
+      },
+      {
+        "date": "2024-10-15",
+        "home": "IRQ",
+        "away": "KOR",
+        "score": "0-3"
+      },
+      {
+        "date": "2025-03-20",
+        "home": "KOR",
+        "away": "JOR",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "KOR",
+        "away": "KUW",
+        "score": "3-0"
+      },
+      {
+        "date": "2025-10-14",
+        "home": "KOR",
+        "away": "IRQ",
+        "score": "2-0"
+      }
+    ]
+  },
+  "JOR": {
+    "competition": {
+      "en": "AFC World Cup 2026 Qualifiers – third round (+ later rounds where applicable)",
+      "nl": "AFC WK 2026-kwalificatie – derde ronde (+ latere rondes indien van toepassing)",
+      "de": "AFC WM 2026-Qualifikation – dritte Runde (+ spätere Runden)",
+      "es": "Clasificatoria AFC al Mundial 2026 – tercera ronda (+ rondas posteriores)",
+      "fr": "Qualifications AFC – troisième tour (+ tours suivants le cas échéant)",
+      "it": "Qualificazioni AFC – terzo turno (+ turni successivi)",
+      "pt": "Qualificação AFC – terceira fase (+ fases posteriores)",
+      "he": "מוקדמות AFC – סיבוב שלישי (+ סיבובים נוספים לפי הצורך)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "KOR",
+        "name": "South Korea",
+        "p": 10,
+        "w": 7,
+        "d": 1,
+        "l": 2,
+        "gf": 22,
+        "ga": 8,
+        "gd": 14,
+        "pts": 22,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "JOR",
+        "name": "Jordan",
+        "p": 10,
+        "w": 5,
+        "d": 1,
+        "l": 4,
+        "gf": 14,
+        "ga": 10,
+        "gd": 4,
+        "pts": 16,
+        "highlight": true
+      },
+      {
+        "pos": 3,
+        "code": "IRQ",
+        "name": "Iraq",
+        "p": 10,
+        "w": 4,
+        "d": 3,
+        "l": 3,
+        "gf": 15,
+        "ga": 12,
+        "gd": 3,
+        "pts": 15,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "OMA",
+        "name": "Oman",
+        "p": 10,
+        "w": 3,
+        "d": 2,
+        "l": 5,
+        "gf": 10,
+        "ga": 14,
+        "gd": -4,
+        "pts": 11,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "PLE",
+        "name": "Palestine",
+        "p": 10,
+        "w": 3,
+        "d": 1,
+        "l": 6,
+        "gf": 10,
+        "ga": 16,
+        "gd": -6,
+        "pts": 10,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "KUW",
+        "name": "Kuwait",
+        "p": 10,
+        "w": 1,
+        "d": 1,
+        "l": 8,
+        "gf": 6,
+        "ga": 22,
+        "gd": -16,
+        "pts": 4,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-10",
+        "home": "JOR",
+        "away": "KUW",
+        "score": "4-2"
+      },
+      {
+        "date": "2025-03-20",
+        "home": "KOR",
+        "away": "JOR",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-06-05",
+        "home": "JOR",
+        "away": "PLE",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "OMA",
+        "away": "JOR",
+        "score": "0-4"
+      }
+    ]
+  },
+  "IRQ": {
+    "competition": {
+      "en": "AFC World Cup 2026 Qualifiers – third round (+ later rounds where applicable)",
+      "nl": "AFC WK 2026-kwalificatie – derde ronde (+ latere rondes indien van toepassing)",
+      "de": "AFC WM 2026-Qualifikation – dritte Runde (+ spätere Runden)",
+      "es": "Clasificatoria AFC al Mundial 2026 – tercera ronda (+ rondas posteriores)",
+      "fr": "Qualifications AFC – troisième tour (+ tours suivants le cas échéant)",
+      "it": "Qualificazioni AFC – terzo turno (+ turni successivi)",
+      "pt": "Qualificação AFC – terceira fase (+ fases posteriores)",
+      "he": "מוקדמות AFC – סיבוב שלישי (+ סיבובים נוספים לפי הצורך)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "KOR",
+        "name": "South Korea",
+        "p": 10,
+        "w": 7,
+        "d": 1,
+        "l": 2,
+        "gf": 22,
+        "ga": 8,
+        "gd": 14,
+        "pts": 22,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "JOR",
+        "name": "Jordan",
+        "p": 10,
+        "w": 5,
+        "d": 1,
+        "l": 4,
+        "gf": 14,
+        "ga": 10,
+        "gd": 4,
+        "pts": 16,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "IRQ",
+        "name": "Iraq",
+        "p": 10,
+        "w": 4,
+        "d": 3,
+        "l": 3,
+        "gf": 15,
+        "ga": 12,
+        "gd": 3,
+        "pts": 15,
+        "highlight": true
+      },
+      {
+        "pos": 4,
+        "code": "OMA",
+        "name": "Oman",
+        "p": 10,
+        "w": 3,
+        "d": 2,
+        "l": 5,
+        "gf": 10,
+        "ga": 14,
+        "gd": -4,
+        "pts": 11,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "PLE",
+        "name": "Palestine",
+        "p": 10,
+        "w": 3,
+        "d": 1,
+        "l": 6,
+        "gf": 10,
+        "ga": 16,
+        "gd": -6,
+        "pts": 10,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "KUW",
+        "name": "Kuwait",
+        "p": 10,
+        "w": 1,
+        "d": 1,
+        "l": 8,
+        "gf": 6,
+        "ga": 22,
+        "gd": -16,
+        "pts": 4,
+        "highlight": false
+      },
+      {
+        "pos": 1,
+        "code": "KSA",
+        "name": "Saudi Arabia",
+        "p": 2,
+        "w": 1,
+        "d": 1,
+        "l": 0,
+        "gf": 3,
+        "ga": 2,
+        "gd": 1,
+        "pts": 4,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "IRQ",
+        "name": "Iraq",
+        "p": 2,
+        "w": 1,
+        "d": 1,
+        "l": 0,
+        "gf": 3,
+        "ga": 2,
+        "gd": 1,
+        "pts": 4,
+        "highlight": true
+      },
+      {
+        "pos": 3,
+        "code": "IDN",
+        "name": "Indonesia",
+        "p": 2,
+        "w": 0,
+        "d": 0,
+        "l": 2,
+        "gf": 1,
+        "ga": 5,
+        "gd": -4,
+        "pts": 0,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-15",
+        "home": "IRQ",
+        "away": "KOR",
+        "score": "0-3"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "IRQ",
+        "away": "KUW",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-06-05",
+        "home": "IRQ",
+        "away": "PLE",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-10-14",
+        "home": "KOR",
+        "away": "IRQ",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-10-15",
+        "home": "KSA",
+        "away": "IRQ",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-10-15",
+        "home": "IRQ",
+        "away": "IDN",
+        "score": "1-0"
+      },
+      {
+        "date": "2026-03-31",
+        "home": "IRQ",
+        "away": "BOL",
+        "score": "2-0"
+      }
+    ]
+  },
+  "JPN": {
+    "competition": {
+      "en": "AFC World Cup 2026 Qualifiers – third round (+ later rounds where applicable)",
+      "nl": "AFC WK 2026-kwalificatie – derde ronde (+ latere rondes indien van toepassing)",
+      "de": "AFC WM 2026-Qualifikation – dritte Runde (+ spätere Runden)",
+      "es": "Clasificatoria AFC al Mundial 2026 – tercera ronda (+ rondas posteriores)",
+      "fr": "Qualifications AFC – troisième tour (+ tours suivants le cas échéant)",
+      "it": "Qualificazioni AFC – terzo turno (+ turni successivi)",
+      "pt": "Qualificação AFC – terceira fase (+ fases posteriores)",
+      "he": "מוקדמות AFC – סיבוב שלישי (+ סיבובים נוספים לפי הצורך)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "JPN",
+        "name": "Japan",
+        "p": 10,
+        "w": 8,
+        "d": 1,
+        "l": 1,
+        "gf": 30,
+        "ga": 6,
+        "gd": 24,
+        "pts": 25,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "AUS",
+        "name": "Australia",
+        "p": 10,
+        "w": 6,
+        "d": 1,
+        "l": 3,
+        "gf": 18,
+        "ga": 12,
+        "gd": 6,
+        "pts": 19,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "KSA",
+        "name": "Saudi Arabia",
+        "p": 10,
+        "w": 3,
+        "d": 4,
+        "l": 3,
+        "gf": 11,
+        "ga": 11,
+        "gd": 0,
+        "pts": 13,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "IDN",
+        "name": "Indonesia",
+        "p": 10,
+        "w": 3,
+        "d": 3,
+        "l": 4,
+        "gf": 12,
+        "ga": 16,
+        "gd": -4,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "CHN",
+        "name": "China",
+        "p": 10,
+        "w": 2,
+        "d": 3,
+        "l": 5,
+        "gf": 9,
+        "ga": 16,
+        "gd": -7,
+        "pts": 9,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "BHR",
+        "name": "Bahrain",
+        "p": 10,
+        "w": 1,
+        "d": 2,
+        "l": 7,
+        "gf": 6,
+        "ga": 19,
+        "gd": -13,
+        "pts": 5,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-09-05",
+        "home": "JPN",
+        "away": "CHN",
+        "score": "7-0"
+      },
+      {
+        "date": "2024-10-10",
+        "home": "AUS",
+        "away": "JPN",
+        "score": "1-1"
+      },
+      {
+        "date": "2024-11-19",
+        "home": "JPN",
+        "away": "IDN",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-03-20",
+        "home": "JPN",
+        "away": "BHR",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "IDN",
+        "away": "JPN",
+        "score": "0-6"
+      }
+    ]
+  },
+  "AUS": {
+    "competition": {
+      "en": "AFC World Cup 2026 Qualifiers – third round (+ later rounds where applicable)",
+      "nl": "AFC WK 2026-kwalificatie – derde ronde (+ latere rondes indien van toepassing)",
+      "de": "AFC WM 2026-Qualifikation – dritte Runde (+ spätere Runden)",
+      "es": "Clasificatoria AFC al Mundial 2026 – tercera ronda (+ rondas posteriores)",
+      "fr": "Qualifications AFC – troisième tour (+ tours suivants le cas échéant)",
+      "it": "Qualificazioni AFC – terzo turno (+ turni successivi)",
+      "pt": "Qualificação AFC – terceira fase (+ fases posteriores)",
+      "he": "מוקדמות AFC – סיבוב שלישי (+ סיבובים נוספים לפי הצורך)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "JPN",
+        "name": "Japan",
+        "p": 10,
+        "w": 8,
+        "d": 1,
+        "l": 1,
+        "gf": 30,
+        "ga": 6,
+        "gd": 24,
+        "pts": 25,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "AUS",
+        "name": "Australia",
+        "p": 10,
+        "w": 6,
+        "d": 1,
+        "l": 3,
+        "gf": 18,
+        "ga": 12,
+        "gd": 6,
+        "pts": 19,
+        "highlight": true
+      },
+      {
+        "pos": 3,
+        "code": "KSA",
+        "name": "Saudi Arabia",
+        "p": 10,
+        "w": 3,
+        "d": 4,
+        "l": 3,
+        "gf": 11,
+        "ga": 11,
+        "gd": 0,
+        "pts": 13,
+        "highlight": false
+      },
+      {
+        "pos": 4,
+        "code": "IDN",
+        "name": "Indonesia",
+        "p": 10,
+        "w": 3,
+        "d": 3,
+        "l": 4,
+        "gf": 12,
+        "ga": 16,
+        "gd": -4,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "CHN",
+        "name": "China",
+        "p": 10,
+        "w": 2,
+        "d": 3,
+        "l": 5,
+        "gf": 9,
+        "ga": 16,
+        "gd": -7,
+        "pts": 9,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "BHR",
+        "name": "Bahrain",
+        "p": 10,
+        "w": 1,
+        "d": 2,
+        "l": 7,
+        "gf": 6,
+        "ga": 19,
+        "gd": -13,
+        "pts": 5,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-10",
+        "home": "AUS",
+        "away": "JPN",
+        "score": "1-1"
+      },
+      {
+        "date": "2024-11-19",
+        "home": "AUS",
+        "away": "KSA",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-03-20",
+        "home": "AUS",
+        "away": "IDN",
+        "score": "5-1"
+      },
+      {
+        "date": "2025-06-05",
+        "home": "CHN",
+        "away": "AUS",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "AUS",
+        "away": "CHN",
+        "score": "3-1"
+      }
+    ]
+  },
+  "KSA": {
+    "competition": {
+      "en": "AFC World Cup 2026 Qualifiers – third round (+ later rounds where applicable)",
+      "nl": "AFC WK 2026-kwalificatie – derde ronde (+ latere rondes indien van toepassing)",
+      "de": "AFC WM 2026-Qualifikation – dritte Runde (+ spätere Runden)",
+      "es": "Clasificatoria AFC al Mundial 2026 – tercera ronda (+ rondas posteriores)",
+      "fr": "Qualifications AFC – troisième tour (+ tours suivants le cas échéant)",
+      "it": "Qualificazioni AFC – terzo turno (+ turni successivi)",
+      "pt": "Qualificação AFC – terceira fase (+ fases posteriores)",
+      "he": "מוקדמות AFC – סיבוב שלישי (+ סיבובים נוספים לפי הצורך)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "JPN",
+        "name": "Japan",
+        "p": 10,
+        "w": 8,
+        "d": 1,
+        "l": 1,
+        "gf": 30,
+        "ga": 6,
+        "gd": 24,
+        "pts": 25,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "AUS",
+        "name": "Australia",
+        "p": 10,
+        "w": 6,
+        "d": 1,
+        "l": 3,
+        "gf": 18,
+        "ga": 12,
+        "gd": 6,
+        "pts": 19,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "KSA",
+        "name": "Saudi Arabia",
+        "p": 10,
+        "w": 3,
+        "d": 4,
+        "l": 3,
+        "gf": 11,
+        "ga": 11,
+        "gd": 0,
+        "pts": 13,
+        "highlight": true
+      },
+      {
+        "pos": 4,
+        "code": "IDN",
+        "name": "Indonesia",
+        "p": 10,
+        "w": 3,
+        "d": 3,
+        "l": 4,
+        "gf": 12,
+        "ga": 16,
+        "gd": -4,
+        "pts": 12,
+        "highlight": false
+      },
+      {
+        "pos": 5,
+        "code": "CHN",
+        "name": "China",
+        "p": 10,
+        "w": 2,
+        "d": 3,
+        "l": 5,
+        "gf": 9,
+        "ga": 16,
+        "gd": -7,
+        "pts": 9,
+        "highlight": false
+      },
+      {
+        "pos": 6,
+        "code": "BHR",
+        "name": "Bahrain",
+        "p": 10,
+        "w": 1,
+        "d": 2,
+        "l": 7,
+        "gf": 6,
+        "ga": 19,
+        "gd": -13,
+        "pts": 5,
+        "highlight": false
+      },
+      {
+        "pos": 1,
+        "code": "KSA",
+        "name": "Saudi Arabia",
+        "p": 2,
+        "w": 1,
+        "d": 1,
+        "l": 0,
+        "gf": 3,
+        "ga": 2,
+        "gd": 1,
+        "pts": 4,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "IRQ",
+        "name": "Iraq",
+        "p": 2,
+        "w": 1,
+        "d": 1,
+        "l": 0,
+        "gf": 3,
+        "ga": 2,
+        "gd": 1,
+        "pts": 4,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "IDN",
+        "name": "Indonesia",
+        "p": 2,
+        "w": 0,
+        "d": 0,
+        "l": 2,
+        "gf": 1,
+        "ga": 5,
+        "gd": -4,
+        "pts": 0,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-11-19",
+        "home": "AUS",
+        "away": "KSA",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "KSA",
+        "away": "BHR",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "KSA",
+        "away": "JPN",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-10-15",
+        "home": "KSA",
+        "away": "IRQ",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "IDN",
+        "away": "KSA",
+        "score": "2-3"
+      }
+    ]
+  },
+  "EGY": {
+    "competition": {
+      "en": "CAF World Cup 2026 Qualifiers – first round group stage (+ play-offs where applicable)",
+      "nl": "CAF WK 2026-kwalificatie – groepsfase (+ play-offs indien van toepassing)",
+      "de": "CAF WM 2026-Qualifikation – Gruppenphase (+ Play-offs)",
+      "es": "Clasificatoria CAF al Mundial 2026 – fase de grupos (+ repechajes)",
+      "fr": "Qualifications CAF – phase de groupes (+ barrages)",
+      "it": "Qualificazioni CAF – fase a gironi (+ spareggi)",
+      "pt": "Qualificação CAF – fase de grupos (+ repescagem)",
+      "he": "מוקדמות CAF – שלב הבתים (+ פלייאוף)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "EGY",
+        "name": "Egypt",
+        "p": 10,
+        "w": 8,
+        "d": 2,
+        "l": 0,
+        "gf": 22,
+        "ga": 6,
+        "gd": 16,
+        "pts": 26,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "BFA",
+        "name": "Burkina Faso",
+        "p": 10,
+        "w": 6,
+        "d": 3,
+        "l": 1,
+        "gf": 18,
+        "ga": 9,
+        "gd": 9,
+        "pts": 21,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-11",
+        "home": "EGY",
+        "away": "ETH",
+        "score": "2-0"
+      },
+      {
+        "date": "2024-11-18",
+        "home": "BFA",
+        "away": "EGY",
+        "score": "1-2"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "EGY",
+        "away": "SLE",
+        "score": "3-0"
+      }
+    ]
+  },
+  "SEN": {
+    "competition": {
+      "en": "CAF World Cup 2026 Qualifiers – first round group stage (+ play-offs where applicable)",
+      "nl": "CAF WK 2026-kwalificatie – groepsfase (+ play-offs indien van toepassing)",
+      "de": "CAF WM 2026-Qualifikation – Gruppenphase (+ Play-offs)",
+      "es": "Clasificatoria CAF al Mundial 2026 – fase de grupos (+ repechajes)",
+      "fr": "Qualifications CAF – phase de groupes (+ barrages)",
+      "it": "Qualificazioni CAF – fase a gironi (+ spareggi)",
+      "pt": "Qualificação CAF – fase de grupos (+ repescagem)",
+      "he": "מוקדמות CAF – שלב הבתים (+ פלייאוף)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "SEN",
+        "name": "Senegal",
+        "p": 10,
+        "w": 7,
+        "d": 3,
+        "l": 0,
+        "gf": 22,
+        "ga": 8,
+        "gd": 14,
+        "pts": 24,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "COD",
+        "name": "DR Congo",
+        "p": 10,
+        "w": 6,
+        "d": 4,
+        "l": 0,
+        "gf": 18,
+        "ga": 8,
+        "gd": 10,
+        "pts": 22,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-11",
+        "home": "SEN",
+        "away": "SSD",
+        "score": "3-0"
+      },
+      {
+        "date": "2024-11-18",
+        "home": "COD",
+        "away": "SEN",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "SEN",
+        "away": "TOG",
+        "score": "3-1"
+      }
+    ]
+  },
+  "RSA": {
+    "competition": {
+      "en": "CAF World Cup 2026 Qualifiers – first round group stage (+ play-offs where applicable)",
+      "nl": "CAF WK 2026-kwalificatie – groepsfase (+ play-offs indien van toepassing)",
+      "de": "CAF WM 2026-Qualifikation – Gruppenphase (+ Play-offs)",
+      "es": "Clasificatoria CAF al Mundial 2026 – fase de grupos (+ repechajes)",
+      "fr": "Qualifications CAF – phase de groupes (+ barrages)",
+      "it": "Qualificazioni CAF – fase a gironi (+ spareggi)",
+      "pt": "Qualificação CAF – fase de grupos (+ repescagem)",
+      "he": "מוקדמות CAF – שלב הבתים (+ פלייאוף)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "RSA",
+        "name": "South Africa",
+        "p": 10,
+        "w": 5,
+        "d": 3,
+        "l": 2,
+        "gf": 12,
+        "ga": 6,
+        "gd": 6,
+        "pts": 18,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "NGA",
+        "name": "Nigeria",
+        "p": 10,
+        "w": 5,
+        "d": 2,
+        "l": 3,
+        "gf": 13,
+        "ga": 11,
+        "gd": 2,
+        "pts": 17,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-11",
+        "home": "RSA",
+        "away": "RWA",
+        "score": "1-2"
+      },
+      {
+        "date": "2024-11-18",
+        "home": "NGA",
+        "away": "RSA",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "RSA",
+        "away": "BEN",
+        "score": "3-0"
+      }
+    ]
+  },
+  "CPV": {
+    "competition": {
+      "en": "CAF World Cup 2026 Qualifiers – first round group stage (+ play-offs where applicable)",
+      "nl": "CAF WK 2026-kwalificatie – groepsfase (+ play-offs indien van toepassing)",
+      "de": "CAF WM 2026-Qualifikation – Gruppenphase (+ Play-offs)",
+      "es": "Clasificatoria CAF al Mundial 2026 – fase de grupos (+ repechajes)",
+      "fr": "Qualifications CAF – phase de groupes (+ barrages)",
+      "it": "Qualificazioni CAF – fase a gironi (+ spareggi)",
+      "pt": "Qualificação CAF – fase de grupos (+ repescagem)",
+      "he": "מוקדמות CAF – שלב הבתים (+ פלייאוף)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "CPV",
+        "name": "Cape Verde",
+        "p": 10,
+        "w": 7,
+        "d": 2,
+        "l": 1,
+        "gf": 18,
+        "ga": 7,
+        "gd": 11,
+        "pts": 23,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "CMR",
+        "name": "Cameroon",
+        "p": 10,
+        "w": 6,
+        "d": 1,
+        "l": 3,
+        "gf": 17,
+        "ga": 9,
+        "gd": 8,
+        "pts": 19,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-11",
+        "home": "CPV",
+        "away": "ESW",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-11-18",
+        "home": "CMR",
+        "away": "CPV",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "CPV",
+        "away": "LBY",
+        "score": "1-0"
+      }
+    ]
+  },
+  "MAR": {
+    "competition": {
+      "en": "CAF World Cup 2026 Qualifiers – first round group stage (+ play-offs where applicable)",
+      "nl": "CAF WK 2026-kwalificatie – groepsfase (+ play-offs indien van toepassing)",
+      "de": "CAF WM 2026-Qualifikation – Gruppenphase (+ Play-offs)",
+      "es": "Clasificatoria CAF al Mundial 2026 – fase de grupos (+ repechajes)",
+      "fr": "Qualifications CAF – phase de groupes (+ barrages)",
+      "it": "Qualificazioni CAF – fase a gironi (+ spareggi)",
+      "pt": "Qualificação CAF – fase de grupos (+ repescagem)",
+      "he": "מוקדמות CAF – שלב הבתים (+ פלייאוף)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "MAR",
+        "name": "Morocco",
+        "p": 8,
+        "w": 8,
+        "d": 0,
+        "l": 0,
+        "gf": 24,
+        "ga": 4,
+        "gd": 20,
+        "pts": 24,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "NIG",
+        "name": "Niger",
+        "p": 8,
+        "w": 4,
+        "d": 3,
+        "l": 1,
+        "gf": 12,
+        "ga": 8,
+        "gd": 4,
+        "pts": 15,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-11",
+        "home": "MAR",
+        "away": "TAN",
+        "score": "2-0"
+      },
+      {
+        "date": "2024-11-18",
+        "home": "ZAM",
+        "away": "MAR",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "MAR",
+        "away": "NIG",
+        "score": "3-0"
+      }
+    ]
+  },
+  "CIV": {
+    "competition": {
+      "en": "CAF World Cup 2026 Qualifiers – first round group stage (+ play-offs where applicable)",
+      "nl": "CAF WK 2026-kwalificatie – groepsfase (+ play-offs indien van toepassing)",
+      "de": "CAF WM 2026-Qualifikation – Gruppenphase (+ Play-offs)",
+      "es": "Clasificatoria CAF al Mundial 2026 – fase de grupos (+ repechajes)",
+      "fr": "Qualifications CAF – phase de groupes (+ barrages)",
+      "it": "Qualificazioni CAF – fase a gironi (+ spareggi)",
+      "pt": "Qualificação CAF – fase de grupos (+ repescagem)",
+      "he": "מוקדמות CAF – שלב הבתים (+ פלייאוף)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "CIV",
+        "name": "Ivory Coast",
+        "p": 10,
+        "w": 8,
+        "d": 2,
+        "l": 0,
+        "gf": 22,
+        "ga": 6,
+        "gd": 16,
+        "pts": 26,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "GAB",
+        "name": "Gabon",
+        "p": 10,
+        "w": 7,
+        "d": 4,
+        "l": 1,
+        "gf": 20,
+        "ga": 8,
+        "gd": 12,
+        "pts": 25,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-11",
+        "home": "CIV",
+        "away": "BDI",
+        "score": "4-0"
+      },
+      {
+        "date": "2024-11-18",
+        "home": "GAB",
+        "away": "CIV",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "CIV",
+        "away": "KEN",
+        "score": "3-0"
+      }
+    ]
+  },
+  "ALG": {
+    "competition": {
+      "en": "CAF World Cup 2026 Qualifiers – first round group stage (+ play-offs where applicable)",
+      "nl": "CAF WK 2026-kwalificatie – groepsfase (+ play-offs indien van toepassing)",
+      "de": "CAF WM 2026-Qualifikation – Gruppenphase (+ Play-offs)",
+      "es": "Clasificatoria CAF al Mundial 2026 – fase de grupos (+ repechajes)",
+      "fr": "Qualifications CAF – phase de groupes (+ barrages)",
+      "it": "Qualificazioni CAF – fase a gironi (+ spareggi)",
+      "pt": "Qualificação CAF – fase de grupos (+ repescagem)",
+      "he": "מוקדמות CAF – שלב הבתים (+ פלייאוף)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "ALG",
+        "name": "Algeria",
+        "p": 10,
+        "w": 8,
+        "d": 1,
+        "l": 1,
+        "gf": 24,
+        "ga": 6,
+        "gd": 18,
+        "pts": 25,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "UGA",
+        "name": "Uganda",
+        "p": 10,
+        "w": 5,
+        "d": 3,
+        "l": 2,
+        "gf": 14,
+        "ga": 10,
+        "gd": 4,
+        "pts": 18,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-11",
+        "home": "ALG",
+        "away": "SOM",
+        "score": "3-1"
+      },
+      {
+        "date": "2024-11-18",
+        "home": "ALG",
+        "away": "GUI",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "MOZ",
+        "away": "ALG",
+        "score": "0-3"
+      }
+    ]
+  },
+  "TUN": {
+    "competition": {
+      "en": "CAF World Cup 2026 Qualifiers – first round group stage (+ play-offs where applicable)",
+      "nl": "CAF WK 2026-kwalificatie – groepsfase (+ play-offs indien van toepassing)",
+      "de": "CAF WM 2026-Qualifikation – Gruppenphase (+ Play-offs)",
+      "es": "Clasificatoria CAF al Mundial 2026 – fase de grupos (+ repechajes)",
+      "fr": "Qualifications CAF – phase de groupes (+ barrages)",
+      "it": "Qualificazioni CAF – fase a gironi (+ spareggi)",
+      "pt": "Qualificação CAF – fase de grupos (+ repescagem)",
+      "he": "מוקדמות CAF – שלב הבתים (+ פלייאוף)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "TUN",
+        "name": "Tunisia",
+        "p": 10,
+        "w": 9,
+        "d": 1,
+        "l": 0,
+        "gf": 22,
+        "ga": 4,
+        "gd": 18,
+        "pts": 28,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "NAM",
+        "name": "Namibia",
+        "p": 10,
+        "w": 4,
+        "d": 3,
+        "l": 3,
+        "gf": 10,
+        "ga": 9,
+        "gd": 1,
+        "pts": 15,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-11",
+        "home": "TUN",
+        "away": "EQG",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-11-18",
+        "home": "TUN",
+        "away": "LBR",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "MWI",
+        "away": "TUN",
+        "score": "0-3"
+      }
+    ]
+  },
+  "GHA": {
+    "competition": {
+      "en": "CAF World Cup 2026 Qualifiers – first round group stage (+ play-offs where applicable)",
+      "nl": "CAF WK 2026-kwalificatie – groepsfase (+ play-offs indien van toepassing)",
+      "de": "CAF WM 2026-Qualifikation – Gruppenphase (+ Play-offs)",
+      "es": "Clasificatoria CAF al Mundial 2026 – fase de grupos (+ repechajes)",
+      "fr": "Qualifications CAF – phase de groupes (+ barrages)",
+      "it": "Qualificazioni CAF – fase a gironi (+ spareggi)",
+      "pt": "Qualificação CAF – fase de grupos (+ repescagem)",
+      "he": "מוקדמות CAF – שלב הבתים (+ פלייאוף)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "GHA",
+        "name": "Ghana",
+        "p": 10,
+        "w": 8,
+        "d": 1,
+        "l": 1,
+        "gf": 22,
+        "ga": 8,
+        "gd": 14,
+        "pts": 25,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "MAD",
+        "name": "Madagascar",
+        "p": 10,
+        "w": 5,
+        "d": 4,
+        "l": 1,
+        "gf": 16,
+        "ga": 10,
+        "gd": 6,
+        "pts": 19,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-10-11",
+        "home": "GHA",
+        "away": "CHA",
+        "score": "1-0"
+      },
+      {
+        "date": "2024-11-18",
+        "home": "GHA",
+        "away": "COM",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "MLI",
+        "away": "GHA",
+        "score": "0-3"
+      }
+    ]
+  },
+  "COD": {
+    "competition": {
+      "en": "CAF World Cup 2026 Qualifiers – first round group stage (+ play-offs where applicable)",
+      "nl": "CAF WK 2026-kwalificatie – groepsfase (+ play-offs indien van toepassing)",
+      "de": "CAF WM 2026-Qualifikation – Gruppenphase (+ Play-offs)",
+      "es": "Clasificatoria CAF al Mundial 2026 – fase de grupos (+ repechajes)",
+      "fr": "Qualifications CAF – phase de groupes (+ barrages)",
+      "it": "Qualificazioni CAF – fase a gironi (+ spareggi)",
+      "pt": "Qualificação CAF – fase de grupos (+ repescagem)",
+      "he": "מוקדמות CAF – שלב הבתים (+ פלייאוף)"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "SEN",
+        "name": "Senegal",
+        "p": 10,
+        "w": 7,
+        "d": 3,
+        "l": 0,
+        "gf": 22,
+        "ga": 8,
+        "gd": 14,
+        "pts": 24,
+        "highlight": false
+      },
+      {
+        "pos": 2,
+        "code": "COD",
+        "name": "DR Congo",
+        "p": 10,
+        "w": 6,
+        "d": 4,
+        "l": 0,
+        "gf": 18,
+        "ga": 8,
+        "gd": 10,
+        "pts": 22,
+        "highlight": true
+      }
+    ],
+    "results": [
+      {
+        "date": "2024-11-18",
+        "home": "COD",
+        "away": "SEN",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-03-25",
+        "home": "COD",
+        "away": "SDN",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-10-12",
+        "home": "GAB",
+        "away": "COD",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-10-15",
+        "home": "COD",
+        "away": "GAB",
+        "score": "1-0"
+      },
+      {
+        "date": "2026-03-31",
+        "home": "COD",
+        "away": "NGA",
+        "score": "0-0"
+      }
+    ]
+  },
+  "PAN": {
+    "competition": {
+      "en": "CONCACAF World Cup 2026 Qualifiers – third round",
+      "nl": "CONCACAF WK 2026-kwalificatie – derde ronde",
+      "de": "CONCACAF WM 2026-Qualifikation – dritte Runde",
+      "es": "Clasificatoria CONCACAF al Mundial 2026 – tercera ronda",
+      "fr": "Qualifications CONCACAF – troisième tour",
+      "it": "Qualificazioni CONCACAF – terzo turno",
+      "pt": "Qualificação CONCACAF – terceira fase",
+      "he": "מוקדמות CONCACAF – סיבוב שלישי"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "PAN",
+        "name": "Panama",
+        "p": 6,
+        "w": 4,
+        "d": 0,
+        "l": 2,
+        "gf": 10,
+        "ga": 6,
+        "gd": 4,
+        "pts": 12,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "SUR",
+        "name": "Suriname",
+        "p": 6,
+        "w": 3,
+        "d": 0,
+        "l": 3,
+        "gf": 9,
+        "ga": 9,
+        "gd": 0,
+        "pts": 9,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-06-06",
+        "home": "PAN",
+        "away": "GUA",
+        "score": "2-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "SLV",
+        "away": "PAN",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-09-04",
+        "home": "PAN",
+        "away": "SUR",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "GUA",
+        "away": "PAN",
+        "score": "1-2"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "PAN",
+        "away": "SLV",
+        "score": "3-1"
+      },
+      {
+        "date": "2025-10-15",
+        "home": "SUR",
+        "away": "PAN",
+        "score": "1-2"
+      }
+    ]
+  },
+  "CUW": {
+    "competition": {
+      "en": "CONCACAF World Cup 2026 Qualifiers – third round",
+      "nl": "CONCACAF WK 2026-kwalificatie – derde ronde",
+      "de": "CONCACAF WM 2026-Qualifikation – dritte Runde",
+      "es": "Clasificatoria CONCACAF al Mundial 2026 – tercera ronda",
+      "fr": "Qualifications CONCACAF – troisième tour",
+      "it": "Qualificazioni CONCACAF – terzo turno",
+      "pt": "Qualificação CONCACAF – terceira fase",
+      "he": "מוקדמות CONCACAF – סיבוב שלישי"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "CUW",
+        "name": "Curaçao",
+        "p": 6,
+        "w": 4,
+        "d": 0,
+        "l": 2,
+        "gf": 9,
+        "ga": 5,
+        "gd": 4,
+        "pts": 12,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "JAM",
+        "name": "Jamaica",
+        "p": 6,
+        "w": 3,
+        "d": 2,
+        "l": 1,
+        "gf": 8,
+        "ga": 6,
+        "gd": 2,
+        "pts": 11,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-06-06",
+        "home": "CUW",
+        "away": "BER",
+        "score": "4-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "JAM",
+        "away": "CUW",
+        "score": "0-1"
+      },
+      {
+        "date": "2025-09-04",
+        "home": "CUW",
+        "away": "TTO",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "BER",
+        "away": "CUW",
+        "score": "0-2"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "CUW",
+        "away": "JAM",
+        "score": "1-1"
+      },
+      {
+        "date": "2025-11-18",
+        "home": "JAM",
+        "away": "CUW",
+        "score": "1-1"
+      }
+    ]
+  },
+  "HAI": {
+    "competition": {
+      "en": "CONCACAF World Cup 2026 Qualifiers – third round",
+      "nl": "CONCACAF WK 2026-kwalificatie – derde ronde",
+      "de": "CONCACAF WM 2026-Qualifikation – dritte Runde",
+      "es": "Clasificatoria CONCACAF al Mundial 2026 – tercera ronda",
+      "fr": "Qualifications CONCACAF – troisième tour",
+      "it": "Qualificazioni CONCACAF – terzo turno",
+      "pt": "Qualificação CONCACAF – terceira fase",
+      "he": "מוקדמות CONCACAF – סיבוב שלישי"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "HAI",
+        "name": "Haiti",
+        "p": 6,
+        "w": 3,
+        "d": 2,
+        "l": 1,
+        "gf": 8,
+        "ga": 5,
+        "gd": 3,
+        "pts": 11,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "HON",
+        "name": "Honduras",
+        "p": 6,
+        "w": 2,
+        "d": 3,
+        "l": 1,
+        "gf": 7,
+        "ga": 6,
+        "gd": 1,
+        "pts": 9,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-06-06",
+        "home": "HAI",
+        "away": "CRC",
+        "score": "1-0"
+      },
+      {
+        "date": "2025-06-10",
+        "home": "HON",
+        "away": "HAI",
+        "score": "0-0"
+      },
+      {
+        "date": "2025-09-04",
+        "home": "HAI",
+        "away": "NCA",
+        "score": "3-0"
+      },
+      {
+        "date": "2025-09-09",
+        "home": "CRC",
+        "away": "HAI",
+        "score": "1-2"
+      },
+      {
+        "date": "2025-10-10",
+        "home": "HAI",
+        "away": "HON",
+        "score": "2-1"
+      },
+      {
+        "date": "2025-10-15",
+        "home": "NCA",
+        "away": "HAI",
+        "score": "0-1"
+      }
+    ]
+  },
+  "NZL": {
+    "competition": {
+      "en": "OFC World Cup 2026 Qualifiers + inter-confederation play-off vs CONMEBOL",
+      "nl": "OFC WK 2026-kwalificatie + intercontinentaal play-off vs CONMEBOL",
+      "de": "OFC WM 2026-Qualifikation + interkontinentales Play-off vs CONMEBOL",
+      "es": "Clasificatoria OFC + repechaje intercontinental vs CONMEBOL",
+      "fr": "Qualifications OFC + barrage intercontinental vs CONMEBOL",
+      "it": "Qualificazioni OFC + spareggio intercontinentale vs CONMEBOL",
+      "pt": "Qualificação OFC + repescagem intercontinental vs CONMEBOL",
+      "he": "מוקדמות OFC + פלייאוף בין-יבשתי מול CONMEBOL"
+    },
+    "standings": [
+      {
+        "pos": 1,
+        "code": "NZL",
+        "name": "New Zealand",
+        "p": 3,
+        "w": 2,
+        "d": 1,
+        "l": 0,
+        "gf": 6,
+        "ga": 2,
+        "gd": 4,
+        "pts": 7,
+        "highlight": true
+      },
+      {
+        "pos": 2,
+        "code": "NCL",
+        "name": "New Caledonia",
+        "p": 3,
+        "w": 1,
+        "d": 1,
+        "l": 1,
+        "gf": 4,
+        "ga": 4,
+        "gd": 0,
+        "pts": 4,
+        "highlight": false
+      },
+      {
+        "pos": 3,
+        "code": "FIJ",
+        "name": "Fiji",
+        "p": 3,
+        "w": 0,
+        "d": 0,
+        "l": 3,
+        "gf": 2,
+        "ga": 6,
+        "gd": -4,
+        "pts": 0,
+        "highlight": false
+      }
+    ],
+    "results": [
+      {
+        "date": "2025-03-21",
+        "home": "NZL",
+        "away": "NCL",
+        "score": "3-0"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "NCL",
+        "away": "NZL",
+        "score": "2-2"
+      },
+      {
+        "date": "2025-03-24",
+        "home": "NZL",
+        "away": "FIJ",
+        "score": "3-2"
+      },
+      {
+        "date": "2026-03-26",
+        "home": "NZL",
+        "away": "BOL",
+        "score": "0-0"
+      }
+    ]
+  }
+}

@@ -88,6 +88,8 @@ jobs:
         run: npm install
       - name: vitest
         run: npm run test:ci
+      - name: Typecheck and production build
+        run: npm run build
 
   dependency-audit:
     name: Dependency audit

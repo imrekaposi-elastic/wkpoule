@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import PlayerCard from "../components/PlayerCard";
+import QualificationTables from "../components/QualificationTables";
 import { localizedTeamName } from "../i18n/teamNames";
 import {
   localizedTeamProfileField,
@@ -87,7 +88,13 @@ export default function TeamDetailPage() {
         <div className="p-4 sm:p-6 space-y-6">
           <section>
             <h2 className="text-lg font-bold text-pitch-900 mb-2">{t("teams.qualification")}</h2>
-            <p className="text-gray-700 leading-relaxed">{qualification}</p>
+            <p className="text-gray-700 leading-relaxed mb-4">{qualification}</p>
+            {team.qualification_data ? (
+              <QualificationTables
+                data={team.qualification_data}
+                highlightCode={team.fifa_code}
+              />
+            ) : null}
           </section>
 
           <div className="grid md:grid-cols-2 gap-6">

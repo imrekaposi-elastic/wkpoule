@@ -14,6 +14,34 @@ class TeamPlayerOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class QualificationStandingOut(BaseModel):
+    pos: int
+    code: str | None = None
+    name: str
+    p: int
+    w: int
+    d: int
+    l: int
+    gf: int
+    ga: int
+    gd: int
+    pts: int
+    highlight: bool = False
+
+
+class QualificationResultOut(BaseModel):
+    date: str
+    home: str
+    away: str
+    score: str
+
+
+class QualificationDataOut(BaseModel):
+    competition: dict[str, str]
+    standings: list[QualificationStandingOut] = Field(default_factory=list)
+    results: list[QualificationResultOut] = Field(default_factory=list)
+
+
 class TeamProfileTextOut(BaseModel):
     qualification_en: str | None = None
     qualification_nl: str | None = None
@@ -51,5 +79,6 @@ class TeamSummaryOut(TeamProfileTextOut):
 
 class TeamDetailOut(TeamSummaryOut):
     players: list[TeamPlayerOut] = Field(default_factory=list)
+    qualification_data: QualificationDataOut | None = None
 
     model_config = {"from_attributes": True}

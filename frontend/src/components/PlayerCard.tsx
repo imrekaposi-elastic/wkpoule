@@ -84,11 +84,15 @@ export default function PlayerCard({
           </div>
           <div className="flex justify-between gap-2">
             <dt className="text-gray-500">{heightLabel}</dt>
-            <dd className="font-medium">{player.height_cm} cm</dd>
+            <dd className="font-medium">
+              {player.height_cm > 0 ? `${player.height_cm} cm` : "—"}
+            </dd>
           </div>
           <div className="flex justify-between gap-2">
             <dt className="text-gray-500">{weightLabel}</dt>
-            <dd className="font-medium">{player.weight_kg} kg</dd>
+            <dd className="font-medium">
+              {player.weight_kg > 0 ? `${player.weight_kg} kg` : "—"}
+            </dd>
           </div>
           <div className="flex justify-between gap-2">
             <dt className="text-gray-500">{capsLabel}</dt>

@@ -278,6 +278,7 @@ def ensure_schema() -> None:
                 "strengths_it", "strengths_he",
                 "weaknesses_pt", "weaknesses_de", "weaknesses_es",
                 "weaknesses_it", "weaknesses_he",
+                "qualification_data_json",
             ):
                 conn.execute(
                     text(f"ALTER TABLE teams ADD COLUMN IF NOT EXISTS {col} TEXT")
@@ -406,6 +407,7 @@ def ensure_schema() -> None:
                 "weaknesses_es",
                 "weaknesses_it",
                 "weaknesses_he",
+                "qualification_data_json",
             ):
                 if col not in team_cols:
                     conn.execute(text(f"ALTER TABLE teams ADD COLUMN {col} TEXT"))

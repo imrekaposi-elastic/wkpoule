@@ -4,19 +4,12 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 
+import { shouldAttemptRefresh } from "./clientUtils";
+
 const api = axios.create({ baseURL: "/api" });
 
 let refreshPromise: Promise<string> | null = null;
 let redirectingToLogin = false;
-
-function shouldAttemptRefresh(url: string | undefined): boolean {
-  if (!url) return true;
-  return (
-    !url.includes("/auth/login") &&
-    !url.includes("/auth/register") &&
-    !url.includes("/auth/refresh")
-  );
-}
 
 function refreshAccessToken(): Promise<string> {
   if (refreshPromise) {

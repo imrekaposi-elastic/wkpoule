@@ -283,6 +283,34 @@ export interface TeamPlayer {
   caps: number;
 }
 
+export interface QualificationStandingRow {
+  pos: number;
+  code?: string | null;
+  name: string;
+  p: number;
+  w: number;
+  d: number;
+  l: number;
+  gf: number;
+  ga: number;
+  gd: number;
+  pts: number;
+  highlight?: boolean;
+}
+
+export interface QualificationResultRow {
+  date: string;
+  home: string;
+  away: string;
+  score: string;
+}
+
+export interface QualificationData {
+  competition: Record<string, string>;
+  standings: QualificationStandingRow[];
+  results: QualificationResultRow[];
+}
+
 export interface TeamSummary {
   id: number;
   name: string;
@@ -315,6 +343,7 @@ export interface TeamDetail extends TeamSummary {
   weaknesses_it: string | null;
   weaknesses_he: string | null;
   players: TeamPlayer[];
+  qualification_data: QualificationData | null;
 }
 
 export interface TokenResponse {

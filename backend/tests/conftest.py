@@ -71,3 +71,24 @@ def client(db) -> Generator[TestClient, None, None]:
         with TestClient(app) as test_client:
             yield test_client
         app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def auth_headers(client) -> dict[str, str]:
+    """Register a user and return Authorization headers for protected routes."""
+    register = client.post(
+        "/api/auth/register",
+        json={
+            "username": "testuser",
+            "email": "testuser@example.com",
+            "password": "secret12",
+        },
+    )
+    assert register.status_code == 201
+    login = client.post(
+        "/api/auth/login",
+        json={"username": "testuser", "password": "secret12"},
+    )
+    assert login.status_code == 200
+    token = login.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}

@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy import Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -41,3 +43,9 @@ class Team(Base):
         cascade="all, delete-orphan",
         order_by="TeamPlayer.sort_order",
     )
+
+    @property
+    def qualification_data(self) -> dict | None:
+        if not self.qualification_data_json:
+            return None
+        return json.loads(self.qualification_data_json)
