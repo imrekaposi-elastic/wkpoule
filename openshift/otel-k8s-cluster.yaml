@@ -8,7 +8,7 @@ metadata:
 spec:
   mode: deployment
   replicas: 1
-  image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.3.2
+  image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.4.2
   serviceAccount: wkpoule-otel-cluster
   resources:
     requests:

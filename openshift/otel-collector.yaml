@@ -7,7 +7,7 @@ spec:
   replicas: 1
   serviceAccount: wkpoule-otel-gateway
   # EDOT collector image (OpenTelemetry Operator needs otelcol, not Fleet `elastic-agent`).
-  image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.3.2
+  image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.4.2
   env:
     # Direct Elasticsearch ingest (same pattern as backend EDOT gateway on otl01: elasticsearch/otel exporter).
     - name: ELASTICSEARCH_URL

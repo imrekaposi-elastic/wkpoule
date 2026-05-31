@@ -60,7 +60,7 @@ metadata:
   name: wkpoule-otel-infra
 spec:
   mode: daemonset
-  image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.3.2
+  image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.4.2
   serviceAccount: wkpoule-otel-infra
   # Read pod log files from the node (CRI writes under /var/log/pods). OpenShift may require hostaccess SCC.
   volumeMounts:
