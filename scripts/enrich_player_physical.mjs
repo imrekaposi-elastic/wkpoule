@@ -93,9 +93,11 @@ async function main() {
     "",
     "PHYSICAL_BY_NAME: dict[str, dict] = {",
   ];
+  const toPythonDict = (value) => JSON.stringify(value).replace(/\bnull\b/g, "None");
+
   for (const key of Object.keys(out).sort()) {
     const p = out[key];
-    lines.push(`    ${JSON.stringify(key)}: ${JSON.stringify(p)},`);
+    lines.push(`    ${JSON.stringify(key)}: ${toPythonDict(p)},`);
   }
   lines.push("}", "");
 
