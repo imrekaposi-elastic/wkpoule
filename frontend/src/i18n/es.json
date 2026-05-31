@@ -4,6 +4,7 @@
     "dashboard": "Panel",
     "matches": "Partidos",
     "groups": "Poules",
+    "teams": "Selecciones",
     "rankings": "Clasificación",
     "venues": "Estadios",
     "subgroups": "Subgrupo",
@@ -448,6 +449,33 @@
       "semi_final": "Semifinales",
       "third_place": "Tercer puesto",
       "final": "Final"
+    }
+  },
+  "teams": {
+    "title": "Selecciones del Mundial",
+    "subtitle": "Cómo se clasificó cada país, fortalezas y debilidades, y una plantilla provisional al estilo álbum Panini.",
+    "group": "Grupo {{letter}}",
+    "ranking": "Ranking FIFA #{{rank}}",
+    "qualification": "Clasificación",
+    "strengths": "Fortalezas",
+    "weaknesses": "Debilidades",
+    "squad": "Plantilla provisional",
+    "squadNote": "Plantilla ilustrativa para el álbum — no la lista oficial de la FIFA.",
+    "viewTeam": "Ver perfil del equipo",
+    "backToList": "Todas las selecciones",
+    "notFound": "Selección no encontrada.",
+    "loadError": "No se pudieron cargar las selecciones.",
+    "player": {
+      "club": "Club",
+      "height": "Altura",
+      "weight": "Peso",
+      "caps": "Partidos",
+      "position": {
+        "GK": "Portero",
+        "DF": "Defensa",
+        "MF": "Centrocampista",
+        "FW": "Delantero"
+      }
     }
   },
   "common": {

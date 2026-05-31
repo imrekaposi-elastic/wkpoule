@@ -4,6 +4,7 @@
     "dashboard": "Dashboard",
     "matches": "Wedstrijden",
     "groups": "Poules",
+    "teams": "Teams",
     "rankings": "Ranglijst",
     "venues": "Stadions",
     "subgroups": "Subgroep",
@@ -448,6 +449,33 @@
       "semi_final": "Halve finales",
       "third_place": "Troostfinale",
       "final": "Finale"
+    }
+  },
+  "teams": {
+    "title": "WK-teams",
+    "subtitle": "Hoe elk land zich plaatste, sterke en zwakke punten, en een Panini-achtige blik op de voorlopige selectie.",
+    "group": "Groep {{letter}}",
+    "ranking": "FIFA-rang #{{rank}}",
+    "qualification": "Kwalificatie",
+    "strengths": "Sterke punten",
+    "weaknesses": "Zwakke punten",
+    "squad": "Voorlopige selectie",
+    "squadNote": "Illustratieve selectie voor het stickeralbum — niet de officiële FIFA-kern.",
+    "viewTeam": "Bekijk teamprofiel",
+    "backToList": "Alle teams",
+    "notFound": "Team niet gevonden.",
+    "loadError": "Teams laden mislukt. Probeer het later opnieuw.",
+    "player": {
+      "club": "Club",
+      "height": "Lengte",
+      "weight": "Gewicht",
+      "caps": "Interlands",
+      "position": {
+        "GK": "Keeper",
+        "DF": "Verdediger",
+        "MF": "Middenvelder",
+        "FW": "Aanvaller"
+      }
     }
   },
   "common": {

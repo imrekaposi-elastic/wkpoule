@@ -272,6 +272,51 @@ export interface VenueDetail {
   matches: VenueScheduledMatch[];
 }
 
+export interface TeamPlayer {
+  id: number;
+  name: string;
+  position: string;
+  shirt_number: number;
+  club: string;
+  height_cm: number;
+  weight_kg: number;
+  caps: number;
+}
+
+export interface TeamSummary {
+  id: number;
+  name: string;
+  fifa_code: string;
+  group_letter: string;
+  world_ranking: number;
+  flag_url: string;
+  qualification_en: string | null;
+  qualification_nl: string | null;
+  qualification_pt: string | null;
+  qualification_de: string | null;
+  qualification_es: string | null;
+  qualification_it: string | null;
+  qualification_he: string | null;
+}
+
+export interface TeamDetail extends TeamSummary {
+  strengths_en: string | null;
+  strengths_nl: string | null;
+  strengths_pt: string | null;
+  strengths_de: string | null;
+  strengths_es: string | null;
+  strengths_it: string | null;
+  strengths_he: string | null;
+  weaknesses_en: string | null;
+  weaknesses_nl: string | null;
+  weaknesses_pt: string | null;
+  weaknesses_de: string | null;
+  weaknesses_es: string | null;
+  weaknesses_it: string | null;
+  weaknesses_he: string | null;
+  players: TeamPlayer[];
+}
+
 export interface TokenResponse {
   access_token: string;
   refresh_token: string;

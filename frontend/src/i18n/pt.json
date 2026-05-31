@@ -4,6 +4,7 @@
     "dashboard": "Painel",
     "matches": "Jogos",
     "groups": "Poules",
+    "teams": "Seleções",
     "rankings": "Classificação",
     "venues": "Estádios",
     "subgroups": "Subgrupo",
@@ -447,6 +448,33 @@
       "semi_final": "Meias-finais",
       "third_place": "Terceiro lugar",
       "final": "Final"
+    }
+  },
+  "teams": {
+    "title": "Seleções da Copa",
+    "subtitle": "Como cada país se classificou, pontos fortes e fracos, e um elenco provisório estilo álbum Panini.",
+    "group": "Grupo {{letter}}",
+    "ranking": "Ranking FIFA #{{rank}}",
+    "qualification": "Classificação",
+    "strengths": "Pontos fortes",
+    "weaknesses": "Pontos fracos",
+    "squad": "Elenco provisório",
+    "squadNote": "Elenco ilustrativo para o álbum — não a lista oficial da FIFA.",
+    "viewTeam": "Ver perfil da seleção",
+    "backToList": "Todas as seleções",
+    "notFound": "Seleção não encontrada.",
+    "loadError": "Não foi possível carregar as seleções.",
+    "player": {
+      "club": "Clube",
+      "height": "Altura",
+      "weight": "Peso",
+      "caps": "Jogos",
+      "position": {
+        "GK": "Goleiro",
+        "DF": "Defensor",
+        "MF": "Meio-campista",
+        "FW": "Atacante"
+      }
     }
   },
   "common": {

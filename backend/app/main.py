@@ -10,7 +10,7 @@ from app.config import get_settings
 from app.database import Base, engine
 from app.db_schema import ensure_admin_access, ensure_schema
 from app.logging_config import configure_logging
-from app.routers import admin, auth, matches, predictions, rankings, subgroups, venues
+from app.routers import admin, auth, matches, predictions, rankings, subgroups, teams, venues
 from app.services.score_poller import start_polling, stop_polling
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 
@@ -44,7 +44,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Worldcup 2026 game",
-    version="2.0.0",
+    version="2.1.0",
     description="World Cup 2026 prediction game",
     lifespan=lifespan,
 )
@@ -93,6 +93,7 @@ app.include_router(predictions.router, prefix="/api/predictions", tags=["predict
 app.include_router(rankings.router, prefix="/api", tags=["rankings"])
 app.include_router(subgroups.router, prefix="/api/subgroups", tags=["subgroups"])
 app.include_router(venues.router, prefix="/api", tags=["venues"])
+app.include_router(teams.router, prefix="/api", tags=["teams"])
 
 
 @app.get("/api/health")

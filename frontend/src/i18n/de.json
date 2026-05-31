@@ -4,6 +4,7 @@
     "dashboard": "Übersicht",
     "matches": "Spiele",
     "groups": "Poules",
+    "teams": "Teams",
     "rankings": "Rangliste",
     "venues": "Stadien",
     "subgroups": "Untergruppe",
@@ -448,6 +449,33 @@
       "semi_final": "Halbfinale",
       "third_place": "Spiel um Platz 3",
       "final": "Finale"
+    }
+  },
+  "teams": {
+    "title": "WM-Teams",
+    "subtitle": "Wie sich jedes Land qualifizierte, Stärken und Schwächen, plus ein Panini-artiger Blick auf den vorläufigen Kader.",
+    "group": "Gruppe {{letter}}",
+    "ranking": "FIFA-Rang #{{rank}}",
+    "qualification": "Qualifikation",
+    "strengths": "Stärken",
+    "weaknesses": "Schwächen",
+    "squad": "Vorläufiger Kader",
+    "squadNote": "Illustrativer Kader fürs Stickeralbum — nicht der offizielle FIFA-Kader.",
+    "viewTeam": "Teamprofil ansehen",
+    "backToList": "Alle Teams",
+    "notFound": "Team nicht gefunden.",
+    "loadError": "Teams konnten nicht geladen werden.",
+    "player": {
+      "club": "Verein",
+      "height": "Größe",
+      "weight": "Gewicht",
+      "caps": "Länderspiele",
+      "position": {
+        "GK": "Torwart",
+        "DF": "Verteidiger",
+        "MF": "Mittelfeld",
+        "FW": "Stürmer"
+      }
     }
   },
   "common": {

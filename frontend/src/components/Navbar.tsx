@@ -12,12 +12,14 @@ const NAV_ITEMS = [
   { to: "/matches", labelKey: "navbar.matches" },
   { to: "/rankings", labelKey: "navbar.rankings" },
   { to: "/groups", labelKey: "navbar.groups" },
+  { to: "/teams", labelKey: "navbar.teams" },
   { to: "/subgroups", labelKey: "navbar.subgroups" },
   { to: "/venues", labelKey: "navbar.venues" },
 ] as const;
 
 function navItemActive(pathname: string, to: string): boolean {
   if (to === "/subgroups") return pathname.startsWith("/subgroups");
+  if (to === "/teams") return pathname.startsWith("/teams");
   return pathname === to;
 }
 
@@ -125,7 +127,9 @@ export default function Navbar() {
     const base =
       to === "/subgroups"
         ? location.pathname.startsWith("/subgroups")
-        : location.pathname === to;
+        : to === "/teams"
+          ? location.pathname.startsWith("/teams")
+          : location.pathname === to;
     return `px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
       base ? "bg-pitch-900 text-white" : "text-green-100 hover:bg-pitch-700"
     }`;

@@ -4,6 +4,7 @@
     "dashboard": "Dashboard",
     "matches": "Partite",
     "groups": "Poules",
+    "teams": "Squadre",
     "rankings": "Classifica",
     "venues": "Stadi",
     "subgroups": "Sottogruppo",
@@ -448,6 +449,33 @@
       "semi_final": "Semifinali",
       "third_place": "Finale 3° posto",
       "final": "Finale"
+    }
+  },
+  "teams": {
+    "title": "Squadre del Mondiale",
+    "subtitle": "Come si è qualificata ogni nazionale, punti di forza e debolezze, e una rosa provvisoria in stile album Panini.",
+    "group": "Gruppo {{letter}}",
+    "ranking": "Ranking FIFA #{{rank}}",
+    "qualification": "Qualificazione",
+    "strengths": "Punti di forza",
+    "weaknesses": "Punti deboli",
+    "squad": "Rosa provvisoria",
+    "squadNote": "Rosa illustrativa per l'album — non l'elenco ufficiale FIFA.",
+    "viewTeam": "Profilo squadra",
+    "backToList": "Tutte le squadre",
+    "notFound": "Squadra non trovata.",
+    "loadError": "Impossibile caricare le squadre.",
+    "player": {
+      "club": "Club",
+      "height": "Altezza",
+      "weight": "Peso",
+      "caps": "Presenze",
+      "position": {
+        "GK": "Portiere",
+        "DF": "Difensore",
+        "MF": "Centrocampista",
+        "FW": "Attaccante"
+      }
     }
   },
   "common": {

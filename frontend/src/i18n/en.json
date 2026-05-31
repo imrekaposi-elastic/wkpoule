@@ -4,6 +4,7 @@
     "dashboard": "Dashboard",
     "matches": "Matches",
     "groups": "Poules",
+    "teams": "Teams",
     "rankings": "Rankings",
     "venues": "Venues",
     "subgroups": "Subgroup",
@@ -448,6 +449,33 @@
       "semi_final": "Semi-final",
       "third_place": "Third place",
       "final": "Final"
+    }
+  },
+  "teams": {
+    "title": "World Cup Teams",
+    "subtitle": "How each nation qualified, what they do best, where they struggle, and a Panini-style look at their provisional squad.",
+    "group": "Group {{letter}}",
+    "ranking": "FIFA rank #{{rank}}",
+    "qualification": "How they qualified",
+    "strengths": "Strengths",
+    "weaknesses": "Weaknesses",
+    "squad": "Provisional squad",
+    "squadNote": "Illustrative squad for the sticker album — not the official FIFA roster.",
+    "viewTeam": "View team profile",
+    "backToList": "All teams",
+    "notFound": "Team not found.",
+    "loadError": "Could not load teams. Please try again later.",
+    "player": {
+      "club": "Club",
+      "height": "Height",
+      "weight": "Weight",
+      "caps": "Caps",
+      "position": {
+        "GK": "Goalkeeper",
+        "DF": "Defender",
+        "MF": "Midfielder",
+        "FW": "Forward"
+      }
     }
   },
   "common": {

@@ -8,11 +8,14 @@ from app.config import get_settings
 from app.database import Base, engine, SessionLocal
 from app.models.user import User
 from app.models.team import Team
+from app.models.team_player import TeamPlayer
 from app.models.venue import Venue
 from app.models.match import Match
 from app.models.prediction import Prediction
 from app.models.fun_comment import FunComment
 from app.auth import hash_password
+from app.data.team_profiles import build_team_profile
+from app.data.team_squads import build_team_squad
 
 # ---------------------------------------------------------------------------
 # Venues (16 stadiums across USA, Canada, Mexico)
@@ -527,10 +530,18 @@ def seed():
         print("Seeding teams...")
         team_map: dict[str, Team] = {}
         for t in TEAMS:
-            team = Team(**t)
+            profile = build_team_profile(
+                t["name"],
+                t["fifa_code"],
+                t["group_letter"],
+                t["world_ranking"],
+            )
+            team = Team(**t, **profile)
             db.add(team)
             db.flush()
             team_map[t["fifa_code"]] = team
+            for player in build_team_squad(t["fifa_code"], t["name"], t["world_ranking"]):
+                db.add(TeamPlayer(team_id=team.id, **player))
 
         # Group matches
         print("Seeding group stage matches...")

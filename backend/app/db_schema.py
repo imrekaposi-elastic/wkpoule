@@ -241,6 +241,71 @@ def ensure_schema() -> None:
                     "ADD COLUMN IF NOT EXISTS comment_text_es TEXT"
                 )
             )
+            conn.execute(
+                text(
+                    "ALTER TABLE teams ADD COLUMN IF NOT EXISTS qualification_en TEXT"
+                )
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE teams ADD COLUMN IF NOT EXISTS qualification_nl TEXT"
+                )
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE teams ADD COLUMN IF NOT EXISTS strengths_en TEXT"
+                )
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE teams ADD COLUMN IF NOT EXISTS strengths_nl TEXT"
+                )
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE teams ADD COLUMN IF NOT EXISTS weaknesses_en TEXT"
+                )
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE teams ADD COLUMN IF NOT EXISTS weaknesses_nl TEXT"
+                )
+            )
+            for col in (
+                "qualification_pt", "qualification_de", "qualification_es",
+                "qualification_it", "qualification_he",
+                "strengths_pt", "strengths_de", "strengths_es",
+                "strengths_it", "strengths_he",
+                "weaknesses_pt", "weaknesses_de", "weaknesses_es",
+                "weaknesses_it", "weaknesses_he",
+            ):
+                conn.execute(
+                    text(f"ALTER TABLE teams ADD COLUMN IF NOT EXISTS {col} TEXT")
+                )
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS team_players (
+                        id SERIAL PRIMARY KEY,
+                        team_id INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+                        name VARCHAR(120) NOT NULL,
+                        position VARCHAR(10) NOT NULL,
+                        shirt_number INTEGER NOT NULL,
+                        club VARCHAR(160) NOT NULL,
+                        height_cm INTEGER NOT NULL,
+                        weight_kg INTEGER NOT NULL,
+                        caps INTEGER NOT NULL DEFAULT 0,
+                        sort_order INTEGER NOT NULL DEFAULT 0
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    "CREATE INDEX IF NOT EXISTS ix_team_players_team_id "
+                    "ON team_players (team_id)"
+                )
+            )
         elif dialect == "sqlite":
             insp = inspect(engine)
             user_cols = {c["name"] for c in insp.get_columns("users")}
@@ -318,6 +383,57 @@ def ensure_schema() -> None:
                 conn.execute(
                     text("ALTER TABLE fun_comments ADD COLUMN comment_text_es TEXT")
                 )
+            team_cols = {c["name"] for c in insp.get_columns("teams")}
+            for col in (
+                "qualification_en",
+                "qualification_nl",
+                "qualification_pt",
+                "qualification_de",
+                "qualification_es",
+                "qualification_it",
+                "qualification_he",
+                "strengths_en",
+                "strengths_nl",
+                "strengths_pt",
+                "strengths_de",
+                "strengths_es",
+                "strengths_it",
+                "strengths_he",
+                "weaknesses_en",
+                "weaknesses_nl",
+                "weaknesses_pt",
+                "weaknesses_de",
+                "weaknesses_es",
+                "weaknesses_it",
+                "weaknesses_he",
+            ):
+                if col not in team_cols:
+                    conn.execute(text(f"ALTER TABLE teams ADD COLUMN {col} TEXT"))
+            if "team_players" not in tables:
+                conn.execute(
+                    text(
+                        """
+                        CREATE TABLE team_players (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            team_id INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+                            name VARCHAR(120) NOT NULL,
+                            position VARCHAR(10) NOT NULL,
+                            shirt_number INTEGER NOT NULL,
+                            club VARCHAR(160) NOT NULL,
+                            height_cm INTEGER NOT NULL,
+                            weight_kg INTEGER NOT NULL,
+                            caps INTEGER NOT NULL DEFAULT 0,
+                            sort_order INTEGER NOT NULL DEFAULT 0
+                        )
+                        """
+                    )
+                )
+                conn.execute(
+                    text(
+                        "CREATE INDEX IF NOT EXISTS ix_team_players_team_id "
+                        "ON team_players (team_id)"
+                    )
+                )
 
         _backfill_venue_hebrew(conn)
         _backfill_venue_es_it(conn)
@@ -340,6 +456,25 @@ def ensure_schema() -> None:
                 """
             )
         )
+
+    _backfill_team_content()
+
+
+def _backfill_team_content() -> None:
+    """Fill team profiles and illustrative squads on existing databases."""
+    try:
+        from app.services.team_content import backfill_all_teams
+    except ImportError:
+        logger.debug("team_content not importable; skipping team backfill")
+        return
+    db = SessionLocal()
+    try:
+        backfill_all_teams(db)
+    except Exception:
+        db.rollback()
+        logger.exception("Team profile/squad backfill failed")
+    finally:
+        db.close()
 
 
 def ensure_admin_account(db: Session) -> None:

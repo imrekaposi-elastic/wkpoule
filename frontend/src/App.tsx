@@ -15,6 +15,8 @@ import Rankings from "./pages/Rankings";
 import Register from "./pages/Register";
 import SubgroupDetail from "./pages/SubgroupDetail";
 import Subgroups from "./pages/Subgroups";
+import TeamDetailPage from "./pages/TeamDetail";
+import Teams from "./pages/Teams";
 import Venues from "./pages/Venues";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -95,6 +97,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Rankings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teams"
+            element={
+              <ProtectedRoute>
+                <Teams />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teams/:fifaCode"
+            element={
+              <ProtectedRoute>
+                <TeamDetailPage />
               </ProtectedRoute>
             }
           />
