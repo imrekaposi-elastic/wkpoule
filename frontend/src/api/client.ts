@@ -1,4 +1,8 @@
-import axios, { type InternalAxiosRequestConfig } from "axios";
+import axios, {
+  type AxiosError,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from "axios";
 
 const api = axios.create({ baseURL: "/api" });
 
@@ -24,11 +28,11 @@ function refreshAccessToken(): Promise<string> {
     return Promise.reject(new Error("No refresh token"));
   }
 
-  refreshPromise = axios
+  const promise = axios
     .post<{ access_token: string; refresh_token: string }>("/api/auth/refresh", {
       refresh_token: refresh,
     })
-    .then(({ data }) => {
+    .then(({ data }: AxiosResponse<{ access_token: string; refresh_token: string }>) => {
       localStorage.setItem("access_token", data.access_token);
       localStorage.setItem("refresh_token", data.refresh_token);
       return data.access_token;
@@ -37,7 +41,8 @@ function refreshAccessToken(): Promise<string> {
       refreshPromise = null;
     });
 
-  return refreshPromise;
+  refreshPromise = promise;
+  return promise;
 }
 
 function clearSessionAndRedirectToLogin(): void {
@@ -49,7 +54,7 @@ function clearSessionAndRedirectToLogin(): void {
   }
 }
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem("access_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -58,8 +63,8 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (r) => r,
-  async (error) => {
+  (response: AxiosResponse) => response,
+  async (error: AxiosError) => {
     const original = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
     if (
       error.response?.status === 401 &&
