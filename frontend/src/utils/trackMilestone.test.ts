@@ -1,9 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
-const startTransaction = vi.fn(() => ({
-  addLabels: vi.fn(),
-  end: vi.fn(),
-}));
+const { startTransaction } = vi.hoisted(() => {
+  const startTransaction = vi.fn(() => ({
+    addLabels: vi.fn(),
+    end: vi.fn(),
+  }));
+  return { startTransaction };
+});
 
 vi.mock("@elastic/apm-rum", () => ({
   apm: { startTransaction },
@@ -19,6 +22,7 @@ describe("trackMilestones", () => {
   });
 
   it("emits a RUM transaction per milestone key", () => {
+    startTransaction.mockClear();
     trackMilestones(["first_prediction", "group_complete"]);
 
     expect(startTransaction).toHaveBeenCalledTimes(2);
