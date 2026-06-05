@@ -13,6 +13,55 @@ from app.models.user import User
 logger = logging.getLogger(__name__)
 
 
+def _ensure_team_player_physical_columns(conn, dialect: str, player_cols: set[str] | None = None) -> None:
+    """Add height/weight/DOB columns used by squad backfill (prod may predate the model)."""
+    if dialect == "postgresql":
+        conn.execute(
+            text(
+                "ALTER TABLE team_players "
+                "ADD COLUMN IF NOT EXISTS height_cm INTEGER NOT NULL DEFAULT 0"
+            )
+        )
+        conn.execute(
+            text(
+                "ALTER TABLE team_players "
+                "ADD COLUMN IF NOT EXISTS weight_kg INTEGER NOT NULL DEFAULT 0"
+            )
+        )
+        conn.execute(
+            text(
+                "ALTER TABLE team_players "
+                "ADD COLUMN IF NOT EXISTS date_of_birth VARCHAR(10)"
+            )
+        )
+        conn.execute(
+            text("ALTER TABLE team_players ADD COLUMN IF NOT EXISTS age INTEGER")
+        )
+        return
+
+    if dialect == "sqlite" and player_cols is not None:
+        if "height_cm" not in player_cols:
+            conn.execute(
+                text(
+                    "ALTER TABLE team_players "
+                    "ADD COLUMN height_cm INTEGER NOT NULL DEFAULT 0"
+                )
+            )
+        if "weight_kg" not in player_cols:
+            conn.execute(
+                text(
+                    "ALTER TABLE team_players "
+                    "ADD COLUMN weight_kg INTEGER NOT NULL DEFAULT 0"
+                )
+            )
+        if "date_of_birth" not in player_cols:
+            conn.execute(
+                text("ALTER TABLE team_players ADD COLUMN date_of_birth VARCHAR(10)")
+            )
+        if "age" not in player_cols:
+            conn.execute(text("ALTER TABLE team_players ADD COLUMN age INTEGER"))
+
+
 def _backfill_fun_comment_it_es(conn) -> None:
     """Fill Italian/Spanish from native match_comments data when DB rows predate es/it columns."""
     try:
@@ -293,8 +342,12 @@ def ensure_schema() -> None:
                         position VARCHAR(10) NOT NULL,
                         shirt_number INTEGER NOT NULL,
                         club VARCHAR(160) NOT NULL,
+                        height_cm INTEGER NOT NULL DEFAULT 0,
+                        weight_kg INTEGER NOT NULL DEFAULT 0,
                         caps INTEGER NOT NULL DEFAULT 0,
-                        sort_order INTEGER NOT NULL DEFAULT 0
+                        sort_order INTEGER NOT NULL DEFAULT 0,
+                        date_of_birth VARCHAR(10),
+                        age INTEGER
                     )
                     """
                 )
@@ -305,6 +358,7 @@ def ensure_schema() -> None:
                     "ON team_players (team_id)"
                 )
             )
+            _ensure_team_player_physical_columns(conn, dialect)
         elif dialect == "sqlite":
             insp = inspect(engine)
             user_cols = {c["name"] for c in insp.get_columns("users")}
@@ -420,8 +474,12 @@ def ensure_schema() -> None:
                             position VARCHAR(10) NOT NULL,
                             shirt_number INTEGER NOT NULL,
                             club VARCHAR(160) NOT NULL,
+                            height_cm INTEGER NOT NULL DEFAULT 0,
+                            weight_kg INTEGER NOT NULL DEFAULT 0,
                             caps INTEGER NOT NULL DEFAULT 0,
-                            sort_order INTEGER NOT NULL DEFAULT 0
+                            sort_order INTEGER NOT NULL DEFAULT 0,
+                            date_of_birth VARCHAR(10),
+                            age INTEGER
                         )
                         """
                     )
@@ -433,7 +491,8 @@ def ensure_schema() -> None:
                     )
                 )
             else:
-                pass
+                player_cols = {c["name"] for c in insp.get_columns("team_players")}
+                _ensure_team_player_physical_columns(conn, dialect, player_cols)
 
         _backfill_venue_hebrew(conn)
         _backfill_venue_es_it(conn)

@@ -29,6 +29,8 @@ def test_apply_team_content_populates_profile_players_and_qualification(db):
     assert len(team.players) >= 20
     assert team.players[0].name
     assert team.players[0].position in {"GK", "DF", "MF", "FW"}
+    assert team.players[0].height_cm >= 0
+    assert team.players[0].weight_kg >= 0
 
 
 def test_backfill_all_teams_updates_every_row(db):

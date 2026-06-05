@@ -15,7 +15,11 @@ class TeamPlayer(Base):
     position: Mapped[str] = mapped_column(String(10), nullable=False)
     shirt_number: Mapped[int] = mapped_column(Integer, nullable=False)
     club: Mapped[str] = mapped_column(String(160), nullable=False)
+    height_cm: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    weight_kg: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     caps: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    date_of_birth: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    age: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     team = relationship("Team", back_populates="players")
