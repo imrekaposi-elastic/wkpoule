@@ -228,7 +228,8 @@ def match_predictions(
 
     preds = (
         db.query(Prediction)
-        .filter(Prediction.match_id == match_id)
+        .join(Prediction.user)
+        .filter(Prediction.match_id == match_id, User.is_admin.is_(False))
         .options(joinedload(Prediction.user))
         .order_by(Prediction.updated_at.desc())
         .all()

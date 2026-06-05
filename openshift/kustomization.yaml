@@ -29,8 +29,10 @@ resources:
   # Deployment: k8s_cluster (OpenShift) → gateway OTLP (Elastic recommended cluster collector)
   - otel-k8s-cluster.yaml
   - pvc-postgres.yaml
+  - pvc-postgres-backup.yaml
   - imagestreams.yaml
   - deployment-postgres.yaml
+  - cronjob-postgres-backup.yaml
   - job-postgres-otel-user.yaml
   - deployment-api.yaml
   - deployment-frontend.yaml

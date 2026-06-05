@@ -61,3 +61,44 @@ Topology matches [Kubernetes environments](https://www.elastic.co/docs/reference
 PostgreSQL observability uses the [PostgreSQL OpenTelemetry Assets](https://www.elastic.co/docs/reference/integrations/postgresql_otel) integration only (`postgresqlreceiver` in [`otel-collector.yaml`](otel-collector.yaml)). The canonical **OTel/APM service name is `postgresql`** (receiver metrics, dependencies via `elasticapm`); the K8s Deployment/Service and `DATABASE_URL` host remain **`postgres`**. Ensure OpenShift **egress** allows the **gateway** Deployment to reach **`ELASTICSEARCH_URL`** on `443`. Edge components keep using **`http://wkpoule-otel-collector:4318`** unless you rename the gateway Service. If TLS verification fails against ECE (hostname vs cert SAN), adjust [`otel-collector.yaml`](otel-collector.yaml) `elasticsearch/otel` `tls` or fix the deployment URL/certificate.
 
 **Public hostname:** Set [`route.yaml`](route.yaml) `spec.host` and the same URL (with `https://`) as **`PUBLIC_APP_URL`** in [`secret.yaml`](secret.yaml) so invite links and CORS stay aligned — see [`deploy.md`](../deploy.md) §7.
+
+## PostgreSQL backups
+
+[`cronjob-postgres-backup.yaml`](cronjob-postgres-backup.yaml) runs **`pg_dump`** every 12 hours (`0 */12 * * *`) and stores custom-format dumps on [`pvc-postgres-backup.yaml`](pvc-postgres-backup.yaml). The job keeps the **14** newest files (~7 days). Dumps are **not** stored in a ConfigMap (1 MiB limit; wrong tool for backup data).
+
+Manual backup run:
+
+```bash
+oc create job --from=cronjob/wkpoule-postgres-backup wkpoule-postgres-backup-manual-$(date +%s)
+```
+
+### Verify backups exist (OKD / restricted PSA)
+
+Do **not** use `oc run` with `busybox` — it runs as root and triggers **PodSecurityViolation** on OKD.
+
+**1. Job logs** (easiest; backup job lists `/backups` at the end):
+
+```bash
+oc get jobs | grep postgres-backup
+oc logs job/<job-name>
+```
+
+Look for `Dump complete (... bytes)` and `ls -lah /backups` output.
+
+**2. List Job** (same image + security profile as the CronJob):
+
+```bash
+oc delete job wkpoule-postgres-backup-ls --ignore-not-found
+oc apply -f openshift/job-postgres-backup-ls.yaml
+oc logs -f job/wkpoule-postgres-backup-ls
+```
+
+**3. CronJob status:**
+
+```bash
+oc get cronjob wkpoule-postgres-backup
+```
+
+Re-apply the stack after changing the CronJob (`oc apply -k openshift/`). New dumps use `chmod 644` so the list Job can read files written by another pod UID.
+
+Copy a dump off-cluster: run a short-lived pod from [`job-postgres-backup-ls.yaml`](job-postgres-backup-ls.yaml) with `sleep 3600` instead of `ls`, then `oc cp` from that pod (postgres image, not busybox).

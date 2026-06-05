@@ -1,0 +1,39 @@
+# One-shot: list dump files on the backup PVC. OKD-safe (postgres image, restricted PSA).
+# Apply: oc apply -f openshift/job-postgres-backup-ls.yaml && oc logs -f job/wkpoule-postgres-backup-ls
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wkpoule-postgres-backup-ls
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 120
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: list
+          image: docker.io/library/postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: backup-storage
+              mountPath: /backups
+              readOnly: true
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              echo "Contents of /backups:"
+              ls -lah /backups
+              echo "---"
+              du -h /backups/wkpoule-*.dump 2>/dev/null || echo "(no wkpoule-*.dump files yet)"
+      volumes:
+        - name: backup-storage
+          persistentVolumeClaim:
+            claimName: wkpoule-postgres-backup-pvc

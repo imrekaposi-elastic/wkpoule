@@ -1,0 +1,82 @@
+# Scheduled pg_dump of the wkpoule database. Dumps are stored on a PVC (not a ConfigMap:
+# ConfigMaps are limited to ~1 MiB and are meant for configuration, not backup blobs).
+#
+# Restore example (from a debug pod with this PVC mounted at /backups):
+#   pg_restore -h postgres -U wkpoule -d wkpoule --clean --if-exists /backups/wkpoule-YYYYMMDDTHHMMSSZ.dump
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: wkpoule-postgres-backup
+spec:
+  schedule: "0 */12 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: OnFailure
+          # OKD restricted PSA: non-root + dropped caps (same profile as job-postgres-backup-ls.yaml).
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: backup
+              image: docker.io/library/postgres:16-alpine
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: wkpoule-secrets
+                      key: POSTGRES_PASSWORD
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef:
+                      name: wkpoule-secrets
+                      key: POSTGRES_USER
+                - name: PGDATABASE
+                  valueFrom:
+                    secretKeyRef:
+                      name: wkpoule-secrets
+                      key: POSTGRES_DB
+                - name: PGHOST
+                  value: postgres
+                - name: PGPORT
+                  value: "5432"
+                # Keep 14 dumps (~7 days at 12h interval). Increase PVC size if dumps grow.
+                - name: BACKUP_RETENTION_COUNT
+                  value: "14"
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+              command: ["/bin/sh", "-ec"]
+              args:
+                - |
+                  set -eu
+                  ts="$(date -u +%Y%m%dT%H%M%SZ)"
+                  outfile="/backups/wkpoule-${ts}.dump"
+                  echo "Starting pg_dump to ${outfile}..."
+                  pg_dump -Fc -f "${outfile}"
+                  chmod 644 "${outfile}"
+                  echo "Dump complete ($(wc -c < "${outfile}") bytes)."
+                  echo "Backups on volume:"
+                  ls -lah /backups
+                  echo "Pruning old backups (keeping ${BACKUP_RETENTION_COUNT})..."
+                  ls -1t /backups/wkpoule-*.dump 2>/dev/null | tail -n +"$((BACKUP_RETENTION_COUNT + 1))" | while read -r old; do
+                    echo "Removing ${old}"
+                    rm -f "${old}"
+                  done
+                  echo "Done."
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: wkpoule-postgres-backup-pvc

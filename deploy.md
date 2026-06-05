@@ -251,7 +251,8 @@ Implementation options (no YAML required in this doc):
 
 - Version-control your **Pipeline**, **Tasks**, and **Trigger** objects under e.g. **`.tekton/`** or **`openshift/pipelines/`** and apply them with `oc apply` or GitOps.
 - Use **Pipeline as Code (PAC)** to drive Tekton from definitions in the Git repo (GitHub / GitLab integration).
-- Hardening: **NetworkPolicies**, resource quotas, backup strategy for Postgres, and secret management beyond plain `Secret` YAML are out of scope for this overview but recommended for production.
+- Hardening: **NetworkPolicies**, resource quotas, and secret management beyond plain `Secret` YAML are out of scope for this overview but recommended for production.
+- **Postgres backups:** [`openshift/cronjob-postgres-backup.yaml`](openshift/cronjob-postgres-backup.yaml) (every 12h, PVC storage). See [`openshift/README.md`](openshift/README.md) § PostgreSQL backups.
 
 **What to do in practice:** Once the first deployment works, copy the Pipeline and Task YAML you created in the console (or export them with `oc get pipeline … -o yaml`) into this repo under **`openshift/pipelines/`** so the next environment can `oc apply` the same definitions. If you use **Pipeline as Code**, you instead add a small bootstrap repo or annotations so Git pushes update the pipeline automatically; that is worth exploring when you are tired of clicking “Start” manually. **If you later install `tkn`**, you can run `tkn pipeline start` or `tkn pipelinerun logs` from your laptop for faster feedback—but the console remains enough for everything above.
 

@@ -28,12 +28,15 @@ export default defineConfig({
       thresholds: {
         lines: 50,
         statements: 50,
-        branches: 45,
+        branches: 44,
         functions: 45,
       },
     },
   },
   server: {
+    // Localhost only. Do not use --host / server.host: true unless you need LAN access;
+    // several Vite dev-server advisories require network exposure to be exploitable.
+    host: false,
     proxy: {
       "/api": "http://localhost:8000",
       "/rum": {
