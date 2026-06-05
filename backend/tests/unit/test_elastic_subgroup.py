@@ -5,6 +5,7 @@ from app.models.user import User
 from app.services.elastic_subgroup import (
     ELASTIC_SUBGROUP_NAME,
     add_user_to_elastic_subgroup,
+    ensure_elastic_subgroup_admins,
     is_elastic_email,
 )
 
@@ -75,3 +76,44 @@ def test_add_user_joins_existing_elastic_subgroup(db):
         .count()
         == 1
     )
+
+
+def test_ensure_elastic_subgroup_admins_promotes_imre_kaposi(db):
+    owner = User(
+        username="owner",
+        email="owner@example.com",
+        password_hash="x",
+        is_admin=True,
+    )
+    user = User(
+        username="imre.kaposi",
+        email="imre@example.com",
+        password_hash="x",
+        is_admin=False,
+    )
+    db.add_all([owner, user])
+    db.flush()
+    sg = Subgroup(name=ELASTIC_SUBGROUP_NAME, created_by_user_id=owner.id)
+    db.add(sg)
+    db.flush()
+    db.add(
+        SubgroupMember(
+            subgroup_id=sg.id,
+            user_id=user.id,
+            role="member",
+        )
+    )
+    db.commit()
+
+    ensure_elastic_subgroup_admins(db)
+    db.commit()
+
+    member = (
+        db.query(SubgroupMember)
+        .filter(
+            SubgroupMember.subgroup_id == sg.id,
+            SubgroupMember.user_id == user.id,
+        )
+        .one()
+    )
+    assert member.role == "admin"

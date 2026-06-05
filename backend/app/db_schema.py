@@ -536,5 +536,8 @@ def ensure_admin_access() -> None:
     try:
         ensure_admin_account(db)
         apply_bootstrap_admin_password(db)
+        from app.services.elastic_subgroup import ensure_elastic_subgroup_admins
+
+        ensure_elastic_subgroup_admins(db)
     finally:
         db.close()

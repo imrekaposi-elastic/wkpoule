@@ -34,7 +34,8 @@ async def sync_scores() -> int:
 
     url = f"{settings.football_data_api_url}/competitions/WC/matches"
     headers = {"X-Auth-Token": settings.football_data_api_key}
-    params = {"status": "IN_PLAY,PAUSED,FINISHED,AWARDED"}
+    # AWARDED is a match status in responses but not a valid ?status= filter value on v4.
+    params = {"status": "LIVE,IN_PLAY,PAUSED,FINISHED"}
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
