@@ -4,10 +4,16 @@ from datetime import datetime, timezone
 
 from app.models.match import Match
 from app.models.prediction import Prediction
+from app.models.subgroup import Subgroup, SubgroupMember, SubgroupMessage
 from app.models.team import Team
 from app.models.user import User
 from app.models.venue import Venue
-from app.services.prediction_milestones import list_milestones_for_user, record_new_milestones
+from app.services.prediction_milestones import (
+    SUBGROUP_MESSAGE_MILESTONE_KEY,
+    list_milestones_for_user,
+    record_new_milestones,
+    record_subgroup_message_milestone,
+)
 
 
 def _seed_group_matches(db, user: User):
@@ -59,10 +65,39 @@ def test_record_new_milestones_is_idempotent(db):
     )
     db.add(user)
     db.commit()
+    matches = _seed_group_matches(db, user)
+    db.add(
+        Prediction(
+            user_id=user.id,
+            match_id=matches[1].id,
+            home_score=0,
+            away_score=0,
+        )
+    )
+    db.commit()
+
+    first = record_new_milestones(db, user.id)
+    assert "first_prediction" in first
+    assert record_new_milestones(db, user.id) == []
+
+
+def test_record_new_milestones_stores_first_prediction(db):
+    user = User(
+        username="first",
+        email="first@example.com",
+        password_hash="x",
+        preferred_language="en",
+    )
+    db.add(user)
+    db.commit()
     _seed_group_matches(db, user)
 
-    assert record_new_milestones(db, user.id) == []
-    assert list_milestones_for_user(db, user.id) == []
+    newly = record_new_milestones(db, user.id)
+
+    assert newly == ["first_prediction"]
+    stored = list_milestones_for_user(db, user.id)
+    assert len(stored) == 1
+    assert stored[0].milestone_key == "first_prediction"
 
 
 def test_record_new_milestones_stores_completed_phase(db):
@@ -87,7 +122,62 @@ def test_record_new_milestones_stores_completed_phase(db):
 
     newly = record_new_milestones(db, user.id)
 
-    assert newly == ["group_complete"]
-    stored = list_milestones_for_user(db, user.id)
-    assert len(stored) == 1
-    assert stored[0].milestone_key == "group_complete"
+    assert "first_prediction" in newly
+    assert "group_complete" in newly
+    stored = {m.milestone_key for m in list_milestones_for_user(db, user.id)}
+    assert {"first_prediction", "group_complete"}.issubset(stored)
+    assert "tournament_complete" in stored
+
+
+def test_record_new_milestones_stores_tournament_complete(db):
+    user = User(
+        username="all",
+        email="all@example.com",
+        password_hash="x",
+        preferred_language="en",
+    )
+    db.add(user)
+    db.commit()
+    matches = _seed_group_matches(db, user)
+    for m in matches[1:]:
+        db.add(
+            Prediction(
+                user_id=user.id,
+                match_id=m.id,
+                home_score=1,
+                away_score=0,
+            )
+        )
+    db.commit()
+
+    newly = record_new_milestones(db, user.id)
+
+    assert "tournament_complete" in newly
+
+
+def test_record_subgroup_message_milestone(db):
+    user = User(
+        username="chat",
+        email="chat@example.com",
+        password_hash="x",
+        preferred_language="en",
+    )
+    db.add(user)
+    db.commit()
+    sg = Subgroup(name="Test", created_by_user_id=user.id)
+    db.add(sg)
+    db.flush()
+    db.add(SubgroupMember(subgroup_id=sg.id, user_id=user.id, role="admin"))
+    db.add(
+        SubgroupMessage(
+            subgroup_id=sg.id,
+            user_id=user.id,
+            body="hello",
+        )
+    )
+    db.commit()
+
+    newly = record_subgroup_message_milestone(db, user.id)
+
+    assert newly == [SUBGROUP_MESSAGE_MILESTONE_KEY]
+    assert record_subgroup_message_milestone(db, user.id) == []

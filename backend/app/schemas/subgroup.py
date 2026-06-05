@@ -70,5 +70,6 @@ class SubgroupMessageOut(BaseModel):
     username: str
     body: str
     created_at: datetime
+    newly_achieved: list[str] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}

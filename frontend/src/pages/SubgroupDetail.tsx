@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { resolveLocale } from "../i18n/languages";
 import type { SubgroupDetail as SubgroupDetailType, SubgroupMessage } from "../types";
 import { normalizeRankingsResponse, rankingsItems } from "../utils/rankings";
+import { trackMilestones } from "../utils/trackMilestone";
 
 const AVATAR_PALETTE = [
   "bg-emerald-600",
@@ -186,7 +187,8 @@ export default function SubgroupDetail() {
     const b = msgBody.trim();
     if (!b) return;
     try {
-      await api.post(`/subgroups/${subgroupId}/messages`, { body: b });
+      const res = await api.post<SubgroupMessage>(`/subgroups/${subgroupId}/messages`, { body: b });
+      trackMilestones(res.data.newly_achieved);
       setMsgBody("");
       loadMessages();
     } catch {

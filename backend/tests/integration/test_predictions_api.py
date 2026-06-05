@@ -76,3 +76,4 @@ def test_upsert_prediction_for_upcoming_match(client, db, auth_headers):
     assert body["home_score"] == 2
     assert body["away_score"] == 1
     assert body["points"] is None
+    assert "first_prediction" in body["newly_achieved"]

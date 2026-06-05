@@ -51,6 +51,53 @@ def _seed_match(db) -> Match:
     return match
 
 
+def test_match_predictions_summary_and_by_outcome(client, db, auth_headers):
+    match = _seed_match(db)
+    admin = db.query(User).filter(User.is_admin.is_(True)).first()
+    viewer = db.query(User).filter(User.id != admin.id).first()
+    assert viewer is not None
+
+    db.add_all(
+        [
+            Prediction(
+                user_id=admin.id,
+                match_id=match.id,
+                home_score=2,
+                away_score=0,
+            ),
+            Prediction(
+                user_id=viewer.id,
+                match_id=match.id,
+                home_score=2,
+                away_score=1,
+            ),
+        ]
+    )
+    db.commit()
+
+    summary = client.get(
+        f"/api/predictions/match/{match.id}/summary",
+        headers=auth_headers,
+    )
+    assert summary.status_code == 200
+    body = summary.json()
+    assert body["total"] == 1
+    assert body["home_win_count"] == 1
+    assert body["away_win_count"] == 0
+    assert body["draw_count"] == 0
+
+    by_outcome = client.get(
+        f"/api/predictions/match/{match.id}/by-outcome",
+        headers=auth_headers,
+        params={"outcome": "home_win", "page": 1, "page_size": 10},
+    )
+    assert by_outcome.status_code == 200
+    items = by_outcome.json()["items"]
+    assert len(items) == 1
+    assert items[0]["home_score"] == 2
+    assert items[0]["away_score"] == 1
+
+
 def test_match_predictions_exclude_admin(client, db, auth_headers):
     match = _seed_match(db)
     admin = db.query(User).filter(User.is_admin.is_(True)).first()

@@ -1,5 +1,7 @@
 import logging
 
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 
@@ -10,6 +12,8 @@ from app.models.prediction import Prediction
 from app.models.user import User
 from app.schemas.pagination import DEFAULT_PAGE_SIZE, PaginatedResponse, paginate_list
 from app.schemas.prediction import (
+    MatchPredictionListItem,
+    MatchPredictionSummaryOut,
     MyPredictionBrief,
     MyPredictionOut,
     PredictionOut,
@@ -23,6 +27,13 @@ from app.services.prediction_advance import (
 )
 from app.services.prediction_lock import match_accepts_prediction_updates
 from app.services.prediction_milestones import list_milestones_for_user, record_new_milestones
+from app.services.match_prediction_list import (
+    OUTCOME_PAGE_SIZE,
+    non_admin_predictions_for_match,
+    predictions_for_outcome,
+    summary_counts,
+    to_list_item,
+)
 from app.services.scoring import calculate_points
 from app.services.virtual_standings import (
     best_third_place_team_ids,
@@ -39,7 +50,7 @@ def my_prediction_milestones(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Phases for which this user has submitted a tip for every match (group → finals)."""
+    """Conversion milestones this user has reached (predictions, subgroup chat)."""
     return list_milestones_for_user(db, user.id)
 
 
@@ -92,7 +103,7 @@ def upsert_prediction(
         db.add(pred)
     db.commit()
     db.refresh(pred)
-    record_new_milestones(db, user.id)
+    newly_achieved = record_new_milestones(db, user.id, username=user.username)
     logger.info(
         "%s %s prediction for match %s",
         user.username,
@@ -125,6 +136,7 @@ def upsert_prediction(
         points=None,
         created_at=pred.created_at,
         updated_at=pred.updated_at,
+        newly_achieved=newly_achieved,
     )
 
 
@@ -214,6 +226,48 @@ def my_predictions(
     return paginate_list(results, page, page_size)
 
 
+@router.get("/match/{match_id}/summary", response_model=MatchPredictionSummaryOut)
+def match_predictions_summary(
+    match_id: int,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    match = db.query(Match).filter(Match.id == match_id).first()
+    if not match:
+        raise HTTPException(status_code=404, detail="Match not found")
+    preds = non_admin_predictions_for_match(db, match_id)
+    counts = summary_counts(preds)
+    return MatchPredictionSummaryOut(
+        total=len(preds),
+        home_win_count=counts["home_win"],
+        away_win_count=counts["away_win"],
+        draw_count=counts["draw"],
+    )
+
+
+@router.get(
+    "/match/{match_id}/by-outcome",
+    response_model=PaginatedResponse[MatchPredictionListItem],
+)
+def match_predictions_by_outcome(
+    match_id: int,
+    outcome: Literal["home_win", "away_win", "draw"] = Query(...),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(OUTCOME_PAGE_SIZE, ge=1, le=OUTCOME_PAGE_SIZE),
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    match = db.query(Match).filter(Match.id == match_id).first()
+    if not match:
+        raise HTTPException(status_code=404, detail="Match not found")
+    preds = predictions_for_outcome(
+        non_admin_predictions_for_match(db, match_id),
+        outcome,
+    )
+    items = [to_list_item(p, match) for p in preds]
+    return paginate_list(items, page, page_size)
+
+
 @router.get("/match/{match_id}", response_model=PaginatedResponse[PredictionOut])
 def match_predictions(
     match_id: int,
@@ -226,31 +280,19 @@ def match_predictions(
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
 
-    preds = (
-        db.query(Prediction)
-        .join(Prediction.user)
-        .filter(Prediction.match_id == match_id, User.is_admin.is_(False))
-        .options(joinedload(Prediction.user))
-        .order_by(Prediction.updated_at.desc())
-        .all()
-    )
     results = []
-    for p in preds:
-        pts = None
-        if match.status == "completed" and match.home_score is not None:
-            pts = calculate_points(
-                p.home_score, p.away_score, match.home_score, match.away_score
-            )["points"]
+    for p in non_admin_predictions_for_match(db, match_id):
+        item = to_list_item(p, match)
         results.append(
             PredictionOut(
                 id=p.id,
-                user_id=p.user_id,
-                username=p.user.username,
+                user_id=item.user_id,
+                username=item.username,
                 match_id=p.match_id,
-                home_score=p.home_score,
-                away_score=p.away_score,
-                advance_team_id=p.advance_team_id,
-                points=pts,
+                home_score=item.home_score,
+                away_score=item.away_score,
+                advance_team_id=item.advance_team_id,
+                points=item.points,
                 created_at=p.created_at,
                 updated_at=p.updated_at,
             )

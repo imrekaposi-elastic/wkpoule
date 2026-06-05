@@ -4,14 +4,15 @@ import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import ExpertAvatar from "../components/ExpertAvatar";
-import Pagination from "../components/Pagination";
+import MatchPredictionsSummary from "../components/MatchPredictionsSummary";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
 import { resolveLocale } from "../i18n/languages";
 import { localizedTeam } from "../i18n/teamNames";
 import { formatStageSlug } from "../utils/formatStage";
 import { funCommentText } from "../utils/funCommentText";
 import { isKnockoutStage, isPredictedDraw } from "../utils/predictions";
-import type { Match, MyPredictionBrief, PaginatedResponse, Prediction, VirtualGroupTable } from "../types";
+import { trackMilestones } from "../utils/trackMilestone";
+import type { Match, MyPredictionBrief, Prediction, VirtualGroupTable } from "../types";
 
 const PREDICTION_TIP_STORAGE_KEY = "wkpoule_prediction_progress_tip_dismissed";
 
@@ -38,10 +39,7 @@ export default function MatchDetail() {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const [match, setMatch] = useState<Match | null>(null);
-  const [predictions, setPredictions] = useState<Prediction[]>([]);
-  const [predPage, setPredPage] = useState(1);
-  const [predTotalPages, setPredTotalPages] = useState(1);
-  const [predTotal, setPredTotal] = useState(0);
+  const [predictionsRefreshKey, setPredictionsRefreshKey] = useState(0);
   const [homeScore, setHomeScore] = useState<ScoreInput>("");
   const [awayScore, setAwayScore] = useState<ScoreInput>("");
   const [advanceTeamId, setAdvanceTeamId] = useState<number | null>(null);
@@ -141,31 +139,6 @@ export default function MatchDetail() {
   }, [id, user?.id]);
 
   useEffect(() => {
-    if (!match?.id || predPage < 1) return;
-    let cancelled = false;
-    api
-      .get<PaginatedResponse<Prediction>>(`/predictions/match/${match.id}`, {
-        params: { page: predPage, page_size: 20 },
-      })
-      .then((r) => {
-        if (cancelled) return;
-        setPredictions(r.data.items);
-        setPredTotalPages(r.data.total_pages);
-        setPredTotal(r.data.total);
-      })
-      .catch(() => {
-        if (!cancelled) setPredictions([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [match?.id, predPage]);
-
-  useEffect(() => {
-    setPredPage(1);
-  }, [match?.id]);
-
-  useEffect(() => {
     if (!match?.group_letter) {
       setVirtualStandings(null);
       return;
@@ -194,18 +167,13 @@ export default function MatchDetail() {
         setMessage(t("matchDetail.advanceTeamRequired"));
         return;
       }
-      await api.put(`/predictions/${match.id}`, {
+      const saveRes = await api.put<Prediction>(`/predictions/${match.id}`, {
         home_score: homeScore,
         away_score: awayScore,
         advance_team_id: knockoutDraw ? advanceTeamId : null,
       });
-      await api.get<PaginatedResponse<Prediction>>(`/predictions/match/${match.id}`, {
-        params: { page: predPage, page_size: 20 },
-      }).then((r) => {
-        setPredictions(r.data.items);
-        setPredTotal(r.data.total);
-        setPredTotalPages(r.data.total_pages);
-      });
+      trackMilestones(saveRes.data.newly_achieved);
+      setPredictionsRefreshKey((k) => k + 1);
 
       if (match.group_letter) {
         await loadVirtualStandings(match.group_letter);
@@ -242,7 +210,7 @@ export default function MatchDetail() {
   const kickoff = new Date(match.kickoff_utc);
   const canEditPrediction =
     match.status === "upcoming" && match.prediction_editable;
-  const myPredRow = predictions.find((p) => p.user_id === user?.id);
+  const hasMyPrediction = homeScore !== "" && awayScore !== "";
   const showKnockoutAfter90Hint = isKnockoutStage(match.stage);
   const showAdvancePicker =
     canEditPrediction &&
@@ -585,18 +553,17 @@ export default function MatchDetail() {
           ) : match.status === "upcoming" ? (
             <div className="text-center py-2 space-y-3">
               <p className="text-gray-500">{t("matchDetail.lockedBeforeKickoff")}</p>
-              {myPredRow ? (
+              {hasMyPrediction ? (
                 <div className={`${readOnlyPredictionBoxClass} space-y-2 text-center`}>
                   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pointer-events-none select-none">
-                    <span className={readOnlyPredictionScoreClass}>{myPredRow.home_score}</span>
+                    <span className={readOnlyPredictionScoreClass}>{homeScore}</span>
                     <span className="text-gray-300 text-xl">-</span>
-                    <span className={readOnlyPredictionScoreClass}>{myPredRow.away_score}</span>
+                    <span className={readOnlyPredictionScoreClass}>{awayScore}</span>
                   </div>
-                  {myPredRow.home_score === myPredRow.away_score &&
-                    advanceTeamLabel(myPredRow.advance_team_id) && (
+                  {homeScore === awayScore && advanceTeamLabel(advanceTeamId) && (
                       <p className="text-xs text-gray-500">
                         {t("matchDetail.advanceTeamReadOnly", {
-                          team: advanceTeamLabel(myPredRow.advance_team_id),
+                          team: advanceTeamLabel(advanceTeamId),
                         })}
                       </p>
                     )}
@@ -608,18 +575,17 @@ export default function MatchDetail() {
           ) : (
             <div className="text-center py-2 space-y-3">
               <p className="text-gray-500">{t("matchDetail.predictionReadOnly")}</p>
-              {myPredRow ? (
+              {hasMyPrediction ? (
                 <div className={`${readOnlyPredictionBoxClass} space-y-2 text-center`}>
                   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pointer-events-none select-none">
-                    <span className={readOnlyPredictionScoreClass}>{myPredRow.home_score}</span>
+                    <span className={readOnlyPredictionScoreClass}>{homeScore}</span>
                     <span className="text-gray-300 text-xl">-</span>
-                    <span className={readOnlyPredictionScoreClass}>{myPredRow.away_score}</span>
+                    <span className={readOnlyPredictionScoreClass}>{awayScore}</span>
                   </div>
-                  {myPredRow.home_score === myPredRow.away_score &&
-                    advanceTeamLabel(myPredRow.advance_team_id) && (
+                  {homeScore === awayScore && advanceTeamLabel(advanceTeamId) && (
                       <p className="text-xs text-gray-500">
                         {t("matchDetail.advanceTeamReadOnly", {
-                          team: advanceTeamLabel(myPredRow.advance_team_id),
+                          team: advanceTeamLabel(advanceTeamId),
                         })}
                       </p>
                     )}
@@ -648,79 +614,12 @@ export default function MatchDetail() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-md p-6 mt-6">
-        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
-          {t("matchDetail.allPredictions")} ({predTotal})
-        </h3>
-        {predictions.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">{t("matchDetail.noPredictions")}</p>
-        ) : (
-          <div className="overflow-x-auto overscroll-x-contain -mx-1">
-            <table className="w-full text-sm min-w-[20rem]">
-              <thead>
-                <tr className="text-left text-gray-500 border-b">
-                  <th className="pb-2 font-medium">{t("matchDetail.user")}</th>
-                  <th className="pb-2 font-medium text-center">{t("matchDetail.prediction")}</th>
-                  <th className="pb-2 font-medium text-center">{t("rankings.points")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {predictions.map((p) => {
-                  const isMe = p.user_id === user?.id;
-                  const myRowReadOnly = isMe && !canEditPrediction;
-                  return (
-                  <tr
-                    key={p.id}
-                    className={`border-b last:border-0 ${
-                      isMe
-                        ? myRowReadOnly
-                          ? "bg-gray-50 text-gray-500"
-                          : "bg-green-50"
-                        : ""
-                    }`}
-                  >
-                    <td className="py-2.5">
-                      {p.username}
-                      {isMe && (
-                        <span
-                          className={`ml-1 text-xs ${
-                            myRowReadOnly ? "text-gray-400" : "text-pitch-600"
-                          }`}
-                        >
-                          {t("matchDetail.you")}
-                        </span>
-                      )}
-                    </td>
-                    <td
-                      className={`py-2.5 text-center font-mono font-semibold ${
-                        myRowReadOnly ? "text-gray-400" : ""
-                      }`}
-                    >
-                      {p.home_score} - {p.away_score}
-                    </td>
-                    <td className="py-2.5 text-center font-semibold">
-                      {p.points !== null ? (
-                        <span className={p.points > 0 ? "text-green-600" : "text-gray-400"}>
-                          {p.points}
-                        </span>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                  </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-        <Pagination
-          page={predPage}
-          totalPages={predTotalPages}
-          total={predTotal}
-          onPageChange={setPredPage}
-        />
-      </div>
+      <MatchPredictionsSummary
+        matchId={match.id}
+        homeTeam={match.home_team}
+        awayTeam={match.away_team}
+        refreshKey={predictionsRefreshKey}
+      />
     </div>
   );
 }

@@ -109,6 +109,7 @@ export interface SubgroupMessage {
   username: string;
   body: string;
   created_at: string;
+  newly_achieved?: string[];
 }
 
 export interface Team {
@@ -178,6 +179,23 @@ export interface Prediction {
   points: number | null;
   created_at: string;
   updated_at: string;
+  newly_achieved?: string[];
+}
+
+export interface MatchPredictionSummary {
+  total: number;
+  home_win_count: number;
+  away_win_count: number;
+  draw_count: number;
+}
+
+export interface MatchPredictionListItem {
+  user_id: number;
+  username: string;
+  home_score: number;
+  away_score: number;
+  advance_team_id?: number | null;
+  points?: number | null;
 }
 
 export interface MyPrediction {

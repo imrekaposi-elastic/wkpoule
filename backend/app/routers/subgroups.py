@@ -28,6 +28,7 @@ from app.schemas.subgroup import (
     SubgroupMineOut,
 )
 from app.services.invite_email import send_subgroup_invite_email
+from app.services.prediction_milestones import record_subgroup_message_milestone
 from app.services.subgroup_join_requests import (
     approve_join_request,
     membership_status_for_user,
@@ -767,12 +768,16 @@ def post_message(
         db.add(poster)
     db.commit()
     db.refresh(msg)
+    newly_achieved = record_subgroup_message_milestone(
+        db, user.id, username=user.username
+    )
     return SubgroupMessageOut(
         id=msg.id,
         user_id=msg.user_id,
         username=user.username,
         body=msg.body,
         created_at=msg.created_at,
+        newly_achieved=newly_achieved,
     )
 
 

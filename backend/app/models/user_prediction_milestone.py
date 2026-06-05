@@ -7,7 +7,7 @@ from app.database import Base
 
 
 class UserPredictionMilestone(Base):
-    """First time a user tipped every match in a tournament phase (see milestone_key)."""
+    """First time a user reaches a conversion milestone (see milestone_key)."""
 
     __tablename__ = "user_prediction_milestones"
     __table_args__ = (

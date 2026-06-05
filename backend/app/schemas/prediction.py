@@ -20,6 +20,7 @@ class PredictionOut(BaseModel):
     points: int | None = None
     created_at: datetime
     updated_at: datetime
+    newly_achieved: list[str] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
 
@@ -46,3 +47,19 @@ class MyPredictionOut(BaseModel):
     match_status: str
 
     model_config = {"from_attributes": True}
+
+
+class MatchPredictionSummaryOut(BaseModel):
+    total: int
+    home_win_count: int
+    away_win_count: int
+    draw_count: int
+
+
+class MatchPredictionListItem(BaseModel):
+    user_id: int
+    username: str
+    home_score: int
+    away_score: int
+    advance_team_id: int | None = None
+    points: int | None = None
