@@ -11,6 +11,7 @@ from app.database import Base, engine
 from app.db_schema import ensure_admin_access, ensure_schema
 from app.logging_config import configure_logging
 from app.routers import admin, auth, matches, predictions, rankings, subgroups, teams, venues
+from app.services.prediction_milestones import backfill_milestones_for_existing_users
 from app.services.score_poller import start_polling, stop_polling
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
@@ -39,6 +40,7 @@ def _cors_allow_origins() -> list[str]:
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     ensure_schema()
+    backfill_milestones_for_existing_users()
     ensure_admin_access()
     start_polling()
     yield

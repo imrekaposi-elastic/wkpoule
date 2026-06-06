@@ -249,6 +249,25 @@ def ensure_schema() -> None:
                 )
             )
             conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS user_prediction_milestones (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                        milestone_key VARCHAR(64) NOT NULL,
+                        achieved_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                        CONSTRAINT uq_user_prediction_milestone UNIQUE (user_id, milestone_key)
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    "CREATE INDEX IF NOT EXISTS ix_user_prediction_milestones_user_id "
+                    "ON user_prediction_milestones (user_id)"
+                )
+            )
+            conn.execute(
                 text("ALTER TABLE venues ADD COLUMN IF NOT EXISTS review_he TEXT")
             )
             conn.execute(
@@ -398,6 +417,26 @@ def ensure_schema() -> None:
                             CONSTRAINT uq_subgroup_join_request_user UNIQUE (subgroup_id, user_id)
                         )
                         """
+                    )
+                )
+            if "user_prediction_milestones" not in tables:
+                conn.execute(
+                    text(
+                        """
+                        CREATE TABLE user_prediction_milestones (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                            milestone_key VARCHAR(64) NOT NULL,
+                            achieved_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            CONSTRAINT uq_user_prediction_milestone UNIQUE (user_id, milestone_key)
+                        )
+                        """
+                    )
+                )
+                conn.execute(
+                    text(
+                        "CREATE INDEX IF NOT EXISTS ix_user_prediction_milestones_user_id "
+                        "ON user_prediction_milestones (user_id)"
                     )
                 )
             vcols = {c["name"] for c in insp.get_columns("venues")}

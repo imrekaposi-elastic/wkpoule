@@ -103,7 +103,14 @@ def upsert_prediction(
         db.add(pred)
     db.commit()
     db.refresh(pred)
-    newly_achieved = record_new_milestones(db, user.id, username=user.username)
+    try:
+        newly_achieved = record_new_milestones(db, user.id, username=user.username)
+    except Exception:
+        logger.exception(
+            "Failed to record prediction milestones for user %s",
+            user.id,
+        )
+        newly_achieved = []
     logger.info(
         "%s %s prediction for match %s",
         user.username,

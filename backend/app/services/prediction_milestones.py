@@ -6,13 +6,15 @@ import logging
 from collections.abc import Callable
 from datetime import datetime, timezone
 
-from sqlalchemy import func
+from sqlalchemy import distinct, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.database import SessionLocal
 from app.models.match import Match
 from app.models.prediction import Prediction
 from app.models.subgroup import SubgroupMessage
+from app.models.user import User
 from app.models.user_prediction_milestone import UserPredictionMilestone
 
 logger = logging.getLogger(__name__)
@@ -92,6 +94,7 @@ def log_milestone_achieved(
     milestone_key: str,
     *,
     username: str | None = None,
+    **context: object,
 ) -> None:
     extra: dict[str, object] = {
         "event.action": "milestone_achieved",
@@ -103,6 +106,7 @@ def log_milestone_achieved(
     }
     if username:
         extra["user.name"] = username
+    extra.update(context)
     logger.info("milestone achieved: %s", milestone_key, extra=extra)
 
 
@@ -134,6 +138,17 @@ def _record_milestone_keys(
             db.commit()
         except IntegrityError:
             db.rollback()
+            logger.warning(
+                "milestone insert race for user %s (keys=%s)",
+                user_id,
+                newly,
+                extra={
+                    "event.action": "milestone_achieved",
+                    "event.outcome": "failure",
+                    "user.id": user_id,
+                    "milestone.keys": newly,
+                },
+            )
             return []
         for key in newly:
             log_milestone_achieved(user_id, key, username=username)
@@ -163,25 +178,52 @@ def record_subgroup_message_milestone(
     user_id: int,
     *,
     username: str | None = None,
+    subgroup_id: int | None = None,
+    message_id: int | None = None,
 ) -> list[str]:
-    """Record the first time a user posts in any subgroup chat."""
-    return _record_milestone_keys(
-        db,
-        user_id,
-        [
-            (
-                SUBGROUP_MESSAGE_MILESTONE_KEY,
-                lambda db, uid: int(
-                    db.query(func.count(SubgroupMessage.id))
-                    .filter(SubgroupMessage.user_id == uid)
-                    .scalar()
-                    or 0
-                )
-                >= 1,
-            ),
-        ],
-        username=username,
+    """
+    Record every subgroup chat post as a conversion milestone (log + RUM).
+    The first post is also stored in user_prediction_milestones for /milestones.
+    """
+    has_message = (
+        int(
+            db.query(func.count(SubgroupMessage.id))
+            .filter(SubgroupMessage.user_id == user_id)
+            .scalar()
+            or 0
+        )
+        >= 1
     )
+    if not has_message:
+        return []
+
+    log_context: dict[str, object] = {}
+    if subgroup_id is not None:
+        log_context["subgroup.id"] = subgroup_id
+    if message_id is not None:
+        log_context["subgroup.message.id"] = message_id
+
+    if SUBGROUP_MESSAGE_MILESTONE_KEY not in _existing_milestone_keys(db, user_id):
+        now = datetime.now(timezone.utc)
+        db.add(
+            UserPredictionMilestone(
+                user_id=user_id,
+                milestone_key=SUBGROUP_MESSAGE_MILESTONE_KEY,
+                achieved_at=now,
+            )
+        )
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+
+    log_milestone_achieved(
+        user_id,
+        SUBGROUP_MESSAGE_MILESTONE_KEY,
+        username=username,
+        **log_context,
+    )
+    return [SUBGROUP_MESSAGE_MILESTONE_KEY]
 
 
 def list_milestones_for_user(db: Session, user_id: int) -> list[UserPredictionMilestone]:
@@ -191,3 +233,31 @@ def list_milestones_for_user(db: Session, user_id: int) -> list[UserPredictionMi
         .order_by(UserPredictionMilestone.achieved_at)
         .all()
     )
+
+
+def backfill_milestones_for_existing_users() -> None:
+    """
+    Idempotent startup backfill for users who already qualified before milestone tracking shipped.
+    Does not emit RUM events (browser-only); writes DB rows and structured logs for new rows.
+    """
+    db = SessionLocal()
+    try:
+        pred_user_ids = {
+            row[0] for row in db.query(distinct(Prediction.user_id)).all() if row[0] is not None
+        }
+        msg_user_ids = {
+            row[0]
+            for row in db.query(distinct(SubgroupMessage.user_id)).all()
+            if row[0] is not None
+        }
+        for user_id in pred_user_ids | msg_user_ids:
+            user = db.get(User, user_id)
+            username = user.username if user is not None else None
+            if user_id in pred_user_ids:
+                record_new_milestones(db, user_id, username=username)
+            if user_id in msg_user_ids:
+                record_subgroup_message_milestone(db, user_id, username=username)
+    except Exception:
+        logger.exception("Milestone backfill failed")
+    finally:
+        db.close()

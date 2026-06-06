@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -38,6 +39,7 @@ from app.services.subgroup_join_requests import (
 from app.services.subgroup_rankings import compute_participant_rankings
 
 router = APIRouter()
+logger = logging.getLogger("wkpoule.subgroups")
 
 SUBGROUP_CHAT_MAX_MESSAGES = 256
 
@@ -768,9 +770,20 @@ def post_message(
         db.add(poster)
     db.commit()
     db.refresh(msg)
-    newly_achieved = record_subgroup_message_milestone(
-        db, user.id, username=user.username
-    )
+    try:
+        newly_achieved = record_subgroup_message_milestone(
+            db,
+            user.id,
+            username=user.username,
+            subgroup_id=subgroup_id,
+            message_id=msg.id,
+        )
+    except Exception:
+        logger.exception(
+            "Failed to record subgroup message milestone for user %s",
+            user.id,
+        )
+        newly_achieved = []
     return SubgroupMessageOut(
         id=msg.id,
         user_id=msg.user_id,

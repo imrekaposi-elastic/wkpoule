@@ -10,6 +10,7 @@ from app.models.user import User
 from app.models.venue import Venue
 from app.services.prediction_milestones import (
     SUBGROUP_MESSAGE_MILESTONE_KEY,
+    backfill_milestones_for_existing_users,
     list_milestones_for_user,
     record_new_milestones,
     record_subgroup_message_milestone,
@@ -180,4 +181,34 @@ def test_record_subgroup_message_milestone(db):
     newly = record_subgroup_message_milestone(db, user.id)
 
     assert newly == [SUBGROUP_MESSAGE_MILESTONE_KEY]
-    assert record_subgroup_message_milestone(db, user.id) == []
+    assert record_subgroup_message_milestone(db, user.id) == [SUBGROUP_MESSAGE_MILESTONE_KEY]
+
+
+def test_backfill_milestones_for_existing_users(db):
+    user = User(
+        username="legacy",
+        email="legacy@example.com",
+        password_hash="x",
+        preferred_language="en",
+    )
+    db.add(user)
+    db.commit()
+    _seed_group_matches(db, user)
+    sg = Subgroup(name="Legacy", created_by_user_id=user.id)
+    db.add(sg)
+    db.flush()
+    db.add(SubgroupMember(subgroup_id=sg.id, user_id=user.id, role="admin"))
+    db.add(
+        SubgroupMessage(
+            subgroup_id=sg.id,
+            user_id=user.id,
+            body="old chat",
+        )
+    )
+    db.commit()
+
+    backfill_milestones_for_existing_users()
+
+    stored = {m.milestone_key for m in list_milestones_for_user(db, user.id)}
+    assert "first_prediction" in stored
+    assert SUBGROUP_MESSAGE_MILESTONE_KEY in stored
