@@ -19,3 +19,5 @@ opentelemetry-instrumentation-fastapi>=0.61b0
 opentelemetry-instrumentation-sqlalchemy>=0.61b0
 # OTLP log export for stdlib logging (pairs with OTEL_LOGS_EXPORTER=otlp).
 opentelemetry-instrumentation-logging>=0.61b0
+# Outbound client spans for weather + football-data.org HTTP calls.
+opentelemetry-instrumentation-httpx>=0.61b0

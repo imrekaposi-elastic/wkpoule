@@ -12,10 +12,13 @@ from app.db_schema import ensure_admin_access, ensure_schema
 from app.logging_config import configure_logging
 from app.routers import admin, auth, matches, predictions, rankings, subgroups, teams, venues
 from app.services.score_poller import start_polling, stop_polling
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 
 # DB client spans → Elastic service map edge from wkpoule-api to postgresql (requires opentelemetry-instrument).
 SQLAlchemyInstrumentor().instrument(engine=engine)
+# Outbound httpx spans → weatherapi + football-data.org dependencies on wkpoule-api.
+HTTPXClientInstrumentor().instrument()
 
 configure_logging()
 logger = logging.getLogger("wkpoule.api")

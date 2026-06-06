@@ -23,6 +23,8 @@ data:
   ELASTICSEARCH_URL: https://o11y.es.ece.kaposi.net:9243
   KIBANA_URL: https://o11y.kb.ece.kaposi.net:9243
 
-  # Frontend nginx RUM proxy. Browser uses same-origin /rum/…; nginx forwards to this APM Server (Elastic Cloud policy URL).
+  # Frontend RUM uses classic APM intake (deployment above), NOT the o11y OTLP stack.
+  # Browser → /rum/ → RUM_APM_UPSTREAM. View RUM in Kibana tied to that APM deployment.
+  # Frontend nginx access logs + wkpoule-api OTLP traces/logs land in o11y (ELASTICSEARCH_URL).
   RUM_APM_UPSTREAM: https://0a07eb70c1a6425b92f4246e00d43cfe.ece.kaposi.net:9243
   RUM_APM_HOST: 0a07eb70c1a6425b92f4246e00d43cfe.ece.kaposi.net

@@ -42,11 +42,44 @@ async def sync_scores() -> int:
             resp = await client.get(url, headers=headers, params=params)
             resp.raise_for_status()
             data = resp.json()
+        logger.info(
+            "football-data.org API call",
+            extra={
+                "event.action": "external_api_request",
+                "event.outcome": "success",
+                "integration.name": "football-data",
+                "url.domain": "api.football-data.org",
+                "http.request.method": "GET",
+                "http.response.status_code": resp.status_code,
+                "football.matches_returned": len(data.get("matches", [])),
+            },
+        )
     except httpx.HTTPStatusError as e:
-        logger.error("football-data.org returned %s: %s", e.response.status_code, e.response.text[:200])
+        logger.error(
+            "football-data.org returned %s: %s",
+            e.response.status_code,
+            e.response.text[:200],
+            extra={
+                "event.action": "external_api_request",
+                "event.outcome": "failure",
+                "integration.name": "football-data",
+                "url.domain": "api.football-data.org",
+                "http.request.method": "GET",
+                "http.response.status_code": e.response.status_code,
+            },
+        )
         return 0
     except Exception as e:
-        logger.error("Failed to fetch scores: %s", e)
+        logger.error(
+            "Failed to fetch scores: %s",
+            e,
+            extra={
+                "event.action": "external_api_request",
+                "event.outcome": "failure",
+                "integration.name": "football-data",
+                "url.domain": "api.football-data.org",
+            },
+        )
         return 0
 
     api_matches = data.get("matches", [])
