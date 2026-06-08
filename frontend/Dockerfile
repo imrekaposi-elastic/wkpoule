@@ -17,10 +17,10 @@ COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 COPY runtime-config.js.template /etc/wkpoule/runtime-config.js.template
 COPY docker-entrypoint.d/40-runtime-config.sh /docker-entrypoint.d/40-runtime-config.sh
-# OpenShift arbitrary UID + root group: allow writing conf.d/cache/run when not using emptyDir (e.g. plain docker).
+# OpenShift arbitrary UID + root group: allow entrypoint to write runtime-config.js and nginx paths.
 RUN chmod +x /docker-entrypoint.d/40-runtime-config.sh \
-    && chgrp -R 0 /var/cache/nginx /var/run /etc/nginx/conf.d \
-    && chmod -R g=u /var/cache/nginx /var/run /etc/nginx/conf.d
+    && chgrp -R 0 /var/cache/nginx /var/run /etc/nginx/conf.d /usr/share/nginx/html \
+    && chmod -R g=u /var/cache/nginx /var/run /etc/nginx/conf.d /usr/share/nginx/html
 ENV API_HOST=api
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
