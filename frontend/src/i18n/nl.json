@@ -12,6 +12,7 @@
     "adminSubmenuScores": "Uitslagen",
     "adminSubmenuSettings": "Instellingen",
     "adminSubmenuSubgroups": "Subgroepen",
+    "profile": "Profiel",
     "logout": "Uitloggen",
     "help": "Help",
     "about": "Info",
@@ -183,6 +184,17 @@
     "signIn": "Inloggen",
     "passwordsMismatch": "Wachtwoorden komen niet overeen",
     "failed": "Registratie mislukt"
+  },
+  "profile": {
+    "title": "Je profiel",
+    "subtitle": "Pas je gebruikersnaam en e-mailadres aan.",
+    "username": "Gebruikersnaam",
+    "email": "E-mailadres",
+    "save": "Wijzigingen opslaan",
+    "saving": "Opslaan…",
+    "saved": "Profiel bijgewerkt.",
+    "noChanges": "Geen wijzigingen om op te slaan.",
+    "saveFailed": "Profiel kon niet worden bijgewerkt."
   },
   "dashboard": {
     "welcome": "Welkom terug, {{name}}!",

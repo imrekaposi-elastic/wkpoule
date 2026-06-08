@@ -1,0 +1,289 @@
+# Node + pod container metrics via kubelet (cAdvisor-style). Runs as a DaemonSet on every worker;
+# forwards OTLP metrics to the in-namespace gateway (wkpoule-otel); gateway exports to Elasticsearch (elasticsearch/otel).
+# Also tails wkpoule-prd container stdout (ECS JSON from nginx; API logs stay on OTLP to avoid duplicates).
+#
+# Prereq: OpenTelemetry Operator already installed (same as wkpoule-otel).
+# Apply: oc apply -k openshift/
+#
+# Notes:
+# - This is not a Prometheus Server; metrics land in Elastic as OTel metrics (e.g. metrics-generic.otel-*).
+#   For native PromQL + long-term Prometheus storage, add OpenShift monitoring / user workload monitoring
+#   or a Prometheus stack and optionally remote_write to Elastic.
+# - True "hypervisor" host metrics (disk by mount, full network counters) need hostPath + often a privileged
+#   SCC; kubeletstats already exposes node allocatable usage and all pod/container CPU & memory on the node.
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: wkpoule-otel-infra
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: wkpoule-otel-infra
+rules:
+  # Kubelet direct + API server reads used by kubeletstats (esp. with k8s_api_config).
+  # Missing rules often show up as 403 in collector logs or as "only namespaces / disk" style gaps in Elastic.
+  - apiGroups: [""]
+    resources:
+      - namespaces
+      - namespaces/status
+      - nodes
+      - nodes/spec
+      - nodes/stats
+      - nodes/proxy
+      - nodes/metrics
+      - nodes/pods
+      - pods
+      - pods/status
+      - persistentvolumeclaims
+      - persistentvolumes
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: wkpoule-otel-infra
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: wkpoule-otel-infra
+subjects:
+  - kind: ServiceAccount
+    name: wkpoule-otel-infra
+    namespace: wkpoule-prd
+---
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: wkpoule-otel-infra
+spec:
+  mode: daemonset
+  image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.4.2
+  serviceAccount: wkpoule-otel-infra
+  # Read pod log files from the node (CRI writes under /var/log/pods). OpenShift may require hostaccess SCC.
+  volumeMounts:
+    - name: varlogpods
+      mountPath: /var/log/pods
+      readOnly: true
+  volumes:
+    - name: varlogpods
+      hostPath:
+        path: /var/log/pods
+  # Schedule on every node (incl. infra masters if tainted).
+  tolerations:
+    - operator: Exists
+  env:
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    # Some clusters resolve kubelet TLS/SNI more reliably via node IP than short DNS name.
+    - name: K8S_NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  config:
+    receivers:
+      kubeletstats:
+        collection_interval: 30s
+        auth_type: serviceAccount
+        endpoint: https://${env:K8S_NODE_IP}:10250
+        insecure_skip_verify: true
+        k8s_api_config:
+          auth_type: serviceAccount
+        # Required when pod cpu/memory *node* utilization metrics are enabled (otherwise collector fails validation).
+        node: ${env:K8S_NODE_NAME}
+        metric_groups:
+          - node
+          - pod
+          - container
+          - volume
+        # Fields used by Kibana “Top CPU/Memory per node vs limit” style panels (Elastic EDOT kubelet docs).
+        metrics:
+          k8s.pod.memory.node.utilization:
+            enabled: true
+          k8s.pod.cpu.node.utilization:
+            enabled: true
+          k8s.container.cpu_limit_utilization:
+            enabled: true
+          k8s.pod.cpu_limit_utilization:
+            enabled: true
+          k8s.container.cpu_request_utilization:
+            enabled: true
+          k8s.container.memory_limit_utilization:
+            enabled: true
+          k8s.pod.memory_limit_utilization:
+            enabled: true
+          k8s.container.memory_request_utilization:
+            enabled: true
+          k8s.node.uptime:
+            enabled: true
+          k8s.node.cpu.usage:
+            enabled: true
+          k8s.pod.cpu.usage:
+            enabled: true
+        extra_metadata_labels:
+          - container.id
+      # cAdvisor counters exposed by kubelet cover data kubeletstats does not provide:
+      # network packets and container filesystem read/write operations/bytes.
+      prometheus/cadvisor:
+        config:
+          scrape_configs:
+            - job_name: kubelet-cadvisor
+              scrape_interval: 30s
+              scheme: https
+              metrics_path: /metrics/cadvisor
+              bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+              tls_config:
+                insecure_skip_verify: true
+              static_configs:
+                - targets: ["${env:K8S_NODE_IP}:10250"]
+      # wkpoule-prd stdout (frontend nginx ECS JSON). API logs use OTLP — exclude wkpoule-api to avoid duplicates.
+      filelog:
+        include:
+          - /var/log/pods/wkpoule-prd_*/*/*.log
+        exclude:
+          - /var/log/pods/wkpoule-prd_*wkpoule-api*/*/*.log
+          - /var/log/pods/wkpoule-prd_*wkpoule-otel*/*/*.log
+        start_at: end
+        include_file_path: true
+        include_file_name: false
+        operators:
+          - type: container
+            id: container-parser
+          - type: router
+            id: ecs-json-router
+            routes:
+              - expr: body matches "^\\{"
+                output: ecs-json-parser
+          - type: json_parser
+            id: ecs-json-parser
+            parse_from: body
+            parse_to: attributes
+            on_error: send_quiet
+
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 15
+      filter/cadvisor:
+        metrics:
+          include:
+            match_type: regexp
+            metric_names:
+              - ^container_cpu_usage_seconds_total$
+              - ^container_memory_(usage|working_set)_bytes$
+              - ^container_fs_(reads|writes|reads_bytes|writes_bytes)_total$
+              - ^container_network_(receive|transmit)_(packets|bytes)_total$
+      # Elastic / Inventory filters often key on deployment.environment; kubeletstats does not set it by default.
+      resource/infra:
+        attributes:
+          - action: upsert
+            key: deployment.environment
+            value: prd
+          - action: upsert
+            key: service.namespace
+            value: wkpoule-prd
+      resource/cadvisor:
+        attributes:
+          - action: upsert
+            key: deployment.environment
+            value: prd
+          - action: upsert
+            key: service.namespace
+            value: wkpoule-prd
+          - action: upsert
+            key: data_stream.dataset
+            value: cadvisor
+      transform/cadvisor_k8s_attributes:
+        error_mode: ignore
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(resource.attributes["k8s.namespace.name"], datapoint.attributes["namespace"]) where datapoint.attributes["namespace"] != nil
+              - set(resource.attributes["k8s.pod.name"], datapoint.attributes["pod"]) where datapoint.attributes["pod"] != nil
+              - set(resource.attributes["k8s.container.name"], datapoint.attributes["container"]) where datapoint.attributes["container"] != nil
+      # Adds host.* / node identity so node-level kubelet metrics correlate in Observability views.
+      resourcedetection/k8snode:
+        detectors: [k8snode]
+        k8snode:
+          auth_type: serviceAccount
+          node_from_env_var: K8S_NODE_NAME
+        timeout: 5s
+        override: false
+      batch: {}
+      k8sattributes:
+        auth_type: serviceAccount
+        passthrough: false
+        filter:
+          node_from_env_var: K8S_NODE_NAME
+        extract:
+          metadata:
+            - k8s.namespace.name
+            - k8s.deployment.name
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.container.name
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.uid
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+      # Promote ECS fields from parsed JSON and align service.name with app traces.
+      transform/filelog_ecs:
+        error_mode: silent
+        log_statements:
+          - set(resource.attributes["service.name"], attributes["service.name"]) where attributes["service.name"] != nil
+          - set(resource.attributes["deployment.environment"], attributes["deployment.environment"]) where attributes["deployment.environment"] != nil
+          - set(resource.attributes["service.name"], "wkpoule-frontend") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend" and resource.attributes["service.name"] == nil
+          - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
+
+    exporters:
+      otlp_http:
+        endpoint: http://wkpoule-otel-collector:4318
+        tls:
+          insecure: true
+        compression: gzip
+
+    service:
+      telemetry:
+        logs:
+          level: info
+          processors:
+            - batch:
+                exporter:
+                  otlp:
+                    protocol: http/protobuf
+                    endpoint: http://wkpoule-otel-collector:4318
+        metrics:
+          readers:
+            - periodic:
+                exporter:
+                  otlp:
+                    protocol: http/protobuf
+                    endpoint: http://wkpoule-otel-collector:4318
+      pipelines:
+        metrics:
+          receivers: [kubeletstats]
+          processors: [memory_limiter, resource/infra, resourcedetection/k8snode, batch]
+          exporters: [otlp_http]
+        metrics/cadvisor:
+          receivers: [prometheus/cadvisor]
+          processors: [memory_limiter, filter/cadvisor, resource/cadvisor, transform/cadvisor_k8s_attributes, resourcedetection/k8snode, batch]
+          exporters: [otlp_http]
+        logs:
+          receivers: [filelog]
+          processors: [memory_limiter, k8sattributes, resource/infra, transform/filelog_ecs, resourcedetection/k8snode, batch]
+          exporters: [otlp_http]

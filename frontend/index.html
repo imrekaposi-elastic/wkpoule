@@ -9,6 +9,8 @@
   </head>
   <body class="bg-gray-50 text-gray-900 min-h-screen">
     <div id="root"></div>
+    <!-- Runtime env from container DEPLOYMENT_ENVIRONMENT (see docker-entrypoint.d/40-runtime-config.sh). -->
+    <script src="/runtime-config.js"></script>
     <!-- Production build uses a single JS entry; RUM is initialized via first import in main.tsx. -->
     <script type="module" src="/src/main.tsx"></script>
   </body>

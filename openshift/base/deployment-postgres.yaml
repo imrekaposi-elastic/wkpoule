@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: docker.io/library/postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          args:
+            - postgres
+            # Required by the PostgreSQL OTel receiver (Elastic PostgreSQL OpenTelemetry Assets).
+            - -c
+            - shared_preload_libraries=pg_stat_statements
+          ports:
+            - containerPort: 5432
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          envFrom:
+            - secretRef:
+                name: wkpoule-secrets
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+            # Writable socket dir (library image expects /var/run/postgresql). OpenShift may still print
+            # "chmod: ... Operation not permitted": entrypoint runs `chmod 03775 ... || :` (setgid); SELinux
+            # often denies that bit on emptyDir—the failure is ignored and PostgreSQL continues.
+            - name: postgres-run
+              mountPath: /var/run/postgresql
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - wkpoule
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: wkpoule-postgres-pvc
+        - name: postgres-run
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432

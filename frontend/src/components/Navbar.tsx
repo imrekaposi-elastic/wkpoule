@@ -279,9 +279,13 @@ export default function Navbar() {
                   )}
                   <div className="hidden lg:flex flex-col items-end ml-1 pl-2 border-l border-pitch-700/80 min-w-0">
                     <div className="flex items-center gap-1.5 max-w-[9rem]">
-                      <span className="text-sm text-green-100 truncate font-medium">
+                      <Link
+                        to="/profile"
+                        className="text-sm text-green-100 truncate font-medium hover:text-white transition-colors"
+                        title={t("navbar.profile")}
+                      >
                         {user.username}
-                      </span>
+                      </Link>
                       {user.is_admin && (
                         <span className="text-[10px] bg-yellow-500 text-black px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0 font-semibold">
                           {t("navbar.admin")}
@@ -401,7 +405,13 @@ export default function Navbar() {
                   </button>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2 text-sm text-green-200">
-                      <span className="font-medium">{user.username}</span>
+                      <Link
+                        to="/profile"
+                        onClick={() => setMobileOpen(false)}
+                        className="font-medium hover:text-white"
+                      >
+                        {user.username}
+                      </Link>
                       {user.is_admin && (
                         <span className="text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded-full">
                           {t("navbar.admin")}

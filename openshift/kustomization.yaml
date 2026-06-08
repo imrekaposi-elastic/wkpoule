@@ -16,24 +16,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: wkpoule-prd
+
 resources:
-  - secret.yaml
-  - secret-postgres-otel.yaml
-  - observability-config.yaml
-  - observability-secret.yaml
-  - rbac-otel-gateway.yaml
-  - rbac-otel-cluster.yaml
-  - otel-collector.yaml
-  # DaemonSet: kubeletstats (node/pod/container metrics) → gateway wkpoule-otel → Elasticsearch (elasticsearch/otel)
-  - otel-k8s-infra.yaml
-  # Deployment: k8s_cluster (OpenShift) → gateway OTLP (Elastic recommended cluster collector)
-  - otel-k8s-cluster.yaml
-  - pvc-postgres.yaml
-  - pvc-postgres-backup.yaml
-  - imagestreams.yaml
-  - deployment-postgres.yaml
-  - cronjob-postgres-backup.yaml
-  - job-postgres-otel-user.yaml
-  - deployment-api.yaml
-  - deployment-frontend.yaml
-  - route.yaml
+  - base

@@ -12,6 +12,7 @@
     "adminSubmenuScores": "Scores",
     "adminSubmenuSettings": "Settings",
     "adminSubmenuSubgroups": "Subgroups",
+    "profile": "Profile",
     "logout": "Logout",
     "help": "Help",
     "about": "About",
@@ -183,6 +184,17 @@
     "signIn": "Sign in",
     "passwordsMismatch": "Passwords do not match",
     "failed": "Registration failed"
+  },
+  "profile": {
+    "title": "Your profile",
+    "subtitle": "Update your username and email address.",
+    "username": "Username",
+    "email": "Email",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Profile updated.",
+    "noChanges": "No changes to save.",
+    "saveFailed": "Could not update profile."
   },
   "dashboard": {
     "welcome": "Welcome back, {{name}}!",

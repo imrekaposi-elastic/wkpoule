@@ -12,6 +12,7 @@
     "adminSubmenuScores": "Placares",
     "adminSubmenuSettings": "Configurações",
     "adminSubmenuSubgroups": "Subgrupos",
+    "profile": "Perfil",
     "logout": "Sair",
     "help": "Ajuda",
     "about": "Sobre",
@@ -182,6 +183,17 @@
     "signIn": "Entrar",
     "passwordsMismatch": "As senhas não coincidem",
     "failed": "Falha no cadastro"
+  },
+  "profile": {
+    "title": "Seu perfil",
+    "subtitle": "Atualize seu nome de usuário e endereço de e-mail.",
+    "username": "Nome de usuário",
+    "email": "E-mail",
+    "save": "Salvar alterações",
+    "saving": "Salvando…",
+    "saved": "Perfil atualizado.",
+    "noChanges": "Nenhuma alteração para salvar.",
+    "saveFailed": "Não foi possível atualizar o perfil."
   },
   "dashboard": {
     "welcome": "Bem-vindo de volta, {{name}}!",

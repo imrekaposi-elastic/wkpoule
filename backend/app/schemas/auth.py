@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 from app.username import normalize_username
 
@@ -70,3 +70,33 @@ class UserResponse(BaseModel):
 
 class UserLanguageIn(BaseModel):
     language: SupportedLanguage
+
+
+class UserProfileUpdateIn(BaseModel):
+    username: str | None = Field(default=None, min_length=3, max_length=50)
+    email: EmailStr | None = None
+
+    @field_validator("username", mode="before")
+    @classmethod
+    def normalize_username(cls, value: object) -> object:
+        if value is None:
+            return None
+        return _normalize_username_field(value)
+
+    @model_validator(mode="after")
+    def require_at_least_one_field(self) -> "UserProfileUpdateIn":
+        if self.username is None and self.email is None:
+            raise ValueError("At least one field must be provided")
+        return self
+
+
+class UserProfileUpdateOut(BaseModel):
+    id: int
+    username: str
+    email: str
+    is_admin: bool
+    preferred_language: str
+    access_token: str | None = None
+    refresh_token: str | None = None
+
+    model_config = {"from_attributes": True}

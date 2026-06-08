@@ -145,6 +145,69 @@ def test_login_rejects_invalid_credentials(client, caplog):
     assert record.__dict__["user.name"] == "lockedout"
 
 
+def _register_and_login(client, username: str, email: str, password: str = "secret12"):
+    client.post(
+        "/api/auth/register",
+        json={"username": username, "email": email, "password": password},
+    )
+    return client.post(
+        "/api/auth/login",
+        json={"username": username, "password": password},
+    ).json()
+
+
+def test_update_profile_email(client):
+    tokens = _register_and_login(client, "profileuser", "profile@example.com")
+    headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+
+    response = client.patch(
+        "/api/auth/me",
+        json={"username": "profileuser", "email": "newmail@example.com"},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["email"] == "newmail@example.com"
+    assert body.get("access_token") is None
+
+    me = client.get("/api/auth/me", headers=headers)
+    assert me.json()["email"] == "newmail@example.com"
+
+
+def test_update_profile_username_issues_new_tokens(client):
+    tokens = _register_and_login(client, "oldname", "rename@example.com")
+    headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+
+    response = client.patch(
+        "/api/auth/me",
+        json={"username": "newname", "email": "rename@example.com"},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["username"] == "newname"
+    assert body["access_token"]
+    assert body["refresh_token"]
+
+    new_headers = {"Authorization": f"Bearer {body['access_token']}"}
+    me = client.get("/api/auth/me", headers=new_headers)
+    assert me.json()["username"] == "newname"
+
+
+def test_update_profile_rejects_duplicate_email(client):
+    _register_and_login(client, "firstprofile", "first@example.com")
+    tokens = _register_and_login(client, "secondprofile", "second@example.com")
+    headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+
+    response = client.patch(
+        "/api/auth/me",
+        json={"email": "first@example.com"},
+        headers=headers,
+    )
+    assert response.status_code == 400
+    assert "Email" in response.json()["detail"]
+
+
 def test_refresh_issues_new_tokens(client):
     client.post(
         "/api/auth/register",

@@ -1,0 +1,281 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: wkpoule-otel
+spec:
+  mode: deployment
+  replicas: 1
+  serviceAccount: wkpoule-otel-gateway
+  # EDOT collector image (OpenTelemetry Operator needs otelcol, not Fleet `elastic-agent`).
+  image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.4.2
+  env:
+    # Direct Elasticsearch ingest (same pattern as backend EDOT gateway on otl01: elasticsearch/otel exporter).
+    - name: ELASTICSEARCH_URL
+      valueFrom:
+        configMapKeyRef:
+          name: wkpoule-observability-config
+          key: ELASTICSEARCH_URL
+    - name: ELASTIC_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-observability-secrets
+          key: ELASTIC_API_KEY
+    # PostgreSQL receiver credentials (least-privileged user).
+    - name: POSTGRES_OTEL_HOST
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-postgres-otel
+          key: POSTGRES_OTEL_HOST
+    - name: POSTGRES_OTEL_PORT
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-postgres-otel
+          key: POSTGRES_OTEL_PORT
+    - name: POSTGRES_OTEL_DB
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-postgres-otel
+          key: POSTGRES_OTEL_DB
+    - name: POSTGRES_OTEL_USER
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-postgres-otel
+          key: POSTGRES_OTEL_USER
+    - name: POSTGRES_OTEL_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: wkpoule-postgres-otel
+          key: POSTGRES_OTEL_PASSWORD
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+      # PostgreSQL: Elastic PostgreSQL OpenTelemetry Assets integration (postgresqlreceiver only).
+      postgresql:
+        endpoint: "${env:POSTGRES_OTEL_HOST}:${env:POSTGRES_OTEL_PORT}"
+        transport: tcp
+        username: "${env:POSTGRES_OTEL_USER}"
+        password: "${env:POSTGRES_OTEL_PASSWORD}"
+        databases: ["${env:POSTGRES_OTEL_DB}"]
+        collection_interval: 30s
+        # Postgres image here is not configured for TLS; disable SSL on the client.
+        tls:
+          insecure: true
+        metrics:
+          postgresql.blks_hit:
+            enabled: true
+          postgresql.blks_read:
+            enabled: true
+          postgresql.database.locks:
+            enabled: true
+          postgresql.deadlocks:
+            enabled: true
+          postgresql.sequential_scans:
+            enabled: true
+          postgresql.temp_files:
+            enabled: true
+          postgresql.temp.io:
+            enabled: true
+          postgresql.tup_deleted:
+            enabled: true
+          postgresql.tup_fetched:
+            enabled: true
+          postgresql.tup_inserted:
+            enabled: true
+          postgresql.tup_returned:
+            enabled: true
+          postgresql.tup_updated:
+            enabled: true
+          postgresql.wal.delay:
+            enabled: true
+          postgresql.function.calls:
+            enabled: true
+        # PostgreSQL OTel dashboards use these receiver-emitted event logs:
+        # db.server.query_sample (pg_stat_activity) and db.server.top_query (pg_stat_statements).
+        events:
+          db.server.query_sample:
+            enabled: true
+          db.server.top_query:
+            enabled: true
+        query_sample_collection:
+          max_rows_per_query: 100
+        top_query_collection:
+          max_rows_per_query: 100
+          top_n_query: 200
+          # Query plans are optional; disabling EXPLAIN avoids errors on parameterized receiver queries.
+          max_explain_each_interval: 0
+          query_plan_cache_size: 1000
+          query_plan_cache_ttl: 1h
+
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 15
+      batch: {}
+      k8sattributes:
+        auth_type: serviceAccount
+        passthrough: false
+        # Required with namespace-scoped Role (rbac-otel-gateway): without this, informers list/watch
+        # pods and replicasets cluster-wide and get 403. Must match the project namespace.
+        filter:
+          namespace: wkpoule-prd
+        extract:
+          metadata:
+            - k8s.namespace.name
+            - k8s.deployment.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.cronjob.name
+            - k8s.job.name
+            - k8s.node.name
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.pod.start_time
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.uid
+          - sources:
+              - from: connection
+      resourcedetection/env:
+        detectors: [env]
+        timeout: 2s
+        override: false
+      # Canonical OTel/APM name for the DB (K8s Deployment/Service and DATABASE_URL host stay "postgres").
+      resource/postgres_metrics:
+        attributes:
+          - action: upsert
+            key: service.name
+            value: postgresql
+          - action: upsert
+            key: deployment.environment
+            value: prd
+          - action: upsert
+            key: service.environment
+            value: prd
+          - action: upsert
+            key: service.namespace
+            value: wkpoule-prd
+          - action: upsert
+            key: k8s.namespace.name
+            value: wkpoule-prd
+          - action: upsert
+            key: k8s.deployment.name
+            value: postgres
+          - action: upsert
+            key: service.instance.id
+            value: postgresql@wkpoule-prd/postgres
+          - action: upsert
+            key: db.system
+            value: postgresql
+      # Default env on OTLP metrics (kubeletstats from wkpoule-otel-infra) for consistent Inventory filters.
+      resource/otlp_metrics_env:
+        attributes:
+          - action: upsert
+            key: deployment.environment
+            value: prd
+      # Derives Elastic infra / K8s dashboard–compatible metrics from OTel kubeletstats (Kibana panels query these).
+      # See: https://www.elastic.co/docs/reference/edot-collector/config/configure-metrics-collection
+      elasticinframetrics: {}
+      # Observability inventory keys on service.name; kubeletstats only adds k8s.*. Map Deployments to the
+      # same service.name as OTLP traces / exporters (api: observability-config; frontend: wkpoule-frontend).
+      transform/kubelet_service_correlation:
+        error_mode: silent
+        metric_statements:
+          - set(resource.attributes["service.name"], "wkpoule-api") where resource.attributes["k8s.deployment.name"] == "wkpoule-api"
+          - set(resource.attributes["service.instance.id"], "wkpoule-api@wkpoule-prd/wkpoule-api") where resource.attributes["k8s.deployment.name"] == "wkpoule-api"
+          - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "wkpoule-api"
+          - set(resource.attributes["service.name"], "wkpoule-frontend") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
+          - set(resource.attributes["service.instance.id"], "wkpoule-frontend@wkpoule-prd/wkpoule-frontend") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
+          - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
+          - set(resource.attributes["service.name"], "postgresql") where resource.attributes["k8s.deployment.name"] == "postgres"
+          - set(resource.attributes["service.instance.id"], "postgresql@wkpoule-prd/postgres") where resource.attributes["k8s.deployment.name"] == "postgres"
+          - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "postgres"
+          - set(resource.attributes["db.system"], "postgresql") where resource.attributes["k8s.deployment.name"] == "postgres"
+      # DATABASE_URL host is "postgres"; inventory / Postgres OTel service is "postgresql". Link DB client spans.
+      transform/db_peer_service:
+        error_mode: silent
+        trace_statements:
+          - context: span
+            statements:
+              - set(span.attributes["peer.service"], "postgresql") where span.attributes["db.system"] == "postgresql" and resource.attributes["service.name"] == "wkpoule-api"
+              - set(span.attributes["peer.service"], "postgresql") where span.attributes["db.system"] == "postgresql" and span.attributes["server.address"] == "postgres"
+      # Enrich OTel spans for Elastic Observability / APM UIs (raw OTel ES export is not enough).
+      elasticapm: {}
+      # Cluster collector tags logs with collector.role=k8s-cluster. K8s OTel dashboards require
+      # data_stream.dataset k8seventsreceiver.otel; set the base dataset name and let OTel mapping append ".otel".
+      transform/logs_k8s_events_datastream:
+        error_mode: silent
+        log_statements:
+          - set(resource.attributes["data_stream.dataset"], "k8seventsreceiver") where resource.attributes["collector.role"] == "k8s-cluster"
+          # Match Kibana kubernetes_otel filters (severity_text == "Warning"), not OTel canonical "WARN".
+          - set(log.severity_text, "Warning") where resource.attributes["collector.role"] == "k8s-cluster" and log.severity_text == "WARN"
+          - set(log.severity_text, "Warning") where resource.attributes["collector.role"] == "k8s-cluster" and log.severity_text == "warn"
+          - set(log.severity_text, "Warning") where resource.attributes["collector.role"] == "k8s-cluster" and log.severity_number >= 13 and log.severity_number <= 16 and log.severity_text != "Warning"
+
+    connectors:
+      # Emits derived APM metrics from traces; must be an exporter on the traces pipeline.
+      elasticapm: {}
+
+    exporters:
+      elasticsearch/otel:
+        endpoints:
+          - ${env:ELASTICSEARCH_URL}
+        api_key: ${env:ELASTIC_API_KEY}
+        mapping:
+          mode: otel
+        # ECE: deployment URL hostname may not match cert SANs (*.ece.kaposi.net). Fix cert/URL on the
+        # platform when possible; same workaround as otl01 / scripts/edot-backend/patch_gateway_otel_tls.py.
+        tls:
+          insecure_skip_verify: true
+
+    service:
+      telemetry:
+        logs:
+          level: info
+          processors:
+            - batch:
+                exporter:
+                  otlp:
+                    protocol: http/protobuf
+                    endpoint: http://127.0.0.1:4318
+        metrics:
+          readers:
+            - periodic:
+                exporter:
+                  otlp:
+                    protocol: http/protobuf
+                    endpoint: http://127.0.0.1:4318
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, k8sattributes, resourcedetection/env, transform/db_peer_service, batch, elasticapm]
+          exporters: [elasticapm, elasticsearch/otel]
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, k8sattributes, resourcedetection/env, resource/otlp_metrics_env, elasticinframetrics, transform/kubelet_service_correlation, batch]
+          exporters: [elasticsearch/otel]
+        metrics/postgresql:
+          receivers: [postgresql]
+          processors: [memory_limiter, resource/postgres_metrics, batch]
+          exporters: [elasticsearch/otel]
+        logs/postgresql:
+          receivers: [postgresql]
+          processors: [memory_limiter, resource/postgres_metrics, batch]
+          exporters: [elasticsearch/otel]
+        metrics/apm-aggregated:
+          receivers: [elasticapm]
+          processors: []
+          exporters: [elasticsearch/otel]
+        logs:
+          receivers: [otlp]
+          processors: [memory_limiter, k8sattributes, resourcedetection/env, transform/logs_k8s_events_datastream, batch, elasticapm]
+          exporters: [elasticsearch/otel]

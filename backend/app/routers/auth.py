@@ -23,6 +23,8 @@ from app.schemas.auth import (
     SelfServicePasswordResetIn,
     TokenResponse,
     UserLanguageIn,
+    UserProfileUpdateIn,
+    UserProfileUpdateOut,
     UserResponse,
 )
 
@@ -151,6 +153,65 @@ def refresh(body: RefreshRequest, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.patch("/me", response_model=UserProfileUpdateOut)
+def update_profile(
+    body: UserProfileUpdateIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    username_changed = False
+
+    if body.username is not None and body.username != user.username:
+        if get_user_by_username(db, body.username):
+            raise HTTPException(status_code=400, detail="Username already taken")
+        user.username = body.username
+        username_changed = True
+
+    if body.email is not None:
+        email = str(body.email).strip().lower()
+        current_email = (user.email or "").strip().lower()
+        if email != current_email:
+            if (
+                db.query(User)
+                .filter(func.lower(User.email) == email, User.id != user.id)
+                .first()
+            ):
+                raise HTTPException(status_code=400, detail="Email already registered")
+            user.email = email
+
+    db.commit()
+    db.refresh(user)
+
+    result = UserProfileUpdateOut.model_validate(user)
+    if username_changed:
+        result.access_token = create_access_token(user.username)
+        result.refresh_token = create_refresh_token(user.username)
+        logger.info(
+            "%s updated username",
+            user.username,
+            extra={
+                "event.action": "user_profile_update",
+                "event.category": "user",
+                "event.outcome": "success",
+                "user.name": user.username,
+                "user.id": user.id,
+            },
+        )
+    else:
+        logger.info(
+            "%s updated profile",
+            user.username,
+            extra={
+                "event.action": "user_profile_update",
+                "event.category": "user",
+                "event.outcome": "success",
+                "user.name": user.username,
+                "user.id": user.id,
+            },
+        )
+    return result
 
 
 @router.patch("/me/language", response_model=UserResponse)

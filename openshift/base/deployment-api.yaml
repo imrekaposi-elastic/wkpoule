@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wkpoule-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wkpoule-api
+  template:
+    metadata:
+      labels:
+        app: wkpoule-api
+    spec:
+      containers:
+        - name: api
+          image: image-registry.openshift-image-registry.svc:5000/wkpoule-prd/wkpoule-api:latest
+          imagePullPolicy: Always
+          # Force EDOT auto-instrumentation. The image may otherwise start plain `uvicorn`, which
+          # ignores OTEL_* env vars and sends no spans to the in-cluster gateway.
+          command: ["opentelemetry-instrument"]
+          args:
+            - uvicorn
+            - app.main:app
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8000"
+            - --proxy-headers
+            - --forwarded-allow-ips
+            - "*"
+            - --no-access-log
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: wkpoule-secrets
+            - configMapRef:
+                name: wkpoule-observability-config
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wkpoule-api
+spec:
+  selector:
+    app: wkpoule-api
+  ports:
+    - port: 8000
+      targetPort: 8000

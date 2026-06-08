@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
@@ -49,6 +49,7 @@ export default function MatchDetail() {
   const [loading, setLoading] = useState(true);
   const [virtualStandings, setVirtualStandings] = useState<VirtualGroupTable | null>(null);
   const [virtualLoading, setVirtualLoading] = useState(false);
+  const homeScoreInputRef = useRef<HTMLInputElement>(null);
 
   const locale = resolveLocale(i18n.language);
 
@@ -147,6 +148,15 @@ export default function MatchDetail() {
     // Include match.id so moving to another fixture in the *same* group refetches
     // (group_letter alone does not change when auto-advancing within the group).
   }, [match?.group_letter, match?.id]);
+
+  useEffect(() => {
+    if (loading || !match) return;
+    if (match.status !== "upcoming" || !match.prediction_editable) return;
+    const frame = requestAnimationFrame(() => {
+      homeScoreInputRef.current?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [loading, match?.id, match?.status, match?.prediction_editable]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -447,6 +457,7 @@ export default function MatchDetail() {
                     {match.home_team?.fifa_code || t("matchDetail.home")}
                   </label>
                   <input
+                    ref={homeScoreInputRef}
                     type="number"
                     min={0}
                     max={20}

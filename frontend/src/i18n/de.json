@@ -12,6 +12,7 @@
     "adminSubmenuScores": "Ergebnisse",
     "adminSubmenuSettings": "Einstellungen",
     "adminSubmenuSubgroups": "Untergruppen",
+    "profile": "Profil",
     "logout": "Abmelden",
     "help": "Hilfe",
     "about": "Über",
@@ -183,6 +184,17 @@
     "signIn": "Anmelden",
     "passwordsMismatch": "Passwörter stimmen nicht überein",
     "failed": "Registrierung fehlgeschlagen"
+  },
+  "profile": {
+    "title": "Dein Profil",
+    "subtitle": "Benutzername und E-Mail-Adresse aktualisieren.",
+    "username": "Benutzername",
+    "email": "E-Mail",
+    "save": "Änderungen speichern",
+    "saving": "Speichern…",
+    "saved": "Profil aktualisiert.",
+    "noChanges": "Keine Änderungen zum Speichern.",
+    "saveFailed": "Profil konnte nicht aktualisiert werden."
   },
   "dashboard": {
     "welcome": "Willkommen zurück, {{name}}!",

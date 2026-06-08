@@ -12,6 +12,7 @@
     "adminSubmenuScores": "תוצאות",
     "adminSubmenuSettings": "הגדרות",
     "adminSubmenuSubgroups": "תת-קבוצות",
+    "profile": "פרופיל",
     "logout": "יציאה",
     "help": "עזרה",
     "about": "אודות",
@@ -182,6 +183,17 @@
     "signIn": "כניסה",
     "passwordsMismatch": "הסיסמאות אינן תואמות",
     "failed": "ההרשמה נכשלה"
+  },
+  "profile": {
+    "title": "הפרופיל שלך",
+    "subtitle": "עדכן שם משתמש וכתובת דוא״ל.",
+    "username": "שם משתמש",
+    "email": "דוא״ל",
+    "save": "שמירת שינויים",
+    "saving": "שומר…",
+    "saved": "הפרופיל עודכן.",
+    "noChanges": "אין שינויים לשמירה.",
+    "saveFailed": "לא ניתן היה לעדכן את הפרופיל."
   },
   "dashboard": {
     "welcome": "שלום, {{name}}!",

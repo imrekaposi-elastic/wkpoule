@@ -1,0 +1,339 @@
+# Acceptance overlay for wkpoule-acc namespace
+# Apply: oc apply -k openshift/overlays/acc
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: wkpoule-acc
+
+resources:
+  - ../../base
+
+# Namespace override
+labels:
+  - pairs:
+      environment: acc
+    includeSelectors: true
+    includeTemplates: true
+
+# Image overrides - use same images but from acc namespace
+images:
+  - name: image-registry.openshift-image-registry.svc:5000/wkpoule-prd/wkpoule-api
+    newName: image-registry.openshift-image-registry.svc:5000/wkpoule-acc/wkpoule-api
+  - name: image-registry.openshift-image-registry.svc:5000/wkpoule-prd/wkpoule-frontend
+    newName: image-registry.openshift-image-registry.svc:5000/wkpoule-acc/wkpoule-frontend
+
+# Patches for acceptance environment
+patches:
+  # Patch route with acc hostname
+  - patch: |-
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        name: wkpoule
+      spec:
+        host: acc-wc2026.apps.cloud.kaposi.net
+    target:
+      kind: Route
+      name: wkpoule
+
+  # Patch secret with acc-specific values
+  - patch: |-
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: wkpoule-secrets
+      stringData:
+        PUBLIC_APP_URL: https://acc-wc2026.apps.cloud.kaposi.net
+        # Database URL points to postgres in same namespace
+        DATABASE_URL: postgresql://wkpoule:changeme@postgres:5432/wkpoule
+    target:
+      kind: Secret
+      name: wkpoule-secrets
+
+  # Patch postgres OTel secret with acc namespace FQDN
+  - patch: |-
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: wkpoule-postgres-otel
+      stringData:
+        POSTGRES_OTEL_HOST: postgres.wkpoule-acc.svc.cluster.local
+        POSTGRES_OTEL_DSN: "postgresql://otel:Kk7hC3wP9mV2sR6tY8nD4xJ1qL5bZ0aG@postgres.wkpoule-acc.svc.cluster.local:5432/wkpoule?sslmode=disable"
+    target:
+      kind: Secret
+      name: wkpoule-postgres-otel
+
+  # Reduce replicas for acceptance (cost savings)
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: wkpoule-api
+      spec:
+        replicas: 1
+    target:
+      kind: Deployment
+      name: wkpoule-api
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: wkpoule-frontend
+      spec:
+        replicas: 1
+    target:
+      kind: Deployment
+      name: wkpoule-frontend
+
+  # Patch observability config for acc environment
+  - patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: wkpoule-observability-config
+      data:
+        DEPLOYMENT_ENVIRONMENT: acc
+        OTEL_RESOURCE_ATTRIBUTES: deployment.environment=acc,service.version=2.3.0
+    target:
+      kind: ConfigMap
+      name: wkpoule-observability-config
+
+  # Patch RBAC gateway RoleBinding to use acc namespace
+  - patch: |-
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: wkpoule-otel-gateway-k8sattrs
+      subjects:
+        - kind: ServiceAccount
+          name: wkpoule-otel-gateway
+          namespace: wkpoule-acc
+    target:
+      kind: RoleBinding
+      name: wkpoule-otel-gateway-k8sattrs
+
+  # Patch RBAC gateway Role to reference acc namespace
+  - patch: |-
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: wkpoule-otel-gateway-k8sattrs
+      rules:
+        - apiGroups: [""]
+          resources: [pods]
+          verbs: [get, list, watch]
+        - apiGroups: [""]
+          resources: [namespaces]
+          resourceNames: [wkpoule-acc]
+          verbs: [get, watch]
+        - apiGroups: ["apps"]
+          resources: [replicasets, deployments, daemonsets, statefulsets]
+          verbs: [get, list, watch]
+    target:
+      kind: Role
+      name: wkpoule-otel-gateway-k8sattrs
+
+  # Patch RBAC cluster ClusterRoleBinding to use acc namespace
+  - patch: |-
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: wkpoule-otel-cluster-reader
+      subjects:
+        - kind: ServiceAccount
+          name: wkpoule-otel-cluster
+          namespace: wkpoule-acc
+    target:
+      kind: ClusterRoleBinding
+      name: wkpoule-otel-cluster-reader
+
+  # Patch RBAC infra ClusterRoleBinding to use acc namespace
+  - patch: |-
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: wkpoule-otel-infra
+      subjects:
+        - kind: ServiceAccount
+          name: wkpoule-otel-infra
+          namespace: wkpoule-acc
+    target:
+      kind: ClusterRoleBinding
+      name: wkpoule-otel-infra
+
+  # Patch OTel gateway collector config - update resource attributes
+  - patch: |-
+      apiVersion: opentelemetry.io/v1beta1
+      kind: OpenTelemetryCollector
+      metadata:
+        name: wkpoule-otel
+      spec:
+        config:
+          processors:
+            resource/cluster:
+              attributes:
+                - action: upsert
+                  key: deployment.environment
+                  value: acc
+                - action: upsert
+                  key: service.namespace
+                  value: wkpoule-acc
+            resource/k8s_event_logs:
+              attributes:
+                - action: upsert
+                  key: deployment.environment
+                  value: acc
+                - action: upsert
+                  key: service.namespace
+                  value: wkpoule-acc
+    target:
+      kind: OpenTelemetryCollector
+      name: wkpoule-otel
+
+  # Patch OTel cluster collector config - update resource attributes
+  - patch: |-
+      apiVersion: opentelemetry.io/v1beta1
+      kind: OpenTelemetryCollector
+      metadata:
+        name: wkpoule-otel-cluster
+      spec:
+        config:
+          processors:
+            resource/cluster:
+              attributes:
+                - action: upsert
+                  key: deployment.environment
+                  value: acc
+                - action: upsert
+                  key: service.namespace
+                  value: wkpoule-acc
+    target:
+      kind: OpenTelemetryCollector
+      name: wkpoule-otel-cluster
+
+  # Patch OTel infra collector config - update resource attributes and filelog paths
+  - patch: |-
+      apiVersion: opentelemetry.io/v1beta1
+      kind: OpenTelemetryCollector
+      metadata:
+        name: wkpoule-otel-infra
+      spec:
+        config:
+          receivers:
+            filelog:
+              include:
+                - /var/log/pods/wkpoule-acc_*/*/*.log
+              exclude:
+                - /var/log/pods/wkpoule-acc_*wkpoule-api*/*/*.log
+                - /var/log/pods/wkpoule-acc_*wkpoule-otel*/*/*.log
+          processors:
+            resource/cadvisor:
+              attributes:
+                - action: upsert
+                  key: deployment.environment
+                  value: acc
+                - action: upsert
+                  key: service.namespace
+                  value: wkpoule-acc
+            resource/infra:
+              attributes:
+                - action: upsert
+                  key: deployment.environment
+                  value: acc
+                - action: upsert
+                  key: service.namespace
+                  value: wkpoule-acc
+            transform/filelog_ecs:
+              log_statements:
+                - set(resource.attributes["service.name"], attributes["service.name"]) where
+                  attributes["service.name"] != nil
+                - set(resource.attributes["deployment.environment"], attributes["deployment.environment"])
+                  where attributes["deployment.environment"] != nil
+                - set(resource.attributes["service.name"], "wkpoule-frontend") where resource.attributes["k8s.deployment.name"]
+                  == "wkpoule-frontend" and resource.attributes["service.name"] == nil
+                - set(resource.attributes["service.environment"], "acc") where resource.attributes["k8s.deployment.name"]
+                  == "wkpoule-frontend"
+    target:
+      kind: OpenTelemetryCollector
+      name: wkpoule-otel-infra
+
+  # Patch OTel gateway collector config - update all prd references to acc
+  - patch: |-
+      apiVersion: opentelemetry.io/v1beta1
+      kind: OpenTelemetryCollector
+      metadata:
+        name: wkpoule-otel
+      spec:
+        config:
+          processors:
+            k8sattributes:
+              filter:
+                namespace: wkpoule-acc
+            resource/postgres_metrics:
+              attributes:
+                - action: upsert
+                  key: deployment.environment
+                  value: acc
+                - action: upsert
+                  key: service.environment
+                  value: acc
+                - action: upsert
+                  key: service.namespace
+                  value: wkpoule-acc
+                - action: upsert
+                  key: k8s.namespace.name
+                  value: wkpoule-acc
+                - action: upsert
+                  key: service.instance.id
+                  value: postgresql@wkpoule-acc/postgres
+            resource/otlp_metrics_env:
+              attributes:
+                - action: upsert
+                  key: deployment.environment
+                  value: acc
+            transform/kubelet_service_correlation:
+              metric_statements:
+                - set(resource.attributes["service.name"], "wkpoule-api") where resource.attributes["k8s.deployment.name"] == "wkpoule-api"
+                - set(resource.attributes["service.instance.id"], "wkpoule-api@wkpoule-acc/wkpoule-api") where resource.attributes["k8s.deployment.name"] == "wkpoule-api"
+                - set(resource.attributes["service.environment"], "acc") where resource.attributes["k8s.deployment.name"] == "wkpoule-api"
+                - set(resource.attributes["service.name"], "wkpoule-frontend") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
+                - set(resource.attributes["service.instance.id"], "wkpoule-frontend@wkpoule-acc/wkpoule-frontend") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
+                - set(resource.attributes["service.environment"], "acc") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
+                - set(resource.attributes["service.name"], "postgresql") where resource.attributes["k8s.deployment.name"] == "postgres"
+                - set(resource.attributes["service.instance.id"], "postgresql@wkpoule-acc/postgres") where resource.attributes["k8s.deployment.name"] == "postgres"
+                - set(resource.attributes["service.environment"], "acc") where resource.attributes["k8s.deployment.name"] == "postgres"
+                - set(resource.attributes["db.system"], "postgresql") where resource.attributes["k8s.deployment.name"] == "postgres"
+    target:
+      kind: OpenTelemetryCollector
+      name: wkpoule-otel
+
+  # Patch OTel cluster collector config - update all prd references to acc
+  - patch: |-
+      apiVersion: opentelemetry.io/v1beta1
+      kind: OpenTelemetryCollector
+      metadata:
+        name: wkpoule-otel-cluster
+      spec:
+        config:
+          processors:
+            resource/cluster:
+              attributes:
+                - action: upsert
+                  key: deployment.environment
+                  value: acc
+                - action: upsert
+                  key: service.namespace
+                  value: wkpoule-acc
+            resource/k8s_event_logs:
+              attributes:
+                - action: upsert
+                  key: deployment.environment
+                  value: acc
+                - action: upsert
+                  key: service.namespace
+                  value: wkpoule-acc
+    target:
+      kind: OpenTelemetryCollector
+      name: wkpoule-otel-cluster

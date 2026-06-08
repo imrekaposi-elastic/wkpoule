@@ -1,0 +1,47 @@
+# Example: OpenShift BuildConfigs for acceptance environment — images only (push to ImageStreams in wkpoule-acc).
+# Do not use oc new-app here; it would create duplicate workloads.
+# 1. Replace GIT_URI / GIT_REF with your repository (and add source secrets if private).
+# 2. oc apply -f openshift/examples/buildconfigs-git-acc.yaml
+# 3. oc start-build wkpoule-api && oc start-build wkpoule-frontend
+#
+# ImageStream tags must exist (see openshift/imagestreams.yaml) or let BuildConfig output create them.
+
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: wkpoule-api
+spec:
+  source:
+    type: Git
+    git:
+      uri: git@github.com:imrekaposi-elastic/wkpoule.git
+      ref: main
+    contextDir: backend
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: wkpoule-api:latest
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: wkpoule-frontend
+spec:
+  source:
+    type: Git
+    git:
+      uri: git@github.com:imrekaposi-elastic/wkpoule.git
+      ref: main
+    contextDir: frontend
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: wkpoule-frontend:latest

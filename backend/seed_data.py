@@ -627,21 +627,25 @@ def seed():
                 ))
                 comment_count += 1
 
-        # Admin user
-        print("Creating admin user...")
-        admin = User(
-            username="admin",
-            email="admin@wkpoule.com",
-            password_hash=hash_password("admin123"),
-            is_admin=True,
-            include_in_rankings=False,
-        )
-        db.add(admin)
+        # Admin user (API startup may already have created one)
+        admin_created = 0
+        if db.query(User).filter(User.username == "admin").first() is None:
+            print("Creating admin user...")
+            db.add(User(
+                username="admin",
+                email="admin@wkpoule.com",
+                password_hash=hash_password("admin123"),
+                is_admin=True,
+                include_in_rankings=False,
+            ))
+            admin_created = 1
+        else:
+            print("Admin user already exists. Skipping.")
 
         db.commit()
         print(f"Seeded {len(VENUES)} venues, {len(TEAMS)} teams, "
               f"{len(GROUP_MATCHES) + len(KNOCKOUT_MATCHES)} matches, "
-              f"{comment_count} fun comments, 1 admin user.")
+              f"{comment_count} fun comments, {admin_created} admin user(s).")
         print("Done!")
     except Exception as e:
         db.rollback()

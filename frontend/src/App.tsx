@@ -11,6 +11,7 @@ import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import MatchDetail from "./pages/MatchDetail";
 import Matches from "./pages/Matches";
+import Profile from "./pages/Profile";
 import Rankings from "./pages/Rankings";
 import Register from "./pages/Register";
 import SubgroupDetail from "./pages/SubgroupDetail";
@@ -137,6 +138,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <SubgroupDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />

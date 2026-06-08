@@ -1,0 +1,26 @@
+# Base kustomization for wkpoule
+# This is the common configuration shared across environments
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - secret.yaml
+  - secret-postgres-otel.yaml
+  - observability-config.yaml
+  - observability-secret.yaml
+  - rbac-otel-gateway.yaml
+  - rbac-otel-cluster.yaml
+  - otel-collector.yaml
+  - otel-k8s-infra.yaml
+  - otel-k8s-cluster.yaml
+  - pvc-postgres.yaml
+  - pvc-postgres-backup.yaml
+  - imagestreams.yaml
+  - deployment-postgres.yaml
+  - cronjob-postgres-backup.yaml
+  - job-postgres-otel-user.yaml
+  - deployment-api.yaml
+  - deployment-frontend.yaml
+  - route.yaml
