@@ -41,6 +41,9 @@ spec:
     type: Docker
     dockerStrategy:
       dockerfilePath: Dockerfile
+      buildArgs:
+        - name: VITE_APM_ENVIRONMENT
+          value: acc
   output:
     to:
       kind: ImageStreamTag

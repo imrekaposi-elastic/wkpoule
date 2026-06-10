@@ -1,9 +1,23 @@
 /// <reference types="vitest/config" />
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 
+const RUNTIME_CONFIG_TAG = '<script src="/runtime-config.js"></script>';
+
+/** Keep runtime-config.js as the first script in head so RUM reads acc/prd before the bundle runs. */
+function runtimeConfigFirst(): Plugin {
+  return {
+    name: "wkpoule-runtime-config-first",
+    transformIndexHtml(html) {
+      if (!html.includes(RUNTIME_CONFIG_TAG)) return html;
+      const without = html.replace(RUNTIME_CONFIG_TAG, "");
+      return without.replace("<head>", `<head>\n    ${RUNTIME_CONFIG_TAG}`);
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), runtimeConfigFirst()],
   test: {
     environment: "jsdom",
     globals: true,

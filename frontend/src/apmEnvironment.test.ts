@@ -8,7 +8,13 @@ describe("resolveApmEnvironment", () => {
     ).toBe("acc");
   });
 
-  it("falls back to build-time when runtime is empty", () => {
+  it("prefers acc hostname over build-time prd when runtime is empty", () => {
+    expect(
+      resolveApmEnvironment("acc-wc2026.apps.cloud.kaposi.net", undefined, "prd"),
+    ).toBe("acc");
+  });
+
+  it("falls back to build-time when runtime is empty and hostname is not acc", () => {
     expect(resolveApmEnvironment("wc2026.apps.cloud.kaposi.net", "", "staging")).toBe(
       "staging",
     );

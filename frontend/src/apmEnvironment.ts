@@ -2,7 +2,7 @@ export type RuntimeConfig = {
   environment?: string;
 };
 
-/** Resolve Elastic RUM environment: runtime ConfigMap wins over build-time Vite, then hostname. */
+/** Resolve Elastic RUM environment: runtime ConfigMap, then hostname, then build-time Vite. */
 export function resolveApmEnvironment(
   hostname: string,
   runtimeEnvironment?: string,
@@ -11,10 +11,10 @@ export function resolveApmEnvironment(
   const runtime = runtimeEnvironment?.trim();
   if (runtime) return runtime;
 
+  if (hostname.startsWith("acc-")) return "acc";
+
   const build = buildEnvironment?.trim();
   if (build) return build;
-
-  if (hostname.startsWith("acc-")) return "acc";
 
   return "prd";
 }

@@ -6,12 +6,12 @@
     <meta name="theme-color" content="#166534" />
     <title>Worldcup 2026 game</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>" />
+    <!-- Must run before the Vite module bundle (written by docker-entrypoint.d/40-runtime-config.sh). -->
+    <script src="/runtime-config.js"></script>
   </head>
   <body class="bg-gray-50 text-gray-900 min-h-screen">
     <div id="root"></div>
-    <!-- Runtime env from container DEPLOYMENT_ENVIRONMENT (see docker-entrypoint.d/40-runtime-config.sh). -->
-    <script src="/runtime-config.js"></script>
-    <!-- Production build uses a single JS entry; RUM is initialized via first import in main.tsx. -->
+    <!-- RUM is initialized via first import in main.tsx (Vite injects the module script in head). -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
