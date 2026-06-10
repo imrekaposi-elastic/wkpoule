@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 import redis.asyncio as aioredis
 from opentelemetry.instrumentation.redis import RedisInstrumentor
 
+from app.cache.metrics import register_pool_metrics
 from app.config import get_settings
 
 if TYPE_CHECKING:
@@ -45,6 +46,7 @@ async def init_redis() -> None:
     try:
         await client.ping()
         _redis = client
+        register_pool_metrics()
         logger.info("Redis connected", extra={"event.action": "redis_connect", "event.outcome": "success"})
     except Exception as exc:
         await client.aclose()

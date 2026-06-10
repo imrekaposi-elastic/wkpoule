@@ -1,0 +1,55 @@
+{
+  "title": "Wkpoule Redis & Cache Observability",
+  "description": "Companion queries for Redis server metrics (Elastic Redis OTel integration) and application cache metrics exported by wkpoule-api via OTLP.",
+  "setup": {
+    "elastic_integration": "Install the Redis OpenTelemetry Assets integration (v0.2.0+) from Kibana → Integrations → Redis OTel. Enable beta integrations if needed.",
+    "collector": "Apply openshift/base/otel-collector.yaml (redis receiver on metrics/redis pipeline).",
+    "docs": "https://www.elastic.co/docs/reference/integrations/redis_otel"
+  },
+  "dashboards": {
+    "elastic_bundled": [
+      "[Redis OTel] Overview",
+      "[Redis OTel] Memory & Persistence"
+    ],
+    "recommended_panels": [
+      {
+        "title": "Application cache hit rate",
+        "type": "esql",
+        "query": "FROM metrics-* | WHERE service.name == \"wkpoule-api\" AND metric.name IN (\"wkpoule.cache.hit\", \"wkpoule.cache.miss\") | STATS hits = SUM(CASE(metric.name == \"wkpoule.cache.hit\", metric.sum, 0)), misses = SUM(CASE(metric.name == \"wkpoule.cache.miss\", metric.sum, 0)) BY bucket = DATE_TRUNC(1 minute, @timestamp) | EVAL hit_rate = hits / (hits + misses) * 100 | KEEP bucket, hit_rate, hits, misses"
+      },
+      {
+        "title": "Cache operation latency p95 (ms)",
+        "type": "esql",
+        "query": "FROM metrics-* | WHERE service.name == \"wkpoule-api\" AND metric.name == \"wkpoule.cache.operation.duration\" | STATS p95_ms = PERCENTILE(metric.histogram, 95) BY cache.operation = metric.attributes.cache.operation, bucket = DATE_TRUNC(1 minute, @timestamp)"
+      },
+      {
+        "title": "Redis keyspace hit rate (server)",
+        "type": "esql",
+        "query": "FROM metrics-* | WHERE service.name == \"redis\" AND metric.name IN (\"redis.keyspace.hits\", \"redis.keyspace.misses\") | STATS hits = SUM(CASE(metric.name == \"redis.keyspace.hits\", metric.sum, 0)), misses = SUM(CASE(metric.name == \"redis.keyspace.misses\", metric.sum, 0)) BY bucket = DATE_TRUNC(1 minute, @timestamp) | EVAL hit_rate = hits / (hits + misses) * 100"
+      },
+      {
+        "title": "Redis memory used",
+        "type": "esql",
+        "query": "FROM metrics-* | WHERE service.name == \"redis\" AND metric.name == \"redis.memory.used\" | STATS used_bytes = MAX(metric.gauge) BY bucket = DATE_TRUNC(1 minute, @timestamp)"
+      },
+      {
+        "title": "Redis connection pool (API)",
+        "type": "esql",
+        "query": "FROM metrics-* | WHERE service.name == \"wkpoule-api\" AND metric.name == \"wkpoule.redis.pool.connections\" | STATS connections = MAX(metric.gauge) BY pool.metric = metric.attributes.pool.metric, bucket = DATE_TRUNC(1 minute, @timestamp)"
+      },
+      {
+        "title": "Redis command latency p99 (server)",
+        "type": "esql",
+        "query": "FROM metrics-* | WHERE service.name == \"redis\" AND metric.name == \"redis.cmd.latency\" | STATS p99_us = PERCENTILE(metric.histogram, 99) BY bucket = DATE_TRUNC(1 minute, @timestamp)"
+      }
+    ]
+  },
+  "alerts": {
+    "note": "Use bundled [Redis OTel] alert rules from the Elastic integration for server-side issues (evictions, maxmemory, rejected connections).",
+    "application_suggestions": [
+      "Cache hit rate below 50% for 15 minutes on wkpoule-api",
+      "wkpoule.cache.operation.error rate above baseline",
+      "redis pool in_use approaching max_connections"
+    ]
+  }
+}

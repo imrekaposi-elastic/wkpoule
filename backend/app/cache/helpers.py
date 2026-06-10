@@ -7,6 +7,7 @@ import logging
 from collections.abc import Awaitable, Callable
 from typing import Any, TypeVar
 
+from app.cache.metrics import record_cache_hit, record_cache_miss
 from app.cache.service import get_cache_service
 
 logger = logging.getLogger("wkpoule.cache")
@@ -24,7 +25,9 @@ async def cached_call(
     cache = get_cache_service()
     hit = await cache.get_json(key, model)
     if hit is not None:
+        record_cache_hit(key)
         return hit
+    record_cache_miss(key)
     result = compute()
     if result is not None:
         await cache.set_json(key, result, ttl)
@@ -41,7 +44,9 @@ async def cached_call_async(
     cache = get_cache_service()
     hit = await cache.get_json(key, model)
     if hit is not None:
+        record_cache_hit(key)
         return hit
+    record_cache_miss(key)
     result = await compute()
     if result is not None:
         await cache.set_json(key, result, ttl)

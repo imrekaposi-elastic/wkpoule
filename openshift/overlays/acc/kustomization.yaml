@@ -288,6 +288,23 @@ patches:
                 - action: upsert
                   key: service.instance.id
                   value: postgresql@wkpoule-acc/postgres
+            resource/redis_metrics:
+              attributes:
+                - action: upsert
+                  key: deployment.environment
+                  value: acc
+                - action: upsert
+                  key: service.environment
+                  value: acc
+                - action: upsert
+                  key: service.namespace
+                  value: wkpoule-acc
+                - action: upsert
+                  key: k8s.namespace.name
+                  value: wkpoule-acc
+                - action: upsert
+                  key: service.instance.id
+                  value: redis@wkpoule-acc/redis
             resource/otlp_metrics_env:
               attributes:
                 - action: upsert
@@ -305,6 +322,10 @@ patches:
                 - set(resource.attributes["service.instance.id"], "postgresql@wkpoule-acc/postgres") where resource.attributes["k8s.deployment.name"] == "postgres"
                 - set(resource.attributes["service.environment"], "acc") where resource.attributes["k8s.deployment.name"] == "postgres"
                 - set(resource.attributes["db.system"], "postgresql") where resource.attributes["k8s.deployment.name"] == "postgres"
+                - set(resource.attributes["service.name"], "redis") where resource.attributes["k8s.deployment.name"] == "redis"
+                - set(resource.attributes["service.instance.id"], "redis@wkpoule-acc/redis") where resource.attributes["k8s.deployment.name"] == "redis"
+                - set(resource.attributes["service.environment"], "acc") where resource.attributes["k8s.deployment.name"] == "redis"
+                - set(resource.attributes["db.system"], "redis") where resource.attributes["k8s.deployment.name"] == "redis"
     target:
       kind: OpenTelemetryCollector
       name: wkpoule-otel

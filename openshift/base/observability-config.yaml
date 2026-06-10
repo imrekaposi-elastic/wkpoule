@@ -22,6 +22,8 @@ data:
   ELASTIC_APM_SERVER_URL: https://0a07eb70c1a6425b92f4246e00d43cfe.ece.kaposi.net:9243
   ELASTICSEARCH_URL: https://o11y.es.ece.kaposi.net:9243
   KIBANA_URL: https://o11y.kb.ece.kaposi.net:9243
+  # In-cluster Redis Service (same namespace as wkpoule-api / OTel gateway).
+  REDIS_OTEL_ENDPOINT: redis:6379
 
   # Frontend RUM uses classic APM intake (deployment above), NOT the o11y OTLP stack.
   # Browser → /rum/ → RUM_APM_UPSTREAM. View RUM in Kibana tied to that APM deployment.

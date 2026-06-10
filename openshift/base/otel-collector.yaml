@@ -46,6 +46,11 @@ spec:
         secretKeyRef:
           name: wkpoule-postgres-otel
           key: POSTGRES_OTEL_PASSWORD
+    - name: REDIS_OTEL_ENDPOINT
+      valueFrom:
+        configMapKeyRef:
+          name: wkpoule-observability-config
+          key: REDIS_OTEL_ENDPOINT
   config:
     receivers:
       otlp:
@@ -110,6 +115,15 @@ spec:
           max_explain_each_interval: 0
           query_plan_cache_size: 1000
           query_plan_cache_ttl: 1h
+      # Redis: Elastic Redis OpenTelemetry Assets integration (redisreceiver).
+      redis:
+        endpoint: "${env:REDIS_OTEL_ENDPOINT}"
+        collection_interval: 30s
+        metrics:
+          redis.cmd.latency:
+            enabled: true
+          redis.maxmemory:
+            enabled: true
 
     processors:
       memory_limiter:
@@ -176,6 +190,32 @@ spec:
           - action: upsert
             key: db.system
             value: postgresql
+      resource/redis_metrics:
+        attributes:
+          - action: upsert
+            key: service.name
+            value: redis
+          - action: upsert
+            key: deployment.environment
+            value: prd
+          - action: upsert
+            key: service.environment
+            value: prd
+          - action: upsert
+            key: service.namespace
+            value: wkpoule-prd
+          - action: upsert
+            key: k8s.namespace.name
+            value: wkpoule-prd
+          - action: upsert
+            key: k8s.deployment.name
+            value: redis
+          - action: upsert
+            key: service.instance.id
+            value: redis@wkpoule-prd/redis
+          - action: upsert
+            key: db.system
+            value: redis
       # Default env on OTLP metrics (kubeletstats from wkpoule-otel-infra) for consistent Inventory filters.
       resource/otlp_metrics_env:
         attributes:
@@ -200,6 +240,10 @@ spec:
           - set(resource.attributes["service.instance.id"], "postgresql@wkpoule-prd/postgres") where resource.attributes["k8s.deployment.name"] == "postgres"
           - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "postgres"
           - set(resource.attributes["db.system"], "postgresql") where resource.attributes["k8s.deployment.name"] == "postgres"
+          - set(resource.attributes["service.name"], "redis") where resource.attributes["k8s.deployment.name"] == "redis"
+          - set(resource.attributes["service.instance.id"], "redis@wkpoule-prd/redis") where resource.attributes["k8s.deployment.name"] == "redis"
+          - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "redis"
+          - set(resource.attributes["db.system"], "redis") where resource.attributes["k8s.deployment.name"] == "redis"
       # DATABASE_URL host is "postgres"; inventory / Postgres OTel service is "postgresql". Link DB client spans.
       transform/db_peer_service:
         error_mode: silent
@@ -208,6 +252,8 @@ spec:
             statements:
               - set(span.attributes["peer.service"], "postgresql") where span.attributes["db.system"] == "postgresql" and resource.attributes["service.name"] == "wkpoule-api"
               - set(span.attributes["peer.service"], "postgresql") where span.attributes["db.system"] == "postgresql" and span.attributes["server.address"] == "postgres"
+              - set(span.attributes["peer.service"], "redis") where span.attributes["db.system"] == "redis" and resource.attributes["service.name"] == "wkpoule-api"
+              - set(span.attributes["peer.service"], "redis") where span.attributes["server.address"] == "redis" and resource.attributes["service.name"] == "wkpoule-api"
       # Enrich OTel spans for Elastic Observability / APM UIs (raw OTel ES export is not enough).
       elasticapm: {}
       # Cluster collector tags logs with collector.role=k8s-cluster. K8s OTel dashboards require
@@ -266,6 +312,10 @@ spec:
         metrics/postgresql:
           receivers: [postgresql]
           processors: [memory_limiter, resource/postgres_metrics, batch]
+          exporters: [elasticsearch/otel]
+        metrics/redis:
+          receivers: [redis]
+          processors: [memory_limiter, resource/redis_metrics, batch]
           exporters: [elasticsearch/otel]
         logs/postgresql:
           receivers: [postgresql]
