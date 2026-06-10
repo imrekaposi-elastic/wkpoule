@@ -21,3 +21,6 @@ opentelemetry-instrumentation-sqlalchemy>=0.61b0
 opentelemetry-instrumentation-logging>=0.61b0
 # Outbound client spans for weather + football-data.org HTTP calls.
 opentelemetry-instrumentation-httpx>=0.61b0
+redis>=5.0.0
+aioredis>=2.0.0
+opentelemetry-instrumentation-redis>=0.61b0

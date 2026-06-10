@@ -16,9 +16,11 @@ resources:
   - otel-k8s-infra.yaml
   - otel-k8s-cluster.yaml
   - pvc-postgres.yaml
+  - pvc-redis.yaml
   - pvc-postgres-backup.yaml
   - imagestreams.yaml
   - deployment-postgres.yaml
+  - deployment-redis.yaml
   - cronjob-postgres-backup.yaml
   - job-postgres-otel-user.yaml
   - deployment-api.yaml

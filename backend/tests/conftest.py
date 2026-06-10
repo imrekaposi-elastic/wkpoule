@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Generator
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -64,6 +64,8 @@ def client(db) -> Generator[TestClient, None, None]:
     with (
         patch("app.main.start_polling"),
         patch("app.main.stop_polling"),
+        patch("app.main.init_redis", new=AsyncMock()),
+        patch("app.main.close_redis", new=AsyncMock()),
     ):
         from app.main import app
 

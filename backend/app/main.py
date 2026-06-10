@@ -11,6 +11,8 @@ from app.database import Base, engine
 from app.db_schema import ensure_admin_access, ensure_schema
 from app.logging_config import configure_logging
 from app.routers import admin, auth, matches, predictions, rankings, subgroups, teams, venues
+from app.cache.redis_client import close_redis, init_redis, redis_ping
+from app.cache.service import reset_cache_service
 from app.services.prediction_milestones import backfill_milestones_for_existing_users
 from app.services.score_poller import start_polling, stop_polling
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
@@ -42,9 +44,12 @@ async def lifespan(app: FastAPI):
     ensure_schema()
     backfill_milestones_for_existing_users()
     ensure_admin_access()
+    await init_redis()
     start_polling()
     yield
     stop_polling()
+    await close_redis()
+    reset_cache_service()
 
 
 app = FastAPI(
@@ -102,5 +107,6 @@ app.include_router(teams.router, prefix="/api", tags=["teams"])
 
 
 @app.get("/api/health")
-def health_check():
-    return {"status": "ok"}
+async def health_check():
+    redis_ok = await redis_ping()
+    return {"status": "ok", "redis": "ok" if redis_ok else "unavailable"}

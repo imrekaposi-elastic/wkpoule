@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     football_data_api_key: str = ""
     football_data_api_url: str = "https://api.football-data.org/v4"
 
+    redis_url: str = "redis://redis:6379/0"
+    redis_max_connections: int = 20
+    redis_socket_timeout: int = 5
+    redis_socket_connect_timeout: int = 5
+
     # Optional SMTP for subgroup invite emails (leave host empty to skip sending).
     smtp_host: str = ""
     smtp_port: int = 587
