@@ -95,7 +95,7 @@ patches:
         name: wkpoule-observability-config
       data:
         DEPLOYMENT_ENVIRONMENT: acc
-        OTEL_RESOURCE_ATTRIBUTES: deployment.environment=acc,service.version=2.4.0
+        OTEL_RESOURCE_ATTRIBUTES: deployment.environment=acc,service.version=2.4.1
     target:
       kind: ConfigMap
       name: wkpoule-observability-config

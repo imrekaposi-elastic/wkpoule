@@ -291,18 +291,18 @@ MATCH_COMMENTS = {
         "pt": "Tunísia vs Japão. As Águias de Cartago contra os Samurai Blue. Uma cultura inventou o cuscuz, a outra inventou o sushi. Ambos são à base de grãos. Sinto que esse jogo deveria ser patrocinado por uma panela de arroz. E vocês notaram que os torcedores japoneses sempre se curvam depois do jogo? Ganhem ou percam — se curvam! Tenta isso na Filadélfia.",
         "de": "Tunesien gegen Japan. Die Adler von Karthago gegen die Samurai Blue. Die eine Kultur hat Couscous erfunden, die andere Sushi. Beides basiert auf Getreide. Ich finde, dieses Spiel sollte von einem Reiskocher gesponsert werden. Und ist euch aufgefallen, dass Japans Fans sich immer nach dem Spiel verbeugen? Sieg oder Niederlage — sie verbeugen sich! Versuch das mal in Philadelphia.",
     },
-    # Match 35: TUN vs NED – AT&T Stadium
+    # Match 35: TUN vs NED – Arrowhead Stadium (Kansas City)
     35: {
         "style": "al_sahhaf",
-        "en": "The Eagles of Carthage will destroy the Dutch infidels! The Netherlands thinks their 'total football' can stop us? Hannibal defeated Rome with elephants — we will defeat the Dutch with total TUNISIAN football! Their orange shirts will turn red with embarrassment! There are no Dutch in our penalty area — only Tunisian heroes!",
+        "en": "The Eagles of Carthage will destroy the Dutch infidels in Kansas City! The Netherlands thinks their 'total football' can stop us at Arrowhead? Hannibal defeated Rome with elephants — we will defeat the Dutch with total TUNISIAN football! Their orange shirts will turn red with embarrassment! There are no Dutch in our penalty area — only Tunisian heroes!",
         "nl": "De Adelaars van Carthago zullen de Nederlandse ongelovigen vernietigen! Nederland denkt dat hun 'totaalvoetbal' ons kan stoppen? Hannibal versloeg Rome met olifanten — wij verslaan de Nederlanders met totaal TUNESISCH voetbal! Hun oranje shirts worden rood van schaamte! Er zijn geen Nederlanders in ons strafschopgebied — alleen Tunesische helden!",
         "pt": "As Águias de Cartago destruirão os infiéis holandeses! A Holanda acha que seu 'futebol total' pode nos parar? Aníbal derrotou Roma com elefantes — nós derrotaremos os holandeses com futebol TUNISIANO total! Suas camisas laranjas ficarão vermelhas de vergonha! Não há holandeses na nossa área — apenas heróis tunisianos!",
         "de": "Die Adler von Karthago werden die niederländischen Ungläubigen vernichten! Die Niederlande denken, ihr 'Totaler Fußball' kann uns aufhalten? Hannibal besiegte Rom mit Elefanten — wir werden die Niederländer mit totalem TUNESISCHEM Fußball besiegen! Ihre orangen Trikots werden rot vor Scham! Es gibt keine Niederländer in unserem Strafraum — nur tunesische Helden!",
     },
-    # Match 36: JPN vs SWE – Arrowhead Stadium
+    # Match 36: JPN vs SWE – AT&T Stadium (Dallas)
     36: {
         "style": "lineker",
-        "en": "Japan versus Sweden. Two wonderfully well-organised nations. Japan's fans will clean the stadium; Sweden's fans will calmly applaud regardless of the result. This might be the most civilised football match ever played. I'm half expecting someone to pour tea at halftime.",
+        "en": "Japan versus Sweden in Dallas. Two wonderfully well-organised nations under Jerry Jones' giant screen. Japan's fans will clean the stadium; Sweden's fans will calmly applaud regardless of the result. This might be the most civilised football match ever played. I'm half expecting someone to pour tea at halftime.",
         "nl": "Japan tegen Zweden. Twee prachtig goed georganiseerde naties. Japans fans ruimen het stadion op; Zweedse fans applaudisseren kalm ongeacht het resultaat. Dit wordt misschien de meest beschaafde voetbalwedstrijd ooit. Ik verwacht half dat iemand in de rust thee inschenkt.",
         "pt": "Japão contra Suécia. Duas nações maravilhosamente bem organizadas. Os torcedores japoneses vão limpar o estádio; os suecos vão aplaudir calmamente independente do resultado. Este pode ser o jogo de futebol mais civilizado já disputado. Estou quase esperando alguém servir chá no intervalo.",
         "de": "Japan gegen Schweden. Zwei wunderbar gut organisierte Nationen. Japans Fans werden das Stadion aufräumen; Schwedens Fans werden unabhängig vom Ergebnis ruhig applaudieren. Das könnte das zivilisierteste Fußballspiel aller Zeiten werden. Ich erwarte fast, dass jemand in der Halbzeit Tee einschenkt.",
@@ -391,18 +391,18 @@ MATCH_COMMENTS = {
         "pt": "Uruguai contra Cabo Verde! La Celeste — os campeões mais antigos, os primeiros vencedores da Copa! Carregam a garra charrúa no sangue. Cabo Verde, esses bravos ilhéus — jogam com o coração do Atlântico. Mas o Uruguai... o Uruguai é história do futebol em azul celeste.",
         "de": "Uruguay gegen Kap Verde! La Celeste — die ältesten Champions, die ersten Weltmeister! Sie tragen die Garra Charrúa im Blut. Kap Verde, diese mutigen Insulaner — sie spielen mit dem Herz des Atlantiks. Aber Uruguay... Uruguay ist Fußballgeschichte in Himmelblau.",
     },
-    # Match 47: URU vs ESP – NRG Stadium
+    # Match 47: URU vs ESP – Estadio Akron (Guadalajara)
     47: {
         "style": "derksen",
-        "en": "Uruguay vs Spain. Two countries that gave South America its language and took its gold. Now they fight over a football. Spain's tiki-taka is beautiful but exhausting to watch — it's like a washing machine: round and round and round. Give me a Uruguayan tackle any day. That's real football.",
+        "en": "Uruguay vs Spain in Guadalajara. Two countries that gave South America its language and took its gold. Now they fight over a football in the shadow of the volcanoes. Spain's tiki-taka is beautiful but exhausting to watch — it's like a washing machine: round and round and round. Give me a Uruguayan tackle any day. That's real football.",
         "nl": "Uruguay tegen Spanje. Twee landen die Zuid-Amerika zijn taal gaven en zijn goud pakten. Nu vechten ze om een voetbal. Spanje's tiki-taka is mooi maar vermoeiend om naar te kijken — het is als een wasmachine: rond en rond en rond. Geef mij maar een Uruguayaanse tackle. Dát is echt voetbal.",
         "pt": "Uruguai vs Espanha. Dois países que deram à América do Sul sua língua e levaram seu ouro. Agora brigam por uma bola. O tiki-taka da Espanha é bonito mas cansativo de assistir — é como uma máquina de lavar: rodando e rodando e rodando. Me dê um tackle uruguaio qualquer dia. ISSO é futebol de verdade.",
         "de": "Uruguay gegen Spanien. Zwei Länder, die Südamerika seine Sprache gaben und sein Gold nahmen. Jetzt kämpfen sie um einen Fußball. Spaniens Tiki-Taka ist schön, aber ermüdend anzuschauen — es ist wie eine Waschmaschine: rund und rund und rund. Gebt mir jederzeit ein uruguayisches Tackling. DAS ist echter Fußball.",
     },
-    # Match 48: CPV vs KSA – Estadio Akron
+    # Match 48: CPV vs KSA – NRG Stadium (Houston)
     48: {
         "style": "carr",
-        "en": "Cape Verde vs Saudi Arabia. An island nation of half a million against an oil kingdom. Saudi's GDP could buy Cape Verde. Twice. And still have change for a Neymar. But on the pitch? Eleven vs eleven. That's the beautiful thing about football — money can't score goals. Well, unless you're PSG. Ha ha ha HAAA!",
+        "en": "Cape Verde vs Saudi Arabia in Houston — air conditioning optional, humidity mandatory. An island nation of half a million against an oil kingdom. Saudi's GDP could buy Cape Verde. Twice. And still have change for a Neymar. But on the pitch? Eleven vs eleven. That's the beautiful thing about football — money can't score goals. Well, unless you're PSG. Ha ha ha HAAA!",
         "nl": "Kaapverdië tegen Saudi-Arabië. Een eilandnatie van een half miljoen tegen een oliekoninkrijk. Saudi's BBP zou Kaapverdië kunnen kopen. Twee keer. En nog wisselgeld overhouden voor een Neymar. Maar op het veld? Elf tegen elf. Dat is het mooie van voetbal — geld kan geen goals scoren. Nou, tenzij je PSG bent. Ha ha ha HAAA!",
         "pt": "Cabo Verde vs Arábia Saudita. Uma nação insular de meio milhão contra um reino do petróleo. O PIB da Arábia poderia comprar Cabo Verde. Duas vezes. E ainda sobraria troco pra um Neymar. Mas em campo? Onze contra onze. Essa é a beleza do futebol — dinheiro não marca gol. Bom, a não ser que você seja o PSG. Ha ha ha HAAA!",
         "de": "Kap Verde gegen Saudi-Arabien. Ein Inselstaat mit einer halben Million gegen ein Ölkönigreich. Saudi-Arabiens BIP könnte Kap Verde kaufen. Zweimal. Und hätte noch Wechselgeld für einen Neymar. Aber auf dem Platz? Elf gegen elf. Das ist das Schöne am Fußball — Geld kann keine Tore schießen. Naja, es sei denn, man ist PSG. Ha ha ha HAAA!",
@@ -622,8 +622,8 @@ KNOCKOUT_MATCH_COMMENTS = {
         "de": "SoFi Stadium in Inglewood — dieses Raumschiff bekam Super Bowls, jetzt kracht die WM-K.o.-Phase hinein. Konzerte und NFL-Titel wärmten den Rasen; heute lebt oder stirbt hier jemand’s Traum. Los Angeles schreibt große Enden.",
     },
     74: {
-        "style": "burr",
-        "en": "NRG Stadium, Houston — roof can close when the Gulf humidity decides to bully everyone. Inside, Super Bowl LI rewrote scripts; outside, barbecue fumes still haunt the parking lot. Knockout football in Texas: someone leaves happy, someone leaves sweaty.",
+        "style": "derksen",
+        "en": "Gillette Stadium, Foxborough — cold wind, Patriots ghosts, and the smell of someone's overpriced clam chowder. They've hosted Gold Cup drama and NFL overtime torture; now it's World Cup knockout. In my day we didn't need heated benches — we needed cigarettes and anger.",
         "nl": "NRG Stadium, Houston — het dak kan dicht als de Golf-vochtigheid iedereen pest. Binnen herschreef Super Bowl LI scripts; buiten hangt barbecuerook nog in de parkeerplaats. Knock-out in Texas: iemand vertrekt blij, iemand bezweet.",
         "pt": "NRG Stadium, Houston — o teto fecha quando a umidade do Golfo resolve humilhar todo mundo. Lá dentro, o Super Bowl LI reescreveu roteiros; lá fora, fumaça de churrasco ainda assombra o estacionamento. Eliminatória no Texas: alguém sai feliz, alguém sai suado.",
         "de": "NRG Stadium, Houston — das Dach kann zu, wenn die Golf-Feuchte alle nervt. Drinnen schrieb Super Bowl LI Drehbücher um; draußen hängt Grillrauch noch auf dem Parkplatz. K.o.-Fußball in Texas: Jemand geht glücklich, jemand schwitzend.",
@@ -643,8 +643,8 @@ KNOCKOUT_MATCH_COMMENTS = {
         "de": "Estadio BBVA in Guadalupe — Monterreys vulkanisch inspirierte Krone. Liga-MX-Finals und Concacaf-Nächte haben diese Ränge erbeben lassen; jetzt kommt die WM-K.o.-Runde nach Nordmexiko. Das Bergpanorama ist egal — es hat hitzigere Köpfe gesehen als jeder Schiri.",
     },
     77: {
-        "style": "cantona",
-        "en": "AT&T Stadium, Arlington — a cathedral of light so vast it humbles the eye. The crowd is a tide; the screen, a mirror in which heroes and cowards recognise themselves at once. Knockout night does not ask for excuses — only for those who will lift their chin when the replay judges them.",
+        "style": "gijp",
+        "en": "MetLife Stadium, East Rutherford — shared by two NFL franchises who argue about everything except the rent. It held Copa América Centenario crowds and cold February nights; in 2026 it stages the final too, but first this knockout chapter. New York region — if you can't handle traffic, you can't handle pressure.",
         "nl": "AT&T Stadium, Arlington — een lichtkathedraal zo groot dat het oog buigt. Het publiek is een vloed; het scherm een spiegel waarin helden en lafaards zich tegelijk herkennen. Knock-outavond vraagt geen smoesjes — alleen wie de kin omhoog houdt als de herhaling oordeelt.",
         "pt": "AT&T Stadium, Arlington — catedral de luz tão vasta que humilha o olho. A torcida é maré; a tela, espelho em que heróis e covardes se reconhecem de uma vez. Noite de eliminatória não pede desculpas — só quem ergue o queixo quando o replay julga.",
         "de": "AT&T Stadium, Arlington — eine Lichtkathedrale, so weit, dass sie das Auge demütigt. Die Menge ist eine Flut; die Leinwand ein Spiegel, in dem Helden und Feiglinge sich zugleich erkennen. K.o.-Abend kennt keine Ausreden — nur wer das Kinn hebt, wenn die Wiederholung urteilt.",
@@ -692,36 +692,36 @@ KNOCKOUT_MATCH_COMMENTS = {
         "de": "BC Place, Vancouver — aufblasbare Dach-Ära wich modernem Retractable; das Frauen-WM-Finale 2015 sah die USA siegen unter dieser Hülle. Heute Männer-K.o. — höfliche Kanadier bis das Bier wirkt, dann überraschend wild.",
     },
     84: {
-        "style": "sponder",
-        "en": "BMO Field, Toronto — the smallest capacity on the schedule but intimacy cuts both ways: nowhere to hide when you bottle a knockout. MLS nights and Canadian Championship sweat soaked this turf; now World Cup elimination — polite apologies optional.",
+        "style": "al_sahhaf",
+        "en": "SoFi Stadium returns — Hollywood adjacent, celebrities in suites, Super Bowl glitter still in the carpet fibers. The weak shall be cast out like rejected screenplays! Only warriors worthy of the silver screen survive this knockout under the LA lights!",
         "nl": "BMO Field, Toronto — de kleinste capaciteit op het schema, maar intimiteit snijdt twee kanten: nergens verstoppen als je een knock-out verknoeit. MLS-nachten en Canadian Championship-zweet doordrenkten dit veld; nu WK-eliminatie — beleefde excuses optioneel.",
         "pt": "BMO Field, Toronto — menor capacidade da tabela, mas intimidade corta dos lados: não tem onde esconder quando você vacila numa eliminatória. Noites de MLS e suor do Canadian Championship encharcaram o gramado; agora Copa — desculpas educadas opcionais.",
         "de": "BMO Field, Toronto — kleinste Kapazität im Plan, aber Intimität trifft beide Seiten: kein Verstecken wenn man die K.o. vergeigt. MLS-Nächte und Canadian-Championship-Schweiß tränkten den Rasen; jetzt WM-Eliminierung — höfliche Entschuldigungen optional.",
     },
     85: {
-        "style": "trump",
-        "en": "AT&T Stadium again — second serving of giant-screen drama in Arlington. Concacaf Gold Cup finals and college playoffs proved this building loves big stakes. Tremendous venue. Tonight another knockout — only winners get their faces on that ridiculous screen in a good way.",
+        "style": "lineker",
+        "en": "BC Place, Vancouver — the inflatable roof era gave way to retractable modernity; the 2015 Women's World Cup final saw the USA triumph under this shell. Tonight men's knockout football — polite Canadian crowds until the beer kicks in, then surprisingly savage.",
         "nl": "AT&T Stadium opnieuw — tweede portie gigascherm-drama in Arlington. Gold Cup-finales en college playoffs bewezen dat dit gebouw van grote inzet houdt. Geweldig stadion. Vanavond weer knock-out — alleen winnaars komen goed op dat belachelijke scherm.",
         "pt": "AT&T de novo — segunda rodada de drama na tela gigante em Arlington. Finais da Gold Cup e playoffs universitários provaram que o lugar ama estaca alta. Estádio tremendo. Hoje mais eliminatória — só vencedores saem bem naquela tela ridícula.",
         "de": "AT&T wieder — zweite Runde Riesenleinwand-Drama in Arlington. Gold-Cup-Finals und College-Playoffs zeigten: das Haus liebt hohe Einsätze. Gewaltiges Stadion. Heute wieder K.o. — nur Gewinner landen gut auf der lächerlichen Leinwand.",
     },
     86: {
-        "style": "al_sahhaf",
-        "en": "SoFi Stadium returns — Hollywood adjacent, celebrities in suites, Super Bowl glitter still in the carpet fibers. The weak shall be cast out like rejected screenplays! Only warriors worthy of the silver screen survive this knockout under the LA lights!",
+        "style": "maradona",
+        "en": "Hard Rock Stadium, Miami Gardens — heat, salsa, and the ghosts of the 1994 World Cup across South Florida. Dolphins Sundays and college bowls baked this turf; tonight knockout football steams under the palms. Hydrate like your life depends on it — because your bracket might.",
         "nl": "SoFi Stadium keert terug — naast Hollywood, celebrities in suites, Super Bowl-glitter nog in het tapijt. De zwakken worden weggegooid als afgewezen scenario’s! Alleen krijgers die het witte doek waard zijn overleven deze knock-out onder LA-licht!",
         "pt": "SoFi de volta — ao lado de Hollywood, celebridades nas suítes, brilho do Super Bowl ainda nos tapetes. Os fracos serão expulsos como roteiros rejeitados! Só guerreiros dignos da tela grande sobrevivem a esta eliminatória sob as luzes de LA!",
         "de": "SoFi wieder — Hollywood nebenan, Promis in den Logen, Super-Bowl-Glitzer noch im Teppich. Die Schwachen fliegen wie abgelehnte Drehbücher! Nur Krieger des Silbernen Bildschirms überleben diese K.o. unter LA-Lichtern!",
     },
     87: {
-        "style": "maradona",
-        "en": "Hard Rock Stadium, Miami Gardens — heat, salsa, and the ghosts of the 1994 World Cup across South Florida. Dolphins Sundays and college bowls baked this turf; tonight knockout football steams under the palms. Hydrate like your life depends on it — because your bracket might.",
+        "style": "derksen",
+        "en": "Arrowhead Stadium, Kansas City — claimed loudest outdoor crowd in the NFL; international football now tests if tourist lungs can keep up. NCAA games and playoff blizzards hardened this place; tonight World Cup knockout. In my day we measured noise with ears bleeding — now they use apps.",
         "nl": "Hard Rock Stadium, Miami Gardens — hitte, salsa en geesten van het WK 1994 door Zuid-Florida. Dolphins-zondagen en college bowls bakten dit veld; vanavond stoomt knock-out onder de palmen. Hydrateer alsof je leven ervan afhangt — want je pool ook.",
         "pt": "Hard Rock Stadium, Miami Gardens — calor, salsa e fantasmas da Copa de 1994 pelo sul da Flórida. Domingos dos Dolphins e bowls universitários assaram o gramado; hoje futebol eliminatório vaporiza sob os coqueiros. Hidrate como se a vida dependesse — porque seu bolão pode.",
         "de": "Hard Rock Stadium, Miami Gardens — Hitze, Salsa und Geister der WM 1994 in Südflorida. Dolphins-Sonntage und College-Bowls braten den Rasen; heute dampft K.o.-Fußball unter Palmen. Hydrieren als ginge es ums Leben — denn um den Tippspiel-Traum auch.",
     },
     88: {
-        "style": "derksen",
-        "en": "Arrowhead Stadium, Kansas City — claimed loudest outdoor crowd in the NFL; international football now tests if tourist lungs can keep up. NCAA games and playoff blizzards hardened this place; tonight World Cup knockout. In my day we measured noise with ears bleeding — now they use apps.",
+        "style": "trump",
+        "en": "AT&T Stadium again — second serving of giant-screen drama in Arlington. Concacaf Gold Cup finals and college playoffs proved this building loves big stakes. Tremendous venue. Tonight another knockout — only winners get their faces on that ridiculous screen in a good way.",
         "nl": "Arrowhead Stadium, Kansas City — zelfverklaard luidste NFL-buitenmenigte; internationaal voetbal test nu of toeristenlongen bijbenen. NCAA-wedstrijden en play-off-blizzards verhardden dit plek; vanavond WK-knock-out. In mijn tijd maten we lawaai met bloedende oren — nu met apps.",
         "pt": "Arrowhead Stadium, Kansas City — autointitulada torcida externa mais barulhenta da NFL; o futebol internacional testa se pulmões de turista aguentam. Jogos NCAA e nevascas nos playoffs endureceram o lugar; hoje eliminatória de Copa. No meu tempo medíamos barulho com ouvido sangrando — agora com apps.",
         "de": "Arrowhead Stadium, Kansas City — selbsternannt lauteste NFL-Freiluft-Menge; internationaler Fußball testet Touristen-Lungen. NCAA-Spiele und Playoff-Blizzards härteten das Haus; heute WM-K.o. Früher maßen wir Lärm mit blutenden Ohren — jetzt mit Apps.",
