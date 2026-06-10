@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import time
 from contextlib import asynccontextmanager
@@ -11,6 +12,7 @@ from app.database import Base, engine
 from app.db_schema import ensure_admin_access, ensure_schema
 from app.logging_config import configure_logging
 from app.routers import admin, auth, matches, predictions, rankings, subgroups, teams, venues
+from app.cache.helpers import reset_main_event_loop, set_main_event_loop
 from app.cache.redis_client import close_redis, init_redis, redis_ping
 from app.cache.service import reset_cache_service
 from app.services.prediction_milestones import backfill_milestones_for_existing_users
@@ -40,6 +42,7 @@ def _cors_allow_origins() -> list[str]:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    set_main_event_loop(asyncio.get_running_loop())
     Base.metadata.create_all(bind=engine)
     ensure_schema()
     backfill_milestones_for_existing_users()
@@ -50,6 +53,7 @@ async def lifespan(app: FastAPI):
     stop_polling()
     await close_redis()
     reset_cache_service()
+    reset_main_event_loop()
 
 
 app = FastAPI(

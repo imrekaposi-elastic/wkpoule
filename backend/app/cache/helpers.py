@@ -14,6 +14,19 @@ logger = logging.getLogger("wkpoule.cache")
 
 T = TypeVar("T")
 
+_main_loop: asyncio.AbstractEventLoop | None = None
+
+
+def set_main_event_loop(loop: asyncio.AbstractEventLoop) -> None:
+    """Store the FastAPI/uvicorn loop so sync routes can schedule cache tasks on it."""
+    global _main_loop
+    _main_loop = loop
+
+
+def reset_main_event_loop() -> None:
+    global _main_loop
+    _main_loop = None
+
 
 async def cached_call(
     key: str,
@@ -53,18 +66,42 @@ async def cached_call_async(
     return result
 
 
-def run_cache_task(coro: Awaitable[Any]) -> None:
-    """Run async cache invalidation from sync route handlers (fail-open)."""
+def _log_cache_task_result(future: asyncio.Future[Any]) -> None:
     try:
-        asyncio.get_running_loop()
+        future.result()
+    except Exception as exc:
+        logger.warning("cache task failed: %s", exc)
+
+
+def run_cache_task(coro: Awaitable[Any]) -> None:
+    """Run async cache invalidation from sync route handlers (fail-open).
+
+    Sync FastAPI routes run in a thread pool without an event loop. The shared
+    Redis client is bound to the uvicorn loop, so we must schedule work there
+    instead of calling asyncio.run() in the worker thread.
+    """
+    try:
+        loop = asyncio.get_running_loop()
     except RuntimeError:
+        loop = None
+
+    if loop is not None:
         try:
-            asyncio.run(coro)
+            loop.create_task(coro)
         except Exception as exc:
             logger.warning("cache task failed: %s", exc)
         return
+
+    app_loop = _main_loop
+    if app_loop is not None and app_loop.is_running():
+        try:
+            future = asyncio.run_coroutine_threadsafe(coro, app_loop)
+            future.add_done_callback(_log_cache_task_result)
+        except Exception as exc:
+            logger.warning("cache task failed: %s", exc)
+        return
+
     try:
-        loop = asyncio.get_event_loop()
-        loop.create_task(coro)
+        asyncio.run(coro)
     except Exception as exc:
         logger.warning("cache task failed: %s", exc)
