@@ -24,14 +24,18 @@ async def invalidate_matches(cache: CacheService | None = None) -> int:
     return deleted
 
 
-async def invalidate_match(match_id: int, cache: CacheService | None = None) -> bool:
+async def invalidate_match(match_id: int, cache: CacheService | None = None) -> int:
     service = cache or get_cache_service()
-    return await service.delete(CacheKeys.match_detail(match_id))
+    deleted = await service.delete_pattern(f"{CacheKeys.PREFIX}:matches:detail:id={match_id}:*")
+    logger.debug("invalidated match %s cache (%s keys)", match_id, deleted)
+    return deleted
 
 
-async def invalidate_subgroup(subgroup_id: int, cache: CacheService | None = None) -> bool:
+async def invalidate_subgroup(subgroup_id: int, cache: CacheService | None = None) -> int:
     service = cache or get_cache_service()
-    return await service.delete(CacheKeys.subgroup_detail(subgroup_id))
+    deleted = await service.delete_pattern(CacheKeys.subgroup_detail_pattern(subgroup_id))
+    logger.debug("invalidated subgroup %s cache (%s keys)", subgroup_id, deleted)
+    return deleted
 
 
 async def invalidate_virtual_groups(cache: CacheService | None = None) -> int:

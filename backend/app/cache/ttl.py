@@ -1,0 +1,7 @@
+"""Cache TTLs (seconds) for API endpoints."""
+
+RANKINGS_TTL = 60
+MATCHES_TTL = 300
+SUBGROUPS_TTL = 60
+VIRTUAL_GROUPS_TTL = 120
+TEAMS_TTL = 3600

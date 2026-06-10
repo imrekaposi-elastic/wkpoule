@@ -162,8 +162,11 @@ async def sync_scores() -> int:
         db.close()
 
     if updates > 0:
+        from app.cache.invalidation import invalidate_on_score_update
         from app.services.scoring import recalculate_points
+
         pts = recalculate_points()
         logger.info("Points recalculated: %d prediction(s) scored", pts)
+        await invalidate_on_score_update()
 
     return updates

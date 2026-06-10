@@ -1,0 +1,17 @@
+# OpenShift cluster image registry — persistent storage on Longhorn (20Gi).
+# Apply PVC first, then patch the ImageRegistry operator config.
+#
+#   oc apply -f registry_pvc.yaml
+#   oc apply -f registry_config_pvc-20gi.yaml
+#
+# Only one storage type may be configured at a time (emptyDir OR pvc, not both).
+apiVersion: imageregistry.operator.openshift.io/v1
+kind: Config
+metadata:
+  name: cluster
+spec:
+  managementState: Managed
+  storage:
+    pvc:
+      claim: image-registry-storage
+    managementState: Managed

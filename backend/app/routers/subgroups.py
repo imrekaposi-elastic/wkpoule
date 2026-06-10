@@ -5,6 +5,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.cache.helpers import cached_call, run_cache_task
+from app.cache.invalidation import invalidate_subgroup
+from app.cache.keys import CacheKeys
+from app.cache.ttl import SUBGROUPS_TTL
 from app.auth import get_current_user
 from app.database import get_db
 from app.models.subgroup import (
@@ -42,6 +46,10 @@ router = APIRouter()
 logger = logging.getLogger("wkpoule.subgroups")
 
 SUBGROUP_CHAT_MAX_MESSAGES = 256
+
+
+def _invalidate_subgroup_cache(subgroup_id: int) -> None:
+    run_cache_task(invalidate_subgroup(subgroup_id))
 
 def _normalize_email(email: str) -> str:
     return email.strip().lower()
@@ -321,6 +329,7 @@ def accept_invite(
         .filter(SubgroupMember.subgroup_id == inv.subgroup_id)
         .scalar()
     )
+    _invalidate_subgroup_cache(inv.subgroup_id)
     return SubgroupMineOut(
         id=sg.id,
         name=sg.name,
@@ -452,6 +461,7 @@ def approve_join_request_endpoint(
         .filter(SubgroupMember.subgroup_id == subgroup_id)
         .scalar()
     )
+    _invalidate_subgroup_cache(subgroup_id)
     return SubgroupMineOut(
         id=sg.id,
         name=sg.name,
@@ -498,7 +508,7 @@ def reject_join_request_endpoint(
 
 
 @router.get("/{subgroup_id}", response_model=SubgroupDetailOut)
-def get_subgroup_detail(
+async def get_subgroup_detail(
     subgroup_id: int,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=20),
@@ -508,38 +518,44 @@ def get_subgroup_detail(
     m = _get_member(db, subgroup_id, user.id)
     if not m:
         raise HTTPException(status_code=403, detail="Not a member of this subgroup")
-    sg = db.query(Subgroup).filter(Subgroup.id == subgroup_id).first()
-    if not sg:
-        raise HTTPException(status_code=404, detail="Subgroup not found")
 
-    member_ids = [
-        row[0]
-        for row in db.query(SubgroupMember.user_id)
-        .filter(SubgroupMember.subgroup_id == subgroup_id)
-        .all()
-    ]
-    all_rankings = compute_participant_rankings(db, member_ids)
-    rankings = paginate_list(all_rankings, page, page_size)
+    cache_key = CacheKeys.subgroup_detail(subgroup_id, user.id, page, page_size)
 
-    member_rows = (
-        db.query(SubgroupMember.user_id, User.username, SubgroupMember.role)
-        .join(User, User.id == SubgroupMember.user_id)
-        .filter(SubgroupMember.subgroup_id == subgroup_id)
-        .order_by(SubgroupMember.role.desc(), User.username)
-        .all()
-    )
-    members = [
-        SubgroupMemberBrief(user_id=uid, username=uname, role=role)
-        for uid, uname, role in member_rows
-    ]
+    def compute() -> SubgroupDetailOut:
+        sg = db.query(Subgroup).filter(Subgroup.id == subgroup_id).first()
+        if not sg:
+            raise HTTPException(status_code=404, detail="Subgroup not found")
 
-    return SubgroupDetailOut(
-        id=sg.id,
-        name=sg.name,
-        my_role=m.role,
-        members=members,
-        rankings=rankings,
-    )
+        member_ids = [
+            row[0]
+            for row in db.query(SubgroupMember.user_id)
+            .filter(SubgroupMember.subgroup_id == subgroup_id)
+            .all()
+        ]
+        all_rankings = compute_participant_rankings(db, member_ids)
+        rankings = paginate_list(all_rankings, page, page_size)
+
+        member_rows = (
+            db.query(SubgroupMember.user_id, User.username, SubgroupMember.role)
+            .join(User, User.id == SubgroupMember.user_id)
+            .filter(SubgroupMember.subgroup_id == subgroup_id)
+            .order_by(SubgroupMember.role.desc(), User.username)
+            .all()
+        )
+        members = [
+            SubgroupMemberBrief(user_id=uid, username=uname, role=role)
+            for uid, uname, role in member_rows
+        ]
+
+        return SubgroupDetailOut(
+            id=sg.id,
+            name=sg.name,
+            my_role=m.role,
+            members=members,
+            rankings=rankings,
+        )
+
+    return await cached_call(cache_key, SUBGROUPS_TTL, SubgroupDetailOut, compute)
 
 
 @router.delete(
@@ -573,6 +589,7 @@ def remove_subgroup_member(
         )
     db.delete(target)
     db.commit()
+    _invalidate_subgroup_cache(subgroup_id)
     return None
 
 
@@ -632,6 +649,7 @@ def leave_subgroup(
 
     db.delete(m)
     db.commit()
+    _invalidate_subgroup_cache(subgroup_id)
     return None
 
 
@@ -770,6 +788,7 @@ def post_message(
         db.add(poster)
     db.commit()
     db.refresh(msg)
+    _invalidate_subgroup_cache(subgroup_id)
     try:
         newly_achieved = record_subgroup_message_milestone(
             db,

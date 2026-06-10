@@ -5,6 +5,10 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
 from app.auth import get_admin_user, get_current_user
+from app.cache.helpers import cached_call_async
+from app.cache.invalidation import invalidate_on_score_update
+from app.cache.keys import CacheKeys
+from app.cache.ttl import MATCHES_TTL
 from app.database import get_db
 from app.models.match import Match
 from app.models.user import User
@@ -107,48 +111,57 @@ async def list_matches(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    q = db.query(Match).options(
-        joinedload(Match.home_team),
-        joinedload(Match.away_team),
-        joinedload(Match.venue),
-        joinedload(Match.fun_comment),
+    cache_key = CacheKeys.matches_list(
+        stage, group, search, page, page_size, predicted_teams, user.id
     )
-    if stage:
-        q = q.filter(Match.stage == stage)
-    if group:
-        q = q.filter(Match.group_letter == group)
 
-    ordered = q.order_by(Match.kickoff_utc).all()
+    async def compute() -> PaginatedResponse[MatchOut]:
+        q = db.query(Match).options(
+            joinedload(Match.home_team),
+            joinedload(Match.away_team),
+            joinedload(Match.venue),
+            joinedload(Match.fun_comment),
+        )
+        if stage:
+            q = q.filter(Match.stage == stage)
+        if group:
+            q = q.filter(Match.group_letter == group)
 
-    predicted_map: dict[int, tuple[TeamOut | None, TeamOut | None]] = {}
-    bracket_map: dict[int, tuple[str | None, str | None]] = {}
-    if predicted_teams or (search and search.strip()):
-        predicted_map, bracket_map = compute_predicted_knockout_teams(db, user.id)
+        ordered = q.order_by(Match.kickoff_utc).all()
 
-    if search and search.strip():
-        ordered = [
-            m
-            for m in ordered
-            if _match_matches_search(m, search, predicted_map.get(m.match_number))
-        ]
+        predicted_map: dict[int, tuple[TeamOut | None, TeamOut | None]] = {}
+        bracket_map: dict[int, tuple[str | None, str | None]] = {}
+        if predicted_teams or (search and search.strip()):
+            predicted_map, bracket_map = compute_predicted_knockout_teams(db, user.id)
 
-    paged = paginate_list(ordered, page, page_size)
+        if search and search.strip():
+            ordered = [
+                m
+                for m in ordered
+                if _match_matches_search(m, search, predicted_map.get(m.match_number))
+            ]
 
-    if predicted_teams and not predicted_map:
-        predicted_map, bracket_map = compute_predicted_knockout_teams(db, user.id)
+        paged = paginate_list(ordered, page, page_size)
 
-    results = []
-    for m in paged.items:
-        temp = await get_match_temperature(m.id, m.venue.city, m.kickoff_utc)
-        pair = predicted_map.get(m.match_number)
-        slots = bracket_map.get(m.match_number)
-        results.append(_match_to_out(m, temp, pair, slots))
-    return PaginatedResponse(
-        items=results,
-        total=paged.total,
-        page=paged.page,
-        page_size=paged.page_size,
-        total_pages=paged.total_pages,
+        if predicted_teams and not predicted_map:
+            predicted_map, bracket_map = compute_predicted_knockout_teams(db, user.id)
+
+        results = []
+        for m in paged.items:
+            temp = await get_match_temperature(m.id, m.venue.city, m.kickoff_utc)
+            pair = predicted_map.get(m.match_number)
+            slots = bracket_map.get(m.match_number)
+            results.append(_match_to_out(m, temp, pair, slots))
+        return PaginatedResponse(
+            items=results,
+            total=paged.total,
+            page=paged.page,
+            page_size=paged.page_size,
+            total_pages=paged.total_pages,
+        )
+
+    return await cached_call_async(
+        cache_key, MATCHES_TTL, PaginatedResponse[MatchOut], compute
     )
 
 
@@ -270,27 +283,32 @@ async def get_match(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    m = (
-        db.query(Match)
-        .options(
-            joinedload(Match.home_team),
-            joinedload(Match.away_team),
-            joinedload(Match.venue),
-            joinedload(Match.fun_comment),
+    cache_key = CacheKeys.match_detail(match_id, predicted_teams, user.id)
+
+    async def compute() -> MatchOut:
+        m = (
+            db.query(Match)
+            .options(
+                joinedload(Match.home_team),
+                joinedload(Match.away_team),
+                joinedload(Match.venue),
+                joinedload(Match.fun_comment),
+            )
+            .filter(Match.id == match_id)
+            .first()
         )
-        .filter(Match.id == match_id)
-        .first()
-    )
-    if not m:
-        raise HTTPException(status_code=404, detail="Match not found")
-    temp = await get_match_temperature(m.id, m.venue.city, m.kickoff_utc)
-    pair = None
-    slots = None
-    if predicted_teams and m.match_number >= 73:
-        pmap, smap = compute_predicted_knockout_teams(db, user.id)
-        pair = pmap.get(m.match_number)
-        slots = smap.get(m.match_number)
-    return _match_to_out(m, temp, pair, slots)
+        if not m:
+            raise HTTPException(status_code=404, detail="Match not found")
+        temp = await get_match_temperature(m.id, m.venue.city, m.kickoff_utc)
+        pair = None
+        slots = None
+        if predicted_teams and m.match_number >= 73:
+            pmap, smap = compute_predicted_knockout_teams(db, user.id)
+            pair = pmap.get(m.match_number)
+            slots = smap.get(m.match_number)
+        return _match_to_out(m, temp, pair, slots)
+
+    return await cached_call_async(cache_key, MATCHES_TTL, MatchOut, compute)
 
 
 @router.patch("/{match_id}/score", response_model=MatchOut)
@@ -319,5 +337,6 @@ async def update_score(
     db.commit()
     db.refresh(m)
     recalculate_points()
+    await invalidate_on_score_update()
     temp = await get_match_temperature(m.id, m.venue.city, m.kickoff_utc)
     return _match_to_out(m, temp)

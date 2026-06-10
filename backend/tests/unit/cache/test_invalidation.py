@@ -34,12 +34,12 @@ async def test_invalidate_rankings(cache_service):
 
 async def test_invalidate_on_score_update(cache_service):
     await cache_service.set(CacheKeys.rankings(1, 20), "data", ttl=60)
-    await cache_service.set(CacheKeys.match_detail(7), "match", ttl=60)
+    await cache_service.set(CacheKeys.match_detail(7, False, 0), "match", ttl=60)
 
     await invalidate_on_score_update(cache_service)
 
     assert await cache_service.get(CacheKeys.rankings(1, 20)) is None
-    assert await cache_service.get(CacheKeys.match_detail(7)) is None
+    assert await cache_service.get(CacheKeys.match_detail(7, False, 0)) is None
 
 
 async def test_invalidate_on_prediction_user_scope(cache_service):
@@ -55,13 +55,21 @@ async def test_invalidate_on_prediction_user_scope(cache_service):
 
 
 async def test_invalidate_subgroup_and_match(cache_service):
-    await cache_service.set(CacheKeys.subgroup_detail(5), "sub", ttl=60)
-    assert await invalidate_subgroup(5, cache_service) is True
-    assert await cache_service.get(CacheKeys.subgroup_detail(5)) is None
+    await cache_service.set(
+        CacheKeys.subgroup_detail(5, 1, 1, 20), "sub", ttl=60
+    )
+    await cache_service.set(
+        CacheKeys.subgroup_detail(5, 2, 1, 20), "sub2", ttl=60
+    )
+    deleted = await invalidate_subgroup(5, cache_service)
+    assert deleted == 2
+    assert await cache_service.get(CacheKeys.subgroup_detail(5, 1, 1, 20)) is None
 
-    await cache_service.set(CacheKeys.match_detail(9), "m", ttl=60)
-    assert await invalidate_match(9, cache_service) is True
-    assert await cache_service.get(CacheKeys.match_detail(9)) is None
+    await cache_service.set(CacheKeys.match_detail(9, False, 0), "m", ttl=60)
+    await cache_service.set(CacheKeys.match_detail(9, True, 3), "m2", ttl=60)
+    deleted = await invalidate_match(9, cache_service)
+    assert deleted == 2
+    assert await cache_service.get(CacheKeys.match_detail(9, False, 0)) is None
 
 
 async def test_invalidate_virtual_groups_all(cache_service):

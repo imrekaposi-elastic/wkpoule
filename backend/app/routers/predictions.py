@@ -6,6 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 
 from app.auth import get_current_user
+from app.cache.helpers import cached_call
+from app.cache.invalidation import invalidate_on_prediction
+from app.cache.keys import CacheKeys
+from app.cache.ttl import VIRTUAL_GROUPS_TTL
 from app.database import get_db
 from app.models.match import Match
 from app.models.prediction import Prediction
@@ -55,7 +59,7 @@ def my_prediction_milestones(
 
 
 @router.put("/{match_id}", response_model=PredictionOut)
-def upsert_prediction(
+async def upsert_prediction(
     match_id: int,
     body: PredictionRequest,
     user: User = Depends(get_current_user),
@@ -132,6 +136,8 @@ def upsert_prediction(
         },
     )
 
+    await invalidate_on_prediction(user.id)
+
     return PredictionOut(
         id=pred.id,
         user_id=pred.user_id,
@@ -148,23 +154,28 @@ def upsert_prediction(
 
 
 @router.get("/virtual-groups", response_model=list[VirtualGroupTable])
-def virtual_groups(
+async def virtual_groups(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Group tables based on this user's predicted scores only (predicted matches count)."""
-    tables = compute_virtual_group_standings(db, user.id)
-    best_third_ids = best_third_place_team_ids(tables)
-    result: list[VirtualGroupTable] = []
-    for gt in tables:
-        result.append(
-            VirtualGroupTable(
-                group_letter=gt.group_letter,
-                standings=gt.standings,
-                third_place_qualifies=third_place_qualifies_for_group(gt, best_third_ids),
+    cache_key = CacheKeys.virtual_groups(user.id)
+
+    def compute() -> list[VirtualGroupTable]:
+        tables = compute_virtual_group_standings(db, user.id)
+        best_third_ids = best_third_place_team_ids(tables)
+        result: list[VirtualGroupTable] = []
+        for gt in tables:
+            result.append(
+                VirtualGroupTable(
+                    group_letter=gt.group_letter,
+                    standings=gt.standings,
+                    third_place_qualifies=third_place_qualifies_for_group(gt, best_third_ids),
+                )
             )
-        )
-    return result
+        return result
+
+    return await cached_call(cache_key, VIRTUAL_GROUPS_TTL, list[VirtualGroupTable], compute)
 
 
 @router.get("/mine/brief", response_model=list[MyPredictionBrief])
