@@ -105,6 +105,19 @@ export default function Dashboard() {
         {t("dashboard.welcome", { name: user?.username })}
       </h1>
 
+      <section className="mb-6 sm:mb-8">
+        <h2 className="mb-3 text-xl font-bold text-pitch-800 sm:text-2xl">
+          {t("dashboard.worldCupBegun")}
+        </h2>
+        <div className="overflow-hidden rounded-xl shadow-md ring-1 ring-gray-100">
+          <img
+            src="/images/world-cup-2026-begun.png"
+            alt={t("dashboard.worldCupBegunAlt")}
+            className="block h-auto w-full"
+          />
+        </div>
+      </section>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {/* Rank Card */}
         <div className="bg-white rounded-xl shadow-md p-6">
