@@ -25,6 +25,8 @@
     "close": "Schließen"
   },
   "landing": {
+    "worldCupBegun": "Die Weltmeisterschaft hat begonnen!!",
+    "worldCupBegunAlt": "WM 2026 Werbebild mit Turnierstars",
     "kicker": "WM 2026 Tippspiel",
     "heroTitle": "Tippe jedes Spiel, fordere Freunde heraus und verfolge die WM wie ein Profi.",
     "heroSubtitle": "Schreibe deine eigene Turniergeschichte mit Ergebnistipps, Stadioninfos, KI-artiger Expertenanalyse, privaten Unterligen und Chat für deine Gruppe.",

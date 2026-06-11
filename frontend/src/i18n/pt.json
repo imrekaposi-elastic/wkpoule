@@ -25,6 +25,8 @@
     "close": "Fechar"
   },
   "landing": {
+    "worldCupBegun": "A Copa do Mundo começou!!",
+    "worldCupBegunAlt": "Imagem promocional da Copa do Mundo 2026 com estrelas do torneio",
     "kicker": "Jogo de palpites da Copa 2026",
     "heroTitle": "Palpite em todos os jogos, desafie amigos e acompanhe a Copa como especialista.",
     "heroSubtitle": "Crie sua própria história do torneio com placares, informações dos estádios, análise de especialistas em estilo IA, subligas privadas e chat para seu grupo.",

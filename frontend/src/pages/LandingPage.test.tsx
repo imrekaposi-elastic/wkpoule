@@ -10,6 +10,7 @@ describe("LandingPage", () => {
 
     expect(screen.getAllByRole("link", { name: /create your account/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("link", { name: /log in/i }).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/2026/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/the world cup has begun/i)).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /fifa world cup 2026/i })).toBeInTheDocument();
   });
 });

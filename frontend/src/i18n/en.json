@@ -25,6 +25,8 @@
     "close": "Close"
   },
   "landing": {
+    "worldCupBegun": "The World Cup has begun!!",
+    "worldCupBegunAlt": "FIFA World Cup 2026 stars lineup promotional image",
     "kicker": "World Cup 2026 prediction game",
     "heroTitle": "Predict every match, challenge friends, and follow the World Cup like a pro.",
     "heroSubtitle": "Build your own tournament story with score predictions, venue information, AI-flavoured expert analysis, private subleagues, and chat for your group.",

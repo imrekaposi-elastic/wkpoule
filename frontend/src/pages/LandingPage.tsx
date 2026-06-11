@@ -44,37 +44,17 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur">
-            <div className="rounded-[1.5rem] bg-white p-5 text-gray-900">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-pitch-700">
-                    {t("landing.previewLabel")}
-                  </p>
-                  <h2 className="text-xl font-black text-pitch-900">{t("landing.previewTitle")}</h2>
-                </div>
-                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-800">
-                  2026
-                </span>
-              </div>
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-2xl bg-gray-50 p-4">
-                <div className="text-right">
-                  <p className="text-xs font-medium text-gray-500">{t("landing.previewHome")}</p>
-                  <p className="text-2xl font-black">2</p>
-                </div>
-                <div className="rounded-full bg-pitch-800 px-3 py-1 text-sm font-bold text-white">
-                  {t("common.vs")}
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-gray-500">{t("landing.previewAway")}</p>
-                  <p className="text-2xl font-black">1</p>
-                </div>
-              </div>
-              <div className="mt-4 rounded-2xl border border-yellow-200 bg-yellow-50 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-yellow-800">
-                  {t("landing.previewExpert")}
+          <div className="overflow-hidden rounded-[2rem] border border-white/15 shadow-2xl ring-1 ring-white/10">
+            <div className="relative">
+              <img
+                src="/images/world-cup-2026-begun.png"
+                alt={t("landing.worldCupBegunAlt")}
+                className="block h-auto w-full object-cover"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pitch-950 via-pitch-950/85 to-transparent px-6 pb-6 pt-16 sm:px-8 sm:pb-8">
+                <p className="text-center text-2xl font-black tracking-tight text-white drop-shadow-lg sm:text-3xl lg:text-4xl">
+                  {t("landing.worldCupBegun")}
                 </p>
-                <p className="mt-1 text-sm text-gray-700">{t("landing.previewExpertText")}</p>
               </div>
             </div>
           </div>
