@@ -21,7 +21,7 @@ So: **two app images**, no “fat” image; the browser hits the frontend Route;
 | Route | Hostname | Service |
 |-------|----------|---------|
 | `wkpoule` | `wc2026.apps.cloud.kaposi.net` (prd) / `acc-wc2026…` (acc) | `wkpoule-frontend` (SPA + nginx `/api` proxy) |
-| `wkpoule-api` | `wc2026-api.apps.cloud.kaposi.net` (prd) / `wc2026-acc-api…` (acc) | `wkpoule-api` (FastAPI, `/docs`, `/openapi.json`) |
+| `wkpoule-api` | `wc2026-api.apps.cloud.kaposi.net` (prd) / `acc-wc2026-api…` (acc) | `wkpoule-api` (FastAPI, `/docs`, `/openapi.json`) |
 
 Set **`PUBLIC_APP_URL`** (SPA) and **`PUBLIC_API_URL`** (API) in [`secret.yaml`](secret.yaml) to match these hosts. Agent documentation: [`docs/AGENTS.md`](../docs/AGENTS.md).
 

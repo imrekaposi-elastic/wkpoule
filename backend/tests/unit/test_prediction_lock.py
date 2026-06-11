@@ -6,6 +6,7 @@ from app.models.match import Match
 from app.services.prediction_lock import (
     PREDICTION_LOCK_MINUTES_BEFORE_KICKOFF,
     match_accepts_prediction_updates,
+    prediction_lock_reason,
 )
 
 
@@ -43,6 +44,23 @@ def test_rejects_non_upcoming_matches():
     match.status = "completed"
 
     assert match_accepts_prediction_updates(match) is False
+    assert prediction_lock_reason(match) == "Predictions are locked for this match"
+
+
+def test_rejects_live_matches():
+    kickoff = datetime.now(timezone.utc) + timedelta(hours=1)
+    match = _upcoming_match(kickoff)
+    match.status = "live"
+
+    assert match_accepts_prediction_updates(match) is False
+
+
+def test_rejects_after_kickoff_even_if_status_still_upcoming():
+    kickoff = datetime.now(timezone.utc) - timedelta(minutes=10)
+    match = _upcoming_match(kickoff)
+
+    assert match_accepts_prediction_updates(match) is False
+    assert prediction_lock_reason(match) is not None
 
 
 def test_naive_kickoff_treated_as_utc():

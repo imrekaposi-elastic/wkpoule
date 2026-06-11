@@ -7,13 +7,29 @@ from app.models.match import Match
 PREDICTION_LOCK_MINUTES_BEFORE_KICKOFF = 30
 
 
-def match_accepts_prediction_updates(match: Match) -> bool:
-    """True if predictions may be submitted or edited (server clock, UTC)."""
-    if match.status != "upcoming":
-        return False
-    now = datetime.now(timezone.utc)
+def _kickoff_utc(match: Match) -> datetime:
     kickoff = match.kickoff_utc
     if kickoff.tzinfo is None:
-        kickoff = kickoff.replace(tzinfo=timezone.utc)
+        return kickoff.replace(tzinfo=timezone.utc)
+    return kickoff
+
+
+def prediction_lock_reason(match: Match) -> str | None:
+    """User-facing reason predictions are locked, or None if create/update is allowed."""
+    if match.status != "upcoming":
+        return "Predictions are locked for this match"
+    now = datetime.now(timezone.utc)
+    kickoff = _kickoff_utc(match)
     cutoff = kickoff - timedelta(minutes=PREDICTION_LOCK_MINUTES_BEFORE_KICKOFF)
-    return now < cutoff
+    if now >= cutoff:
+        return (
+            "Predictions cannot be created or changed within "
+            f"{PREDICTION_LOCK_MINUTES_BEFORE_KICKOFF} minutes of kickoff "
+            "or after the match has started"
+        )
+    return None
+
+
+def match_accepts_prediction_updates(match: Match) -> bool:
+    """True if predictions may be submitted or edited (server clock, UTC)."""
+    return prediction_lock_reason(match) is None

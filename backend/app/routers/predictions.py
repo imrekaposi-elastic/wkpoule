@@ -29,7 +29,7 @@ from app.services.prediction_advance import (
     resolve_fixture_team_ids,
     validate_advance_team_for_prediction,
 )
-from app.services.prediction_lock import match_accepts_prediction_updates
+from app.services.prediction_lock import prediction_lock_reason
 from app.services.prediction_milestones import list_milestones_for_user, record_new_milestones
 from app.services.match_prediction_list import (
     OUTCOME_PAGE_SIZE,
@@ -66,8 +66,9 @@ def my_prediction_milestones(
         "Submit or change your score prediction for a match. "
         "`match_id` is the **database id** (not the FIFA match number); "
         "resolve it first via `GET /api/matches/by-number/{match_number}`. "
-        "Predictions are locked when the match is no longer `upcoming`, "
-        "or within 30 minutes of kickoff. "
+        "Predictions cannot be created, updated, or removed within 30 minutes of kickoff, "
+        "after the match has started, or once the match is no longer `upcoming`. "
+        "Check `prediction_editable` on `GET /api/matches/{id}` before submitting. "
         "Knockout draws require `advance_team_id` (the team you predict advances on penalties)."
     ),
 )
@@ -80,13 +81,9 @@ async def upsert_prediction(
     match = db.query(Match).filter(Match.id == match_id).first()
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
-    if match.status != "upcoming":
-        raise HTTPException(status_code=400, detail="Predictions are locked for this match")
-    if not match_accepts_prediction_updates(match):
-        raise HTTPException(
-            status_code=400,
-            detail="Predictions cannot be changed within 30 minutes of kickoff",
-        )
+    lock_reason = prediction_lock_reason(match)
+    if lock_reason:
+        raise HTTPException(status_code=400, detail=lock_reason)
 
     home_tid, away_tid = resolve_fixture_team_ids(db, match, user.id)
     advance_team_id = validate_advance_team_for_prediction(

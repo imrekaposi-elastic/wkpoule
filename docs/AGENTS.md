@@ -7,7 +7,7 @@ This document describes how automated agents (e.g. Claude) can authenticate, dis
 | Environment | API base URL | Web app (SPA) |
 |-------------|--------------|---------------|
 | Production | `https://wc2026-api.apps.cloud.kaposi.net` | `https://wc2026.apps.cloud.kaposi.net` |
-| Acceptance | `https://wc2026-acc-api.apps.cloud.kaposi.net` | `https://acc-wc2026.apps.cloud.kaposi.net` |
+| Acceptance | `https://acc-wc2026-api.apps.cloud.kaposi.net` | `https://acc-wc2026.apps.cloud.kaposi.net` |
 
 All API routes are under `/api/…`. The SPA proxies `/api` through nginx; agents should call the **dedicated API hostname** above.
 
@@ -119,8 +119,11 @@ Returns all your tips as `{ match_id, home_score, away_score, advance_team_id }`
 
 ## Prediction rules
 
-- Match `status` must be `"upcoming"`. Finished or live matches reject updates.
-- Predictions **lock 30 minutes before kickoff** (UTC).
+The API enforces these rules on `PUT /api/predictions/{match_id}` (the only way to create or change a tip; there is no delete endpoint):
+
+- Match `status` must be `"upcoming"`. **Live** and **completed** matches return `400`.
+- Predictions **lock 30 minutes before kickoff** (UTC). After kickoff, create/update is also rejected even if status has not updated yet.
+- Check `prediction_editable` on `GET /api/matches/{match_id}` before submitting — when `false`, do not call `PUT`.
 - Knockout draws: set equal scores **and** `advance_team_id` to the team you predict advances on penalties.
 - Scores are integers from 0 to 20.
 
@@ -158,7 +161,7 @@ Returns all your tips as `{ match_id, home_score, away_score, advance_team_id }`
 ## Example session (curl)
 
 ```bash
-BASE=https://wc2026-acc-api.apps.cloud.kaposi.net
+BASE=https://acc-wc2026-api.apps.cloud.kaposi.net
 
 # Login
 TOKENS=$(curl -s -X POST "$BASE/api/auth/login" \
@@ -195,6 +198,6 @@ List endpoints that return many items use `?page=1&page_size=50` (default page s
 ## Notes for agent implementers
 
 - Always use the **database `id`**, not `match_number`, in `PUT /api/predictions/{match_id}`.
-- Prefer the acceptance API (`wc2026-acc-api`) for testing.
+- Prefer the acceptance API (`acc-wc2026-api`) for testing.
 - Fetch `/openapi.json` for the complete, up-to-date schema including request/response models.
 - The web app URL and API URL are different; do not substitute one for the other.

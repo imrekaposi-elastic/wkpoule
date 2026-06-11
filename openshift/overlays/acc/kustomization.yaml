@@ -44,7 +44,7 @@ patches:
       metadata:
         name: wkpoule-api
       spec:
-        host: wc2026-acc-api.apps.cloud.kaposi.net
+        host: acc-wc2026-api.apps.cloud.kaposi.net
     target:
       kind: Route
       name: wkpoule-api
@@ -57,7 +57,7 @@ patches:
         name: wkpoule-secrets
       stringData:
         PUBLIC_APP_URL: https://acc-wc2026.apps.cloud.kaposi.net
-        PUBLIC_API_URL: https://wc2026-acc-api.apps.cloud.kaposi.net
+        PUBLIC_API_URL: https://acc-wc2026-api.apps.cloud.kaposi.net
         # Database URL points to postgres in same namespace
         DATABASE_URL: postgresql://wkpoule:changeme@postgres:5432/wkpoule
     target:

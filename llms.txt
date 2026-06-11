@@ -7,7 +7,7 @@
 - Agent guide (login, predictions workflow): docs/AGENTS.md
 - Interactive API reference: https://wc2026-api.apps.cloud.kaposi.net/docs
 - OpenAPI spec: https://wc2026-api.apps.cloud.kaposi.net/openapi.json
-- Acceptance API: https://wc2026-acc-api.apps.cloud.kaposi.net
+- Acceptance API: https://acc-wc2026-api.apps.cloud.kaposi.net
 
 ## Quick start for agents
 
