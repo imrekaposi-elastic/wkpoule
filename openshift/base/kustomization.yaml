@@ -26,3 +26,4 @@ resources:
   - deployment-api.yaml
   - deployment-frontend.yaml
   - route.yaml
+  - route-api.yaml

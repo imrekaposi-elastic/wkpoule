@@ -94,7 +94,7 @@ spec:
   config:
     receivers:
       kubeletstats:
-        collection_interval: 30s
+        collection_interval: 60s
         auth_type: serviceAccount
         endpoint: https://${env:K8S_NODE_IP}:10250
         insecure_skip_verify: true
@@ -245,8 +245,8 @@ spec:
       transform/filelog_ecs:
         error_mode: silent
         log_statements:
-          - set(resource.attributes["service.name"], attributes["service.name"]) where attributes["service.name"] != nil
-          - set(resource.attributes["deployment.environment"], attributes["deployment.environment"]) where attributes["deployment.environment"] != nil
+          - set(resource.attributes["service.name"], log.attributes["service.name"]) where log.attributes["service.name"] != nil
+          - set(resource.attributes["deployment.environment"], log.attributes["deployment.environment"]) where log.attributes["deployment.environment"] != nil
           - set(resource.attributes["service.name"], "wkpoule-frontend") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend" and resource.attributes["service.name"] == nil
           - set(resource.attributes["service.environment"], "prd") where resource.attributes["k8s.deployment.name"] == "wkpoule-frontend"
 

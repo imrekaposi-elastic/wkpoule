@@ -88,7 +88,16 @@ def self_service_reset_password(
     return None
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post(
+    "/login",
+    response_model=TokenResponse,
+    summary="Obtain access and refresh tokens",
+    description=(
+        "Authenticate with username and password. "
+        "Use the returned `access_token` as `Authorization: Bearer <access_token>` on all protected routes. "
+        "Access tokens expire after 30 minutes; refresh with `POST /api/auth/refresh`."
+    ),
+)
 def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
     user = get_user_by_username(db, body.username)
     if not user or not verify_password(body.password, user.password_hash):

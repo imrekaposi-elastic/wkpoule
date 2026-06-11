@@ -1,0 +1,14 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: wkpoule-api
+spec:
+  host: wc2026-api.apps.cloud.kaposi.net
+  to:
+    kind: Service
+    name: wkpoule-api
+  port:
+    targetPort: 8000
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

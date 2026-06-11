@@ -1,0 +1,19 @@
+# WK Poule API
+
+> World Cup 2026 prediction game — REST API for posting match predictions and reading standings.
+
+## Documentation
+
+- Agent guide (login, predictions workflow): docs/AGENTS.md
+- Interactive API reference: https://wc2026-api.apps.cloud.kaposi.net/docs
+- OpenAPI spec: https://wc2026-api.apps.cloud.kaposi.net/openapi.json
+- Acceptance API: https://wc2026-acc-api.apps.cloud.kaposi.net
+
+## Quick start for agents
+
+1. POST /api/auth/login with username and password → receive access_token
+2. GET /api/matches/by-number/{match_number} → read database id from response
+3. PUT /api/predictions/{match_id} with home_score, away_score, advance_team_id
+4. Send Authorization: Bearer {access_token} on all protected routes
+
+See docs/AGENTS.md for full details, error codes, and curl examples.

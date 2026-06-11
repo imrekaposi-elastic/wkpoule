@@ -14,7 +14,16 @@ This folder deploys **three separate container workloads**. None of them use the
 - **Local / OpenShift (single Route):** nginx in the frontend container proxies `/api/*` to the cluster Service `wkpoule-api:8000` via env **`API_HOST`** ([`frontend/nginx.conf`](../frontend/nginx.conf), [`deployment-frontend.yaml`](deployment-frontend.yaml)).
 - **Vite dev server:** proxies `/api` to `localhost:8000` ([`frontend/vite.config.ts`](../frontend/vite.config.ts)).
 
-So: **two app images**, no “fat” image; the browser only hits the Route host; API is not mixed into the static build.
+So: **two app images**, no “fat” image; the browser hits the frontend Route; the API is also exposed on a **dedicated Route** for direct access.
+
+### Public hostnames
+
+| Route | Hostname | Service |
+|-------|----------|---------|
+| `wkpoule` | `wc2026.apps.cloud.kaposi.net` (prd) / `acc-wc2026…` (acc) | `wkpoule-frontend` (SPA + nginx `/api` proxy) |
+| `wkpoule-api` | `wc2026-api.apps.cloud.kaposi.net` (prd) / `wc2026-acc-api…` (acc) | `wkpoule-api` (FastAPI, `/docs`, `/openapi.json`) |
+
+Set **`PUBLIC_APP_URL`** (SPA) and **`PUBLIC_API_URL`** (API) in [`secret.yaml`](secret.yaml) to match these hosts. Agent documentation: [`docs/AGENTS.md`](../docs/AGENTS.md).
 
 ## Building images from this monorepo
 
@@ -64,7 +73,7 @@ Redis observability uses the [Redis OpenTelemetry Assets](https://www.elastic.co
 
 Ensure OpenShift **egress** allows the **gateway** Deployment to reach **`ELASTICSEARCH_URL`** on `443`. Edge components keep using **`http://wkpoule-otel-collector:4318`** unless you rename the gateway Service. If TLS verification fails against ECE (hostname vs cert SAN), adjust [`otel-collector.yaml`](otel-collector.yaml) `elasticsearch/otel` `tls` or fix the deployment URL/certificate.
 
-**Public hostname:** Set [`route.yaml`](route.yaml) `spec.host` and the same URL (with `https://`) as **`PUBLIC_APP_URL`** in [`secret.yaml`](secret.yaml) so invite links and CORS stay aligned — see [`deploy.md`](../deploy.md) §7.
+**Public hostnames:** Set [`route.yaml`](route.yaml) / [`route-api.yaml`](base/route-api.yaml) `spec.host` values and the matching **`PUBLIC_APP_URL`** / **`PUBLIC_API_URL`** in [`secret.yaml`](secret.yaml) so invite links, OpenAPI servers, and CORS stay aligned — see [`deploy.md`](../deploy.md) §7.
 
 ## PostgreSQL backups
 

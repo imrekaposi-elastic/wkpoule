@@ -34,10 +34,22 @@ def _cors_allow_origins() -> list[str]:
     if s.cors_origins.strip():
         return [x.strip() for x in s.cors_origins.split(",") if x.strip()]
     origins = ["http://localhost:5173", "http://localhost:3000"]
-    pub = s.public_app_url.rstrip("/")
-    if pub and pub not in origins:
-        origins.append(pub)
+    for url in (s.public_app_url, s.public_api_url):
+        pub = url.rstrip("/")
+        if pub and pub not in origins:
+            origins.append(pub)
     return origins
+
+
+def _openapi_servers() -> list[dict[str, str]]:
+    s = get_settings()
+    servers: list[dict[str, str]] = []
+    api_url = s.public_api_url.rstrip("/")
+    if api_url:
+        servers.append({"url": api_url, "description": "Public API"})
+    if api_url != "http://localhost:8000":
+        servers.append({"url": "http://localhost:8000", "description": "Local development"})
+    return servers
 
 
 @asynccontextmanager
@@ -57,10 +69,16 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Worldcup 2026 game",
+    title="WK Poule API",
     version="2.4.1",
-    description="World Cup 2026 prediction game",
+    description=(
+        "World Cup 2026 prediction game API. "
+        "Authenticate with `POST /api/auth/login`, then send `Authorization: Bearer <access_token>` "
+        "on protected routes. See `/docs` for the interactive reference or read `docs/AGENTS.md` "
+        "in the repository for agent-oriented workflows (login, resolve matches, post predictions)."
+    ),
     lifespan=lifespan,
+    servers=_openapi_servers(),
 )
 
 app.add_middleware(
@@ -110,7 +128,20 @@ app.include_router(venues.router, prefix="/api", tags=["venues"])
 app.include_router(teams.router, prefix="/api", tags=["teams"])
 
 
-@app.get("/api/health")
+@app.get("/", include_in_schema=False)
+async def root():
+    return {
+        "name": "WK Poule API",
+        "version": "2.4.1",
+        "docs": "/docs",
+        "openapi": "/openapi.json",
+        "health": "/api/health",
+        "agent_guide": "https://github.com/imrekaposi-elastic/wkpoule/blob/main/docs/AGENTS.md",
+    }
+
+
+@app.get("/api/health", tags=["health"])
 async def health_check():
+    """Liveness/readiness probe. No authentication required."""
     redis_ok = await redis_ping()
     return {"status": "ok", "redis": "ok" if redis_ok else "unavailable"}

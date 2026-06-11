@@ -37,6 +37,18 @@ patches:
       kind: Route
       name: wkpoule
 
+  # Patch API route with acc hostname
+  - patch: |-
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        name: wkpoule-api
+      spec:
+        host: wc2026-acc-api.apps.cloud.kaposi.net
+    target:
+      kind: Route
+      name: wkpoule-api
+
   # Patch secret with acc-specific values
   - patch: |-
       apiVersion: v1
@@ -45,6 +57,7 @@ patches:
         name: wkpoule-secrets
       stringData:
         PUBLIC_APP_URL: https://acc-wc2026.apps.cloud.kaposi.net
+        PUBLIC_API_URL: https://wc2026-acc-api.apps.cloud.kaposi.net
         # Database URL points to postgres in same namespace
         DATABASE_URL: postgresql://wkpoule:changeme@postgres:5432/wkpoule
     target:
@@ -135,13 +148,16 @@ patches:
       kind: Role
       name: wkpoule-otel-gateway-k8sattrs
 
-  # Patch RBAC cluster ClusterRoleBinding to use acc namespace
+  # ClusterRoleBinding is cluster-scoped: bind both prd and acc collector service accounts.
   - patch: |-
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
       metadata:
         name: wkpoule-otel-cluster-reader
       subjects:
+        - kind: ServiceAccount
+          name: wkpoule-otel-cluster
+          namespace: wkpoule-prd
         - kind: ServiceAccount
           name: wkpoule-otel-cluster
           namespace: wkpoule-acc

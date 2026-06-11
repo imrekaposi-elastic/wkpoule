@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     smtp_use_tls: bool = True
     # Public browser URL (HTTPS on OpenShift). Used in subgroup invite emails; also added to CORS when CORS_ORIGINS is unset.
     public_app_url: str = "http://localhost:3000"
+    # Public API URL (dedicated Route to wkpoule-api). Used in OpenAPI servers and CORS.
+    public_api_url: str = "http://localhost:8000"
     # Optional comma-separated extra origins (e.g. alternate domains). If empty, CORS uses localhost dev URLs + public_app_url.
     cors_origins: str = ""
     # If set, on startup the `admin` user's password is set to this value (and they stay admin). Dev/local recovery only.

@@ -58,7 +58,19 @@ def my_prediction_milestones(
     return list_milestones_for_user(db, user.id)
 
 
-@router.put("/{match_id}", response_model=PredictionOut)
+@router.put(
+    "/{match_id}",
+    response_model=PredictionOut,
+    summary="Create or update a prediction",
+    description=(
+        "Submit or change your score prediction for a match. "
+        "`match_id` is the **database id** (not the FIFA match number); "
+        "resolve it first via `GET /api/matches/by-number/{match_number}`. "
+        "Predictions are locked when the match is no longer `upcoming`, "
+        "or within 30 minutes of kickoff. "
+        "Knockout draws require `advance_team_id` (the team you predict advances on penalties)."
+    ),
+)
 async def upsert_prediction(
     match_id: int,
     body: PredictionRequest,

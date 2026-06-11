@@ -56,3 +56,6 @@ subjects:
   - kind: ServiceAccount
     name: wkpoule-otel-cluster
     namespace: wkpoule-prd
+  - kind: ServiceAccount
+    name: wkpoule-otel-cluster
+    namespace: wkpoule-acc

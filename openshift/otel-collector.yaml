@@ -6,6 +6,13 @@ spec:
   mode: deployment
   replicas: 1
   serviceAccount: wkpoule-otel-gateway
+  resources:
+    requests:
+      cpu: 100m
+      memory: 384Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
   # EDOT collector image (OpenTelemetry Operator needs otelcol, not Fleet `elastic-agent`).
   image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.4.2
   env:
@@ -99,15 +106,12 @@ spec:
             enabled: true
           postgresql.function.calls:
             enabled: true
-        # PostgreSQL OTel dashboards use these receiver-emitted event logs:
-        # db.server.query_sample (pg_stat_activity) and db.server.top_query (pg_stat_statements).
+        # PostgreSQL OTel dashboards: top queries via pg_stat_statements (query_sample disabled — lighter).
         events:
           db.server.query_sample:
-            enabled: true
+            enabled: false
           db.server.top_query:
             enabled: true
-        query_sample_collection:
-          max_rows_per_query: 100
         top_query_collection:
           max_rows_per_query: 100
           top_n_query: 200
