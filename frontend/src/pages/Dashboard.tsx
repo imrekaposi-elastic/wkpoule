@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import { beforeAuthenticatedPoll } from "../api/authenticatedPoll";
 import MatchDayCalendar from "../components/MatchDayCalendar";
 import { useAuth } from "../context/AuthContext";
 import { resolveLocale } from "../i18n/languages";
@@ -70,14 +71,18 @@ export default function Dashboard() {
   }, [user?.id, loadSubgroupRankings]);
 
   useEffect(() => {
+    if (!user) return;
     const refreshMine = () => {
-      api
-        .get<SubgroupMine[]>("/subgroups/mine")
-        .then((r) => {
-          setSubgroupMine(r.data);
-          loadSubgroupRankings(r.data);
-        })
-        .catch(() => {});
+      void beforeAuthenticatedPoll().then((ok) => {
+        if (!ok) return;
+        api
+          .get<SubgroupMine[]>("/subgroups/mine")
+          .then((r) => {
+            setSubgroupMine(r.data);
+            loadSubgroupRankings(r.data);
+          })
+          .catch(() => {});
+      });
     };
     const tmr = window.setInterval(refreshMine, 30000);
     window.addEventListener("subgroups-mine-changed", refreshMine);
@@ -85,7 +90,7 @@ export default function Dashboard() {
       window.clearInterval(tmr);
       window.removeEventListener("subgroups-mine-changed", refreshMine);
     };
-  }, [loadSubgroupRankings]);
+  }, [loadSubgroupRankings, user]);
 
   if (loading)
     return (

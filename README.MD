@@ -23,7 +23,6 @@ I want to have a world cup game prediction website.
 - **Backend** (pytest): unit tests for scoring, auth, prediction lock, bracket logic; integration tests for HTTP API (`backend/tests/`). Run locally: `make test-backend` or `cd backend && pytest`.
 - **Frontend** (Vitest): unit tests under `frontend/src/**/*.test.ts`. Run locally: `make test-frontend` or `cd frontend && npm run test:ci`.
 - **GitHub** (`.github/workflows/`): runs on every push/PR to `main` — see the [Actions tab](https://github.com/imrekaposi-elastic/wkpoule/actions).
-- **GitLab** (`.gitlab-ci.yml`): same jobs if you mirror the repo to GitLab.
 
 ## Repository layout (containers)
 

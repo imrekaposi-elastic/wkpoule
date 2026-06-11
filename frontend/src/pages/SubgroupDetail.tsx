@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import { beforeAuthenticatedPoll } from "../api/authenticatedPoll";
 import Pagination from "../components/Pagination";
 import { useAuth } from "../context/AuthContext";
 import { resolveLocale } from "../i18n/languages";
@@ -63,13 +64,16 @@ export default function SubgroupDetail() {
 
   const loadMessages = useCallback(() => {
     if (Number.isNaN(subgroupId)) return;
-    api
-      .get<SubgroupMessage[]>(`/subgroups/${subgroupId}/messages`)
-      .then((r) => {
-        setMessages(r.data);
-        window.dispatchEvent(new Event("subgroups-mine-changed"));
-      })
-      .catch(() => setMessages([]));
+    void beforeAuthenticatedPoll().then((ok) => {
+      if (!ok) return;
+      api
+        .get<SubgroupMessage[]>(`/subgroups/${subgroupId}/messages`)
+        .then((r) => {
+          setMessages(r.data);
+          window.dispatchEvent(new Event("subgroups-mine-changed"));
+        })
+        .catch(() => setMessages([]));
+    });
   }, [subgroupId]);
 
   const loadDetail = useCallback(
@@ -118,10 +122,10 @@ export default function SubgroupDetail() {
   }, [subgroupId, rankingsPage]);
 
   useEffect(() => {
-    if (Number.isNaN(subgroupId) || !detail) return;
+    if (Number.isNaN(subgroupId) || !detail || !user) return;
     const tmr = window.setInterval(loadMessages, 12000);
     return () => window.clearInterval(tmr);
-  }, [subgroupId, detail, loadMessages]);
+  }, [subgroupId, detail, loadMessages, user]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });

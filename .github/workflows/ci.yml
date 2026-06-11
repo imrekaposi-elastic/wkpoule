@@ -1,5 +1,4 @@
 # Runs on GitHub for every push and pull request.
-# (.gitlab-ci.yml is only used if you also mirror this repo to GitLab.)
 
 name: CI
 
@@ -33,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
       - name: pytest (unit)
-        run: pytest tests/unit -v --cov=app --cov-report=term-missing --cov-fail-under=70
+        run: pytest tests/unit -v --cov=app --cov-report=term-missing --cov-fail-under=80
 
   backend-integration:
     name: Backend integration tests

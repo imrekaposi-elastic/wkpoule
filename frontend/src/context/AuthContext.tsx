@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import api from "../api/client";
+import api, { ensureFreshAccessToken, msUntilAccessTokenRefresh } from "../api/client";
 import i18n from "../i18n/i18n";
 import type { User } from "../types";
 
@@ -41,20 +41,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   userRef.current = user;
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      api
-        .get("/auth/me")
-        .then((r) => setUser(r.data))
-        .catch(() => {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
+    void (async () => {
+      const token = await ensureFreshAccessToken();
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const r = await api.get("/auth/me");
+        setUser(r.data);
+      } catch {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    let timeoutId: number | undefined;
+
+    const scheduleRefresh = () => {
+      const delay = msUntilAccessTokenRefresh();
+      if (delay === null) return;
+      timeoutId = window.setTimeout(() => {
+        void ensureFreshAccessToken().finally(scheduleRefresh);
+      }, delay);
+    };
+
+    scheduleRefresh();
+    return () => {
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    };
+  }, [user?.id]);
 
   useEffect(() => {
     const onLang = (lng: string) => {

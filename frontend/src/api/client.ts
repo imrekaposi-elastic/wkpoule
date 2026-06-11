@@ -4,7 +4,14 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 
-import { shouldAttemptRefresh } from "./clientUtils";
+import { isAuthEndpoint, shouldAttemptRefresh } from "./clientUtils";
+import {
+  getAccessTokenExpiryMs,
+  hasStoredAuthTokens,
+  isAccessTokenExpiringSoon,
+} from "./tokenStorage";
+
+export { hasStoredAuthTokens } from "./tokenStorage";
 
 const api = axios.create({ baseURL: "/api" });
 
@@ -38,6 +45,40 @@ function refreshAccessToken(): Promise<string> {
   return promise;
 }
 
+/** Refresh before access token expiry so API calls avoid a 401 round-trip. */
+export async function ensureFreshAccessToken(): Promise<string | null> {
+  const access = localStorage.getItem("access_token");
+  const refresh = localStorage.getItem("refresh_token");
+
+  if (!access && !refresh) {
+    return null;
+  }
+
+  if (access && !isAccessTokenExpiringSoon(access)) {
+    return access;
+  }
+
+  if (!refresh) {
+    return access;
+  }
+
+  try {
+    return await refreshAccessToken();
+  } catch {
+    return null;
+  }
+}
+
+/** Milliseconds until proactive refresh should run (2 min before access token expiry). */
+export function msUntilAccessTokenRefresh(): number | null {
+  const access = localStorage.getItem("access_token");
+  if (!access) return null;
+  const expMs = getAccessTokenExpiryMs(access);
+  if (expMs === null) return null;
+  const refreshAt = expMs - 2 * 60 * 1000;
+  return Math.max(0, refreshAt - Date.now());
+}
+
 function clearSessionAndRedirectToLogin(): void {
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
@@ -47,8 +88,16 @@ function clearSessionAndRedirectToLogin(): void {
   }
 }
 
-api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = localStorage.getItem("access_token");
+api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+  if (isAuthEndpoint(config.url)) {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  }
+
+  const token = await ensureFreshAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

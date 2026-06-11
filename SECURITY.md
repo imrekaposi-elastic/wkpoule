@@ -31,6 +31,3 @@ settings page, then restore a `codeql.yml` workflow.
 
 Results: [Actions](https://github.com/imrekaposi-elastic/wkpoule/actions) and
 [Security](https://github.com/imrekaposi-elastic/wkpoule/security) on GitHub.
-
-If the repo is mirrored to GitLab, `.gitlab-ci.yml` runs SAST, dependency scanning,
-and secret detection there as well.

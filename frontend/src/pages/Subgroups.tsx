@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
+import { beforeAuthenticatedPoll } from "../api/authenticatedPoll";
+import { useAuth } from "../context/AuthContext";
 import type {
   SubgroupDirectory,
   SubgroupInvitePending,
@@ -10,6 +12,7 @@ import type {
 } from "../types";
 
 export default function Subgroups() {
+  const { user } = useAuth();
   const { t } = useTranslation();
   const [mine, setMine] = useState<SubgroupMine[]>([]);
   const [directory, setDirectory] = useState<SubgroupDirectory[]>([]);
@@ -50,12 +53,17 @@ export default function Subgroups() {
   }, [load]);
 
   useEffect(() => {
-    const tmr = window.setInterval(() => {
-      api
-        .get<SubgroupMine[]>("/subgroups/mine")
-        .then((r) => setMine(r.data))
-        .catch(() => {});
-    }, 30000);
+    if (!user) return;
+    const refreshMine = () => {
+      void beforeAuthenticatedPoll().then((ok) => {
+        if (!ok) return;
+        api
+          .get<SubgroupMine[]>("/subgroups/mine")
+          .then((r) => setMine(r.data))
+          .catch(() => {});
+      });
+    };
+    const tmr = window.setInterval(refreshMine, 30000);
     const onMineChanged = () => {
       load();
     };
@@ -64,7 +72,7 @@ export default function Subgroups() {
       window.clearInterval(tmr);
       window.removeEventListener("subgroups-mine-changed", onMineChanged);
     };
-  }, [load]);
+  }, [load, user]);
 
   const onCreate = async (e: React.FormEvent) => {
     e.preventDefault();

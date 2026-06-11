@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { APP_VERSION } from "../version";
 import api from "../api/client";
+import { beforeAuthenticatedPoll } from "../api/authenticatedPoll";
 import type { SubgroupMine } from "../types";
 
 const NAV_ITEMS = [
@@ -95,20 +96,23 @@ export default function Navbar() {
       return;
     }
     const fetchSubgroupNav = () => {
-      Promise.all([
-        api.get<{ id: number }[]>("/subgroups/invites/pending"),
-        api.get<SubgroupMine[]>("/subgroups/mine"),
-      ])
-        .then(([inv, mine]) => {
-          setPendingSubgroupInvites(inv.data.length);
-          setSubgroupChatUnread(
-            mine.data.reduce((sum, s) => sum + (s.unread_message_count ?? 0), 0),
-          );
-        })
-        .catch(() => {
-          setPendingSubgroupInvites(0);
-          setSubgroupChatUnread(0);
-        });
+      void beforeAuthenticatedPoll().then((ok) => {
+        if (!ok) return;
+        Promise.all([
+          api.get<{ id: number }[]>("/subgroups/invites/pending"),
+          api.get<SubgroupMine[]>("/subgroups/mine"),
+        ])
+          .then(([inv, mine]) => {
+            setPendingSubgroupInvites(inv.data.length);
+            setSubgroupChatUnread(
+              mine.data.reduce((sum, s) => sum + (s.unread_message_count ?? 0), 0),
+            );
+          })
+          .catch(() => {
+            setPendingSubgroupInvites(0);
+            setSubgroupChatUnread(0);
+          });
+      });
     };
     fetchSubgroupNav();
     const onInvitesChanged = () => fetchSubgroupNav();
