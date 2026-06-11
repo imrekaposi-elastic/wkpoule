@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
@@ -66,7 +66,8 @@ def seed_group_match(
         home_team_id=home.id,
         away_team_id=away.id,
         venue_id=venue.id,
-        kickoff_utc=kickoff or datetime(2026, 6, 11, 18, 0, tzinfo=timezone.utc),
+        kickoff_utc=kickoff
+        or (datetime.now(timezone.utc) + timedelta(hours=2)),
         status=status,
     )
     db.add(match)

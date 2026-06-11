@@ -1,6 +1,6 @@
 """Unit tests for next-match prediction helper."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from app.models.match import Match
 from app.models.prediction import Prediction
@@ -34,7 +34,7 @@ def test_first_match_needing_prediction_skips_predicted_matches(db):
         stage="group",
         group_letter="D",
         venue_id=venue.id,
-        kickoff_utc=datetime(2026, 6, 11, 18, tzinfo=timezone.utc),
+        kickoff_utc=datetime.now(timezone.utc) - timedelta(hours=1),
         status="upcoming",
         home_team_id=home.id,
         away_team_id=away.id,
@@ -44,7 +44,7 @@ def test_first_match_needing_prediction_skips_predicted_matches(db):
         stage="group",
         group_letter="D",
         venue_id=venue.id,
-        kickoff_utc=datetime(2026, 6, 12, 18, tzinfo=timezone.utc),
+        kickoff_utc=datetime.now(timezone.utc) + timedelta(days=2),
         status="upcoming",
         home_team_id=away.id,
         away_team_id=home.id,
