@@ -1,6 +1,40 @@
 """Unit tests for rankings and predictions router endpoints."""
 
+from unittest.mock import patch
+
+import fakeredis.aioredis
+import pytest
+
+from app.cache.service import CacheService
+from app.services import rankings_cache
 from tests.seed_fixtures import seed_group_match
+
+
+@pytest.fixture
+def rankings_cache_service(monkeypatch):
+    fake = fakeredis.aioredis.FakeRedis(decode_responses=True)
+    service = CacheService(fake)
+    monkeypatch.setattr("app.cache.helpers.get_cache_service", lambda: service)
+    return service
+
+
+def test_rankings_me_reuses_shared_rankings_cache(client, auth_headers, rankings_cache_service):
+    calls = {"count": 0}
+    original = rankings_cache.compute_participant_rankings
+
+    def counting_compute(session, user_ids=None):
+        calls["count"] += 1
+        return original(session, user_ids)
+
+    with patch.object(rankings_cache, "compute_participant_rankings", counting_compute):
+        rankings = client.get("/api/rankings", headers=auth_headers)
+        me = client.get("/api/rankings/me", headers=auth_headers)
+
+    assert rankings.status_code == 200
+    assert me.status_code == 200
+    assert calls["count"] == 1
+    assert me.json() is not None
+    assert me.json()["user_id"] == rankings.json()["items"][0]["user_id"]
 
 
 def test_rankings_endpoints(client, auth_headers):

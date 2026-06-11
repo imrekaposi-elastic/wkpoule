@@ -11,6 +11,10 @@ class CacheKeys:
         return f"{PREFIX}:rankings:page={page}:size={page_size}"
 
     @staticmethod
+    def rankings_all() -> str:
+        return f"{PREFIX}:rankings:all"
+
+    @staticmethod
     def rankings_me(user_id: int) -> str:
         return f"{PREFIX}:rankings:me:user={user_id}"
 

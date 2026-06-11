@@ -23,7 +23,7 @@ def cache_service():
 
 
 async def test_invalidate_rankings(cache_service):
-    await cache_service.set(CacheKeys.rankings(1, 20), "data", ttl=60)
+    await cache_service.set(CacheKeys.rankings_all(), "all", ttl=60)
     await cache_service.set(CacheKeys.rankings_me(42), "me", ttl=60)
     await cache_service.set(CacheKeys.teams_list(), "teams", ttl=60)
 
@@ -33,23 +33,23 @@ async def test_invalidate_rankings(cache_service):
 
 
 async def test_invalidate_on_score_update(cache_service):
-    await cache_service.set(CacheKeys.rankings(1, 20), "data", ttl=60)
+    await cache_service.set(CacheKeys.rankings_all(), "data", ttl=60)
     await cache_service.set(CacheKeys.match_detail(7, False, 0), "match", ttl=60)
 
     await invalidate_on_score_update(cache_service)
 
-    assert await cache_service.get(CacheKeys.rankings(1, 20)) is None
+    assert await cache_service.get(CacheKeys.rankings_all()) is None
     assert await cache_service.get(CacheKeys.match_detail(7, False, 0)) is None
 
 
 async def test_invalidate_on_prediction_user_scope(cache_service):
-    await cache_service.set(CacheKeys.rankings_me(1), "rank", ttl=60)
+    await cache_service.set(CacheKeys.rankings_all(), "rank", ttl=60)
     await cache_service.set(CacheKeys.virtual_groups(1), "vg1", ttl=60)
     await cache_service.set(CacheKeys.virtual_groups(2), "vg2", ttl=60)
 
     await invalidate_on_prediction(user_id=1, cache=cache_service)
 
-    assert await cache_service.get(CacheKeys.rankings_me(1)) is None
+    assert await cache_service.get(CacheKeys.rankings_all()) is None
     assert await cache_service.get(CacheKeys.virtual_groups(1)) is None
     assert await cache_service.get(CacheKeys.virtual_groups(2)) == "vg2"
 

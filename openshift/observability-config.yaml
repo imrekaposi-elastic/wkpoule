@@ -7,7 +7,7 @@ data:
   SERVICE_NAME: wkpoule-api
   LOG_LEVEL: INFO
   OTEL_SERVICE_NAME: wkpoule-api
-  OTEL_RESOURCE_ATTRIBUTES: deployment.environment=prd,service.version=2.4.1
+  OTEL_RESOURCE_ATTRIBUTES: deployment.environment=prd,service.version=2.4.2
   # Substituted into frontend nginx ECS access log (service inventory / log correlation).
   DEPLOYMENT_ENVIRONMENT: prd
   # OTLP → in-cluster gateway; gateway writes to Elasticsearch with elasticsearch/otel (see otel-collector.yaml).
