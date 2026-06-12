@@ -10,8 +10,8 @@ from app.config import get_settings
 
 logger = logging.getLogger("wkpoule.score_poller")
 
-MIN_SYNC_INTERVAL = timedelta(hours=2)
-MAX_SYNCS_PER_DAY = 10
+MIN_SYNC_INTERVAL = timedelta(minutes=15)
+MAX_SYNCS_PER_DAY = 256
 
 _task: asyncio.Task | None = None
 _last_sync_at: datetime | None = None
@@ -27,9 +27,9 @@ def start_polling() -> None:
         return
     _task = asyncio.create_task(_poll_loop())
     logger.info(
-        "Score poller started (max %d syncs/day, min %dh between syncs)",
+        "Score poller started (max %d syncs/day, min %d min between syncs)",
         MAX_SYNCS_PER_DAY,
-        int(MIN_SYNC_INTERVAL.total_seconds() // 3600),
+        int(MIN_SYNC_INTERVAL.total_seconds() // 60),
     )
 
 
