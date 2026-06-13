@@ -44,6 +44,39 @@ docker build -t wkpoule-frontend:latest -f frontend/Dockerfile frontend
 
 On OpenShift, use **Git `contextDir`** — [`examples/buildconfigs-git.yaml`](examples/buildconfigs-git.yaml) (HTTPS) or [`examples/buildconfigs-git-ssh.yaml`](examples/buildconfigs-git-ssh.yaml) with a `kubernetes.io/ssh-auth` Secret — or Tekton with an SSH workspace. Full SSH steps: [`deploy.md`](../deploy.md) §4.
 
+Acceptance BuildConfigs (with `VITE_APM_ENVIRONMENT=acc`): [`overlays/acc/buildconfigs.yaml`](overlays/acc/buildconfigs.yaml).
+
+## Continuous deploy to acceptance
+
+On every **push to `main`**, GitHub Actions runs tests (`.github/workflows/ci.yml`). When all jobs pass, the **`Deploy to acceptance`** job:
+
+1. Logs in to OpenShift with repository secrets.
+2. Runs `oc start-build wkpoule-api wkpoule-frontend -n wkpoule-acc --wait --follow` (Git clone + Docker build on cluster).
+3. Waits for rollouts (Deployments have **ImageStream triggers** — new `:latest` tags roll out automatically).
+
+**One-time setup:**
+
+```bash
+# RBAC for GitHub Actions (namespace wkpoule-acc)
+oc apply -f openshift/overlays/acc/rbac-github-deploy.yaml
+
+# ImageStream → Deployment triggers (if not applied via kustomize yet)
+oc set triggers deployment/wkpoule-api --from-image=wkpoule-api:latest --containers=api -n wkpoule-acc
+oc set triggers deployment/wkpoule-frontend --from-image=wkpoule-frontend:latest --containers=frontend -n wkpoule-acc
+
+# Token for GitHub (valid 1 year; rotate before expiry)
+oc create token github-actions-deploy -n wkpoule-acc --duration=8760h
+```
+
+Add GitHub repository secrets:
+
+| Secret | Value |
+|--------|--------|
+| `OPENSHIFT_API_URL` | `https://api.cloud.kaposi.net:6443` |
+| `OPENSHIFT_TOKEN` | output of `oc create token …` above |
+
+Production (`wkpoule-prd`) is **not** auto-deployed — promote manually when ready.
+
 ## Apply manifests
 
 ```bash

@@ -110,3 +110,30 @@ jobs:
         run: |
           npm install
           npm audit --omit=dev --audit-level=high
+
+  deploy-acc:
+    name: Deploy to acceptance
+    runs-on: ubuntu-latest
+    needs:
+      - backend-unit
+      - backend-integration
+      - backend-production-smoke
+      - frontend-test
+      - dependency-audit
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Install OpenShift CLI
+        uses: redhat-actions/oc-installer@v1
+      - name: Log in to OpenShift
+        uses: redhat-actions/openshift-login@v1
+        with:
+          openshift_server_url: ${{ secrets.OPENSHIFT_API_URL }}
+          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+      - name: Build images on cluster
+        run: |
+          oc start-build wkpoule-api wkpoule-frontend \
+            -n wkpoule-acc --wait --follow
+      - name: Wait for rollouts
+        run: |
+          oc rollout status deployment/wkpoule-api -n wkpoule-acc --timeout=10m
+          oc rollout status deployment/wkpoule-frontend -n wkpoule-acc --timeout=10m
