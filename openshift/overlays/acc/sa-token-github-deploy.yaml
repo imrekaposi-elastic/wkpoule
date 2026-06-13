@@ -1,0 +1,12 @@
+# Long-lived token for GitHub Actions (does not expire like oc create token --duration).
+# Apply: oc apply -f openshift/overlays/acc/sa-token-github-deploy.yaml
+# Wait ~10s, then copy token into GitHub secret OPENSHIFT_TOKEN:
+#   oc extract secret/github-actions-deploy-token -n wkpoule-acc --keys=token --to=-
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-actions-deploy-token
+  namespace: wkpoule-acc
+  annotations:
+    kubernetes.io/service-account.name: github-actions-deploy
+type: kubernetes.io/service-account-token

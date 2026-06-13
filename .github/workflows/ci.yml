@@ -133,11 +133,18 @@ jobs:
           OPENSHIFT_API_URL: ${{ secrets.OPENSHIFT_API_URL }}
           OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
         run: |
+          OPENSHIFT_API_URL=$(printf '%s' "$OPENSHIFT_API_URL" | tr -d '\r\n' | xargs)
+          OPENSHIFT_TOKEN=$(printf '%s' "$OPENSHIFT_TOKEN" | tr -d '\r\n' | xargs)
           if [ -z "$OPENSHIFT_API_URL" ] || [ -z "$OPENSHIFT_TOKEN" ]; then
             echo "Missing OPENSHIFT_API_URL or OPENSHIFT_TOKEN repository secret."
             exit 1
           fi
-          oc login "$OPENSHIFT_API_URL" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify=true
+          if ! oc login "$OPENSHIFT_API_URL" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify=true; then
+            echo "OpenShift login failed. Re-copy OPENSHIFT_TOKEN from:"
+            echo "  oc extract secret/github-actions-deploy-token -n wkpoule-acc --keys=token --to=-"
+            echo "Use the long-lived service-account token (not oc whoami -t)."
+            exit 1
+          fi
           oc whoami
           oc auth can-i create buildconfigs/instantiate -n wkpoule-acc
       - name: Build images on cluster

@@ -23,6 +23,11 @@ spec:
     to:
       kind: ImageStreamTag
       name: wkpoule-api:latest
+  triggers:
+    - type: Generic
+      generic:
+        secretReference:
+          name: github-actions-build-webhook
 ---
 apiVersion: build.openshift.io/v1
 kind: BuildConfig
@@ -49,3 +54,8 @@ spec:
     to:
       kind: ImageStreamTag
       name: wkpoule-frontend:latest
+  triggers:
+    - type: Generic
+      generic:
+        secretReference:
+          name: github-actions-build-webhook

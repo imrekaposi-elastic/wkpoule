@@ -1,7 +1,7 @@
 # Service account for GitHub Actions CD (start builds + watch rollouts in wkpoule-acc).
 # Apply: oc apply -f openshift/overlays/acc/rbac-github-deploy.yaml
-# Token for GitHub secret OPENSHIFT_TOKEN:
-#   oc create token github-actions-deploy -n wkpoule-acc --duration=8760h
+# Long-lived token: oc apply -f openshift/overlays/acc/sa-token-github-deploy.yaml
+#   oc extract secret/github-actions-deploy-token -n wkpoule-acc --keys=token --to=-
 apiVersion: v1
 kind: ServiceAccount
 metadata:
