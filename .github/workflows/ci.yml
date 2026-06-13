@@ -110,7 +110,7 @@ jobs:
         working-directory: frontend
         run: |
           npm install
-          npm audit --omit=dev --audit-level=high
+          npm audit --audit-level=high
 
   deploy-acc:
     name: Deploy to acceptance
