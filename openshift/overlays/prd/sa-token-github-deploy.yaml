@@ -1,0 +1,11 @@
+# Long-lived token for GitHub Actions production deploy.
+# Apply: oc apply -f openshift/overlays/prd/sa-token-github-deploy.yaml
+#   oc extract secret/github-actions-deploy-token -n wkpoule-prd --keys=token --to=-
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-actions-deploy-token
+  namespace: wkpoule-prd
+  annotations:
+    kubernetes.io/service-account.name: github-actions-deploy
+type: kubernetes.io/service-account-token

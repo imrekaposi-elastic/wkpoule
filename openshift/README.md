@@ -80,6 +80,40 @@ Do **not** use `oc create token` for CI unless you enjoy rotating secrets; the `
 
 Production (`wkpoule-prd`) is **not** auto-deployed — promote manually when ready.
 
+## Manual deploy to production
+
+Use GitHub Actions workflow **[Deploy production](https://github.com/imrekaposi-elastic/wkpoule/actions/workflows/deploy-prd.yml)** (`Run workflow` button):
+
+1. Choose branch **main**
+2. Type **`deploy`** in the confirm field
+3. Run workflow
+
+This builds `main` on the cluster (`wkpoule-prd`) and waits for rollouts. Acc is not required to be green first, but you should only promote after acc looks good.
+
+### Optional approval gate
+
+Repo → **Settings → Environments → New environment** → name it **`production`**
+
+- Enable **Required reviewers** to block deploy until someone approves (shows as a gate in the workflow run)
+- Add environment secrets (separate from acc):
+
+| Secret | Value |
+|--------|--------|
+| `OPENSHIFT_API_URL` | `https://api.cloud.kaposi.net:6443` |
+| `OPENSHIFT_TOKEN` | `oc extract secret/github-actions-deploy-token -n wkpoule-prd --keys=token --to=-` |
+
+**One-time cluster setup:**
+
+```bash
+oc apply -f openshift/overlays/prd/rbac-github-deploy.yaml
+oc apply -f openshift/overlays/prd/sa-token-github-deploy.yaml
+oc apply -f openshift/overlays/prd/buildconfigs.yaml
+oc set triggers deployment/wkpoule-api --from-image=wkpoule-api:latest --containers=api -n wkpoule-prd
+oc set triggers deployment/wkpoule-frontend --from-image=wkpoule-frontend:latest --containers=frontend -n wkpoule-prd
+```
+
+Repository-level secrets (`OPENSHIFT_*` without environment) remain used by **acc** auto-deploy only.
+
 ## Apply manifests
 
 ```bash

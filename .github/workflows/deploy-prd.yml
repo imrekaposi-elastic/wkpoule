@@ -1,0 +1,79 @@
+# Manual production deploy — use the "Run workflow" button on GitHub Actions.
+# Optional approval gate: repo Settings → Environments → production → Required reviewers.
+
+name: Deploy production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "deploy" to release current main to wkpoule-prd'
+        required: true
+        type: string
+
+concurrency:
+  group: deploy-prd
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-prd:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Confirm deploy
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "deploy" ]; then
+            echo 'You must type deploy in the confirm field.'
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install OpenShift CLI
+        run: |
+          curl -fsSL "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin oc kubectl
+          oc version --client
+
+      - name: Log in to OpenShift
+        env:
+          OPENSHIFT_API_URL: ${{ secrets.OPENSHIFT_API_URL }}
+          OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
+        run: |
+          OPENSHIFT_API_URL=$(printf '%s' "$OPENSHIFT_API_URL" | tr -d '\r\n' | xargs)
+          OPENSHIFT_TOKEN=$(printf '%s' "$OPENSHIFT_TOKEN" | tr -d '\r\n' | xargs)
+          if [ -z "$OPENSHIFT_API_URL" ] || [ -z "$OPENSHIFT_TOKEN" ]; then
+            echo "Missing OPENSHIFT_API_URL or OPENSHIFT_TOKEN on the production environment."
+            exit 1
+          fi
+          if ! oc login "$OPENSHIFT_API_URL" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify=true; then
+            echo "OpenShift login failed. Update production environment OPENSHIFT_TOKEN from:"
+            echo "  oc extract secret/github-actions-deploy-token -n wkpoule-prd --keys=token --to=-"
+            exit 1
+          fi
+          oc whoami
+          oc auth can-i create buildconfigs/instantiate -n wkpoule-prd
+
+      - name: Build images on cluster
+        run: |
+          oc start-build wkpoule-api -n wkpoule-prd --wait &
+          api_pid=$!
+          oc start-build wkpoule-frontend -n wkpoule-prd --wait &
+          frontend_pid=$!
+          wait "$api_pid" "$frontend_pid"
+
+      - name: Wait for rollouts
+        run: |
+          oc rollout status deployment/wkpoule-api -n wkpoule-prd --timeout=15m
+          oc rollout status deployment/wkpoule-frontend -n wkpoule-prd --timeout=15m
+
+      - name: Verify production health
+        run: |
+          curl -sf https://wc2026-api.apps.cloud.kaposi.net/api/health
+          curl -sf https://wc2026.apps.cloud.kaposi.net/

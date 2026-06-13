@@ -1,0 +1,51 @@
+# BuildConfigs for wkpoule-prd — images only.
+# Requires Secret wkpoule-git-ssh (kubernetes.io/ssh-auth) in wkpoule-prd.
+# Apply: oc apply -f openshift/overlays/prd/buildconfigs.yaml
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: wkpoule-api
+  namespace: wkpoule-prd
+spec:
+  source:
+    type: Git
+    git:
+      uri: git@github.com:imrekaposi-elastic/wkpoule.git
+      ref: main
+    contextDir: backend
+    sourceSecret:
+      name: wkpoule-git-ssh
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: wkpoule-api:latest
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: wkpoule-frontend
+  namespace: wkpoule-prd
+spec:
+  source:
+    type: Git
+    git:
+      uri: git@github.com:imrekaposi-elastic/wkpoule.git
+      ref: main
+    contextDir: frontend
+    sourceSecret:
+      name: wkpoule-git-ssh
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+      buildArgs:
+        - name: VITE_APM_ENVIRONMENT
+          value: prd
+  output:
+    to:
+      kind: ImageStreamTag
+      name: wkpoule-frontend:latest

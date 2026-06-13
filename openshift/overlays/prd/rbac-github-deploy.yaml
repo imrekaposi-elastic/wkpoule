@@ -1,0 +1,41 @@
+# Service account for GitHub Actions production deploy (wkpoule-prd).
+# Apply: oc apply -f openshift/overlays/prd/rbac-github-deploy.yaml
+# Long-lived token: oc apply -f openshift/overlays/prd/sa-token-github-deploy.yaml
+#   oc extract secret/github-actions-deploy-token -n wkpoule-prd --keys=token --to=-
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: github-actions-deploy
+  namespace: wkpoule-prd
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: github-actions-deploy
+  namespace: wkpoule-prd
+rules:
+  - apiGroups: ["build.openshift.io"]
+    resources: ["buildconfigs", "buildconfigs/instantiate", "builds"]
+    verbs: ["get", "list", "create", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/rollout"]
+    verbs: ["get", "watch"]
+  - apiGroups: ["image.openshift.io"]
+    resources: ["imagestreams", "imagestreamtags"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: github-actions-deploy
+  namespace: wkpoule-prd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: github-actions-deploy
+subjects:
+  - kind: ServiceAccount
+    name: github-actions-deploy
