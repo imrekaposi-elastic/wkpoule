@@ -142,9 +142,9 @@ jobs:
           oc auth can-i create buildconfigs/instantiate -n wkpoule-acc
       - name: Build images on cluster
         run: |
-          oc start-build wkpoule-api -n wkpoule-acc --wait --follow &
+          oc start-build wkpoule-api -n wkpoule-acc --wait &
           api_pid=$!
-          oc start-build wkpoule-frontend -n wkpoule-acc --wait --follow &
+          oc start-build wkpoule-frontend -n wkpoule-acc --wait &
           frontend_pid=$!
           wait "$api_pid" "$frontend_pid"
       - name: Wait for rollouts
