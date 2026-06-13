@@ -7,6 +7,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -123,13 +124,17 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Install OpenShift CLI
-        uses: redhat-actions/oc-installer@v1
+        run: |
+          curl -fsSL "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin oc kubectl
+          oc version --client
       - name: Log in to OpenShift
-        uses: redhat-actions/oc-login@v1
-        with:
-          openshift_server_url: ${{ secrets.OPENSHIFT_API_URL }}
-          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
-          namespace: wkpoule-acc
+        env:
+          OPENSHIFT_API_URL: ${{ secrets.OPENSHIFT_API_URL }}
+          OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
+        run: |
+          oc login "$OPENSHIFT_API_URL" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify=true
+          oc project wkpoule-acc
       - name: Build images on cluster
         run: |
           oc start-build wkpoule-api wkpoule-frontend \
