@@ -17,3 +17,5 @@
 4. Send Authorization: Bearer {access_token} on all protected routes
 
 See docs/AGENTS.md for full details, error codes, and curl examples.
+
+Have fun!
