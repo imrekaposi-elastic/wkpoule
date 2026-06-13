@@ -95,12 +95,14 @@ This builds `main` on the cluster (`wkpoule-prd`) and waits for rollouts. Acc is
 Repo → **Settings → Environments → New environment** → name it **`production`**
 
 - Enable **Required reviewers** to block deploy until someone approves (shows as a gate in the workflow run)
-- Add environment secrets (separate from acc):
+- Add **production-only** secrets (do not reuse acc `OPENSHIFT_TOKEN` — that SA cannot build in `wkpoule-prd`):
 
 | Secret | Value |
 |--------|--------|
-| `OPENSHIFT_API_URL` | `https://api.cloud.kaposi.net:6443` |
-| `OPENSHIFT_TOKEN` | `oc extract secret/github-actions-deploy-token -n wkpoule-prd --keys=token --to=-` |
+| `OPENSHIFT_API_URL_PRD` | `https://api.cloud.kaposi.net:6443` (optional; workflow defaults to this) |
+| `OPENSHIFT_TOKEN_PRD` | `oc extract secret/github-actions-deploy-token -n wkpoule-prd --keys=token --to=-` |
+
+Set these on the **production** environment, or as repository secrets with the `_PRD` suffix. The workflow verifies login as `system:serviceaccount:wkpoule-prd:github-actions-deploy`.
 
 **One-time cluster setup:**
 
@@ -112,7 +114,7 @@ oc set triggers deployment/wkpoule-api --from-image=wkpoule-api:latest --contain
 oc set triggers deployment/wkpoule-frontend --from-image=wkpoule-frontend:latest --containers=frontend -n wkpoule-prd
 ```
 
-Repository-level secrets (`OPENSHIFT_*` without environment) remain used by **acc** auto-deploy only.
+Repository-level secrets `OPENSHIFT_API_URL` / `OPENSHIFT_TOKEN` (no suffix) remain used by **acc** auto-deploy only. Production uses `OPENSHIFT_*_PRD` so the two tokens cannot be mixed up.
 
 ## Apply manifests
 

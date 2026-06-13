@@ -43,22 +43,53 @@ jobs:
 
       - name: Log in to OpenShift
         env:
+          OPENSHIFT_API_URL_PRD: ${{ secrets.OPENSHIFT_API_URL_PRD }}
+          OPENSHIFT_TOKEN_PRD: ${{ secrets.OPENSHIFT_TOKEN_PRD }}
           OPENSHIFT_API_URL: ${{ secrets.OPENSHIFT_API_URL }}
           OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
         run: |
-          OPENSHIFT_API_URL=$(printf '%s' "$OPENSHIFT_API_URL" | tr -d '\r\n' | xargs)
-          OPENSHIFT_TOKEN=$(printf '%s' "$OPENSHIFT_TOKEN" | tr -d '\r\n' | xargs)
-          if [ -z "$OPENSHIFT_API_URL" ] || [ -z "$OPENSHIFT_TOKEN" ]; then
-            echo "Missing OPENSHIFT_API_URL or OPENSHIFT_TOKEN on the production environment."
-            exit 1
+          set -euo pipefail
+          trim() { printf '%s' "$1" | tr -d '\r\n' | xargs; }
+
+          OPENSHIFT_API_URL=$(trim "${OPENSHIFT_API_URL_PRD:-$OPENSHIFT_API_URL}")
+          OPENSHIFT_TOKEN=$(trim "${OPENSHIFT_TOKEN_PRD:-$OPENSHIFT_TOKEN}")
+          if [ -z "$OPENSHIFT_API_URL" ]; then
+            OPENSHIFT_API_URL="https://api.cloud.kaposi.net:6443"
           fi
-          if ! oc login "$OPENSHIFT_API_URL" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify=true; then
-            echo "OpenShift login failed. Update production environment OPENSHIFT_TOKEN from:"
+
+          if [ -z "$OPENSHIFT_TOKEN" ]; then
+            echo "Missing production deploy token."
+            echo "Add repository or production environment secret OPENSHIFT_TOKEN_PRD from:"
             echo "  oc extract secret/github-actions-deploy-token -n wkpoule-prd --keys=token --to=-"
+            echo "Do not reuse OPENSHIFT_TOKEN from acc — that token cannot start builds in wkpoule-prd."
             exit 1
           fi
-          oc whoami
-          oc auth can-i create buildconfigs/instantiate -n wkpoule-prd
+
+          if ! oc login "$OPENSHIFT_API_URL" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify=true; then
+            echo "OpenShift login failed. Re-copy OPENSHIFT_TOKEN_PRD from:"
+            echo "  oc extract secret/github-actions-deploy-token -n wkpoule-prd --keys=token --to=-"
+            echo "Use the long-lived service-account token (not oc whoami -t)."
+            exit 1
+          fi
+
+          WHOAMI=$(oc whoami)
+          echo "Logged in as: $WHOAMI"
+          EXPECTED="system:serviceaccount:wkpoule-prd:github-actions-deploy"
+          if [ "$WHOAMI" != "$EXPECTED" ]; then
+            echo "Wrong token for production deploy."
+            echo "Expected: $EXPECTED"
+            echo "Got:      $WHOAMI"
+            echo "Set OPENSHIFT_TOKEN_PRD from wkpoule-prd (see openshift/README.md)."
+            exit 1
+          fi
+
+          if ! oc auth can-i create buildconfigs/instantiate -n wkpoule-prd | grep -qx yes; then
+            echo "Token cannot start builds in wkpoule-prd."
+            echo "Apply cluster RBAC once:"
+            echo "  oc apply -f openshift/overlays/prd/rbac-github-deploy.yaml"
+            echo "  oc apply -f openshift/overlays/prd/sa-token-github-deploy.yaml"
+            exit 1
+          fi
 
       - name: Build images on cluster
         run: |
