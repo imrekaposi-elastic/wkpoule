@@ -125,10 +125,11 @@ jobs:
       - name: Install OpenShift CLI
         uses: redhat-actions/oc-installer@v1
       - name: Log in to OpenShift
-        uses: redhat-actions/openshift-login@v1
+        uses: redhat-actions/oc-login@v1
         with:
           openshift_server_url: ${{ secrets.OPENSHIFT_API_URL }}
           openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+          namespace: wkpoule-acc
       - name: Build images on cluster
         run: |
           oc start-build wkpoule-api wkpoule-frontend \
