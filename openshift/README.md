@@ -72,8 +72,8 @@ Add GitHub repository secrets:
 
 | Secret | Value |
 |--------|--------|
-| `OPENSHIFT_API_URL` | `https://api.cloud.kaposi.net:6443` |
-| `OPENSHIFT_TOKEN` | output of `oc create token …` above |
+| `OPENSHIFT_API_URL` | `https://api.cloud.kaposi.net:6443` (API URL, not the web console) |
+| `OPENSHIFT_TOKEN` | output of `oc create token …` above (no extra spaces/newlines) |
 
 Production (`wkpoule-prd`) is **not** auto-deployed — promote manually when ready.
 

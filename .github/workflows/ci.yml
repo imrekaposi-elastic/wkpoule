@@ -133,8 +133,13 @@ jobs:
           OPENSHIFT_API_URL: ${{ secrets.OPENSHIFT_API_URL }}
           OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
         run: |
+          if [ -z "$OPENSHIFT_API_URL" ] || [ -z "$OPENSHIFT_TOKEN" ]; then
+            echo "Missing OPENSHIFT_API_URL or OPENSHIFT_TOKEN repository secret."
+            exit 1
+          fi
           oc login "$OPENSHIFT_API_URL" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify=true
-          oc project wkpoule-acc
+          oc whoami
+          oc auth can-i create buildconfigs/instantiate -n wkpoule-acc
       - name: Build images on cluster
         run: |
           oc start-build wkpoule-api wkpoule-frontend \
