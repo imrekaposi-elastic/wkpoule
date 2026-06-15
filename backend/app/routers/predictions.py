@@ -199,6 +199,7 @@ def my_predictions_brief(
             Prediction.home_score,
             Prediction.away_score,
             Prediction.advance_team_id,
+            Prediction.points,
         )
         .filter(Prediction.user_id == user.id)
         .all()
@@ -209,8 +210,9 @@ def my_predictions_brief(
             home_score=h,
             away_score=a,
             advance_team_id=adv,
+            points=pts,
         )
-        for mid, h, a, adv in rows
+        for mid, h, a, adv, pts in rows
     ]
 
 

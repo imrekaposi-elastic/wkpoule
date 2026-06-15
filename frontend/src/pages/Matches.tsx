@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
@@ -10,9 +10,13 @@ import { localizedTeam } from "../i18n/teamNames";
 import type { Match, MyPredictionBrief, PaginatedResponse, VirtualGroupTable } from "../types";
 
 function predictionsByMatchId(mine: MyPredictionBrief[]) {
-  const map: Record<number, { home: number; away: number }> = {};
+  const map: Record<number, { home: number; away: number; points: number | null }> = {};
   for (const p of mine) {
-    map[p.match_id] = { home: p.home_score, away: p.away_score };
+    map[p.match_id] = {
+      home: p.home_score,
+      away: p.away_score,
+      points: p.points ?? null,
+    };
   }
   return map;
 }
@@ -34,7 +38,7 @@ export default function Matches() {
   const { t, i18n } = useTranslation();
   const [matches, setMatches] = useState<Match[]>([]);
   const [myPredByMatchId, setMyPredByMatchId] = useState<
-    Record<number, { home: number; away: number }>
+    Record<number, { home: number; away: number; points: number | null }>
   >({});
   const [virtualGroup, setVirtualGroup] = useState<VirtualGroupTable | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,6 +49,7 @@ export default function Matches() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const skipCompletedPagesRef = useRef(true);
 
   const locale = resolveLocale(i18n.language);
 
@@ -115,8 +120,32 @@ export default function Matches() {
   }, [page, stage, group, searchApplied, loadMatches]);
 
   useEffect(() => {
+    skipCompletedPagesRef.current = true;
     setPage(1);
   }, [stage, group, searchApplied]);
+
+  const listScrollKey = `${page}|${stage}|${group}|${searchApplied}`;
+
+  useEffect(() => {
+    if (loading || matches.length === 0) return;
+
+    if (
+      skipCompletedPagesRef.current &&
+      matches.every((m) => m.status === "completed") &&
+      page < totalPages
+    ) {
+      setPage((p) => p + 1);
+      return;
+    }
+    skipCompletedPagesRef.current = false;
+
+    const firstOpenIdx = matches.findIndex((m) => m.status !== "completed");
+    if (firstOpenIdx <= 0) return;
+    const targetId = `match-row-${matches[firstOpenIdx].id}`;
+    requestAnimationFrame(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [loading, matches, listScrollKey, page, totalPages]);
 
   const grouped: Record<string, Match[]> = {};
   for (const m of matches) {
@@ -219,8 +248,9 @@ export default function Matches() {
                 return (
                 <Link
                   key={m.id}
+                  id={`match-row-${m.id}`}
                   to={`/matches/${m.match_number}`}
-                  className="block bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-3 sm:p-4 touch-manipulation"
+                  className="block bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-3 sm:p-4 touch-manipulation scroll-mt-20"
                 >
                   <div className="flex flex-col gap-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -245,17 +275,38 @@ export default function Matches() {
                           })}
                         </span>
                       </div>
-                      <span
-                        className={`shrink-0 inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                          m.status === "completed"
-                            ? "bg-green-100 text-green-700"
-                            : m.status === "in_progress"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-blue-100 text-blue-700"
-                        }`}
-                      >
-                        {statusLabel(m.status)}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        {m.status === "completed" && (
+                          myTip ? (
+                            myTip.points !== null ? (
+                              <span
+                                className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold tabular-nums ${
+                                  myTip.points > 0
+                                    ? "bg-emerald-100 text-emerald-800"
+                                    : "bg-gray-100 text-gray-600"
+                                }`}
+                              >
+                                {t("matches.pointsEarned", { count: myTip.points })}
+                              </span>
+                            ) : null
+                          ) : (
+                            <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                              {t("matches.noTip")}
+                            </span>
+                          )
+                        )}
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                            m.status === "completed"
+                              ? "bg-green-100 text-green-700"
+                              : m.status === "in_progress"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-blue-100 text-blue-700"
+                          }`}
+                        >
+                          {statusLabel(m.status)}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-[1fr_auto_1fr] gap-x-2 gap-y-1 items-center w-full min-w-0">

@@ -196,8 +196,6 @@
     "saveFailed": "לא ניתן היה לעדכן את הפרופיל."
   },
   "dashboard": {
-    "worldCupBegun": "המונדיאל התחיל!!",
-    "worldCupBegunAlt": "תמונת קידום של מונדיאל 2026 עם כוכבי הטורניר",
     "welcome": "שלום, {{name}}!",
     "yourRanking": "הדירוג שלך",
     "points": "{{count}} נקודות",
@@ -271,7 +269,9 @@
     "virtualLegendYellowRed": "שורה 3 (אדום): שלישית אך לא בין הטובות ביותר",
     "virtualLegendRed": "שורה 4: בדרך כלל נפסלת",
     "selectGroupForVirtual": "טיפ: בחר בית ספציפי (A–L) בסינון כדי לראות כאן את הטבלה החזויה. בעמוד משחק ביתי הטבלה מוצגת אוטומטית.",
-    "yourTip": "הניבוי שלך"
+    "yourTip": "הניבוי שלך",
+    "pointsEarned": "{{count}} נק׳",
+    "noTip": "ללא ניבוי"
   },
   "matchDetail": {
     "notFound": "המשחק לא נמצא",

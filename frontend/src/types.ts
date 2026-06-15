@@ -21,6 +21,7 @@ export interface MyPredictionBrief {
   home_score: number;
   away_score: number;
   advance_team_id?: number | null;
+  points?: number | null;
 }
 
 /** GET /admin/users */

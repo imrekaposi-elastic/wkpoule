@@ -197,8 +197,6 @@
     "saveFailed": "Profiel kon niet worden bijgewerkt."
   },
   "dashboard": {
-    "worldCupBegun": "Het WK is begonnen!!",
-    "worldCupBegunAlt": "Promotieafbeelding WK 2026 met sterren van het toernooi",
     "welcome": "Welkom terug, {{name}}!",
     "yourRanking": "Je ranglijst",
     "points": "{{count}} punten",
@@ -272,7 +270,9 @@
     "virtualLegendYellowRed": "Rij 3 (rood): derde maar niet bij de beste nummers drie",
     "virtualLegendRed": "Rij 4: meestal uitgeschakeld",
     "selectGroupForVirtual": "Tip: kies een groep (A–L) in het filter hierboven om je voorspelde stand te zien. Op een groepswedstrijdpagina verschijnt de tabel automatisch.",
-    "yourTip": "Jouw voorspelling"
+    "yourTip": "Jouw voorspelling",
+    "pointsEarned": "{{count}} ptn",
+    "noTip": "Geen voorspelling"
   },
   "matchDetail": {
     "notFound": "Wedstrijd niet gevonden",

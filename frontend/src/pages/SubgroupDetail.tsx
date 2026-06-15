@@ -58,7 +58,20 @@ export default function SubgroupDetail() {
   const [sending, setSending] = useState(false);
   const [banner, setBanner] = useState<{ ok: boolean; text: string } | null>(null);
   const [rankingsPage, setRankingsPage] = useState(1);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const prevMessageCountRef = useRef(0);
+  const isNearBottomRef = useRef(true);
+
+  const scrollChatToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    chatEndRef.current?.scrollIntoView({ behavior, block: "end" });
+  }, []);
+
+  const handleChatScroll = useCallback(() => {
+    const el = chatScrollRef.current;
+    if (!el) return;
+    isNearBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 64;
+  }, []);
 
   const subgroupId = id ? parseInt(id, 10) : NaN;
 
@@ -99,6 +112,8 @@ export default function SubgroupDetail() {
       setLoading(false);
       return;
     }
+    prevMessageCountRef.current = 0;
+    isNearBottomRef.current = true;
     setLoading(true);
     Promise.all([
       api.get<SubgroupDetailType>(`/subgroups/${subgroupId}`, {
@@ -128,8 +143,16 @@ export default function SubgroupDetail() {
   }, [subgroupId, detail, loadMessages, user]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (loading) return;
+    const count = messages.length;
+    const prev = prevMessageCountRef.current;
+    if (prev === 0 && count > 0) {
+      scrollChatToBottom("auto");
+    } else if (count > prev && isNearBottomRef.current) {
+      scrollChatToBottom("smooth");
+    }
+    prevMessageCountRef.current = count;
+  }, [messages, loading, scrollChatToBottom]);
 
   const onLeave = async () => {
     if (!window.confirm(t("subgroups.confirmLeave"))) return;
@@ -194,6 +217,7 @@ export default function SubgroupDetail() {
       const res = await api.post<SubgroupMessage>(`/subgroups/${subgroupId}/messages`, { body: b });
       trackMilestones(res.data.newly_achieved);
       setMsgBody("");
+      isNearBottomRef.current = true;
       loadMessages();
     } catch {
       /* ignore */
@@ -412,6 +436,8 @@ export default function SubgroupDetail() {
         </div>
 
         <div
+          ref={chatScrollRef}
+          onScroll={handleChatScroll}
           className="relative max-h-[min(28rem,55vh)] min-h-[16rem] overflow-y-auto scroll-smooth bg-gradient-to-b from-pitch-50/80 via-white to-gray-50/90 px-3 py-4 sm:px-5"
           aria-live="polite"
         >

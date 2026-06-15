@@ -196,8 +196,6 @@
     "saveFailed": "Não foi possível atualizar o perfil."
   },
   "dashboard": {
-    "worldCupBegun": "A Copa do Mundo começou!!",
-    "worldCupBegunAlt": "Imagem promocional da Copa do Mundo 2026 com estrelas do torneio",
     "welcome": "Bem-vindo de volta, {{name}}!",
     "yourRanking": "Sua classificação",
     "points": "{{count}} pontos",
@@ -271,7 +269,9 @@
     "virtualLegendYellowRed": "Linha 3 (vermelho): terceiro mas não entre os melhores terceiros",
     "virtualLegendRed": "Linha 4: eliminação habitual",
     "selectGroupForVirtual": "Dica: escolha um grupo (A–L) no filtro acima para ver sua tabela prevista. Na página de um jogo de grupo, a tabela aparece automaticamente.",
-    "yourTip": "Seu palpite"
+    "yourTip": "Seu palpite",
+    "pointsEarned": "{{count}} pts",
+    "noTip": "Sem palpite"
   },
   "matchDetail": {
     "notFound": "Jogo não encontrado",

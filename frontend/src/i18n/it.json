@@ -197,8 +197,6 @@
     "saveFailed": "Impossibile aggiornare il profilo."
   },
   "dashboard": {
-    "worldCupBegun": "I Mondiali sono iniziati!!",
-    "worldCupBegunAlt": "Immagine promozionale dei Mondiali 2026 con le stelle del torneo",
     "welcome": "Bentornato, {{name}}!",
     "yourRanking": "La tua classifica",
     "points": "{{count}} punti",
@@ -272,7 +270,9 @@
     "virtualLegendYellowRed": "Riga 3 (rosso): terza ma non tra le migliori terze",
     "virtualLegendRed": "Riga 4: di solito eliminata",
     "selectGroupForVirtual": "Suggerimento: scegli un girone specifico (A–L) nel filtro sopra per vedere qui la tua classifica prevista. Nella pagina di una partita di girone, la tabella appare automaticamente.",
-    "yourTip": "Il tuo pronostico"
+    "yourTip": "Il tuo pronostico",
+    "pointsEarned": "{{count}} pt",
+    "noTip": "Nessun pronostico"
   },
   "matchDetail": {
     "notFound": "Partita non trovata",

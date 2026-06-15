@@ -43,8 +43,6 @@ describe("Dashboard page", () => {
       expect(screen.getByText(/welcome back, alice/i)).toBeInTheDocument();
     });
     expect(screen.getByText("#2")).toBeInTheDocument();
-    expect(screen.getByText(/the world cup has begun/i)).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: /fifa world cup 2026/i })).toBeInTheDocument();
   });
 
   it("shows the next match to predict", async () => {

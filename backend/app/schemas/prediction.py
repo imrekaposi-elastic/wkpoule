@@ -32,6 +32,7 @@ class MyPredictionBrief(BaseModel):
     home_score: int
     away_score: int
     advance_team_id: int | None = None
+    points: int | None = None
 
 
 class MyPredictionOut(BaseModel):

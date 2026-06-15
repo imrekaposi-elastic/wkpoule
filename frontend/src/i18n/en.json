@@ -197,8 +197,6 @@
     "saveFailed": "Could not update profile."
   },
   "dashboard": {
-    "worldCupBegun": "The World Cup has begun!!",
-    "worldCupBegunAlt": "FIFA World Cup 2026 stars lineup promotional image",
     "welcome": "Welcome back, {{name}}!",
     "yourRanking": "Your Ranking",
     "points": "{{count}} points",
@@ -272,7 +270,9 @@
     "virtualLegendYellowRed": "Row 3 (red): third place but not among best thirds",
     "virtualLegendRed": "Row 4: typically eliminated",
     "selectGroupForVirtual": "Tip: choose a specific group (A–L) in the filter above to see your predicted group table here. On a group match page, the table appears automatically.",
-    "yourTip": "Your tip"
+    "yourTip": "Your tip",
+    "pointsEarned": "{{count}} pts",
+    "noTip": "No prediction"
   },
   "matchDetail": {
     "notFound": "Match not found",

@@ -197,8 +197,6 @@
     "saveFailed": "Profil konnte nicht aktualisiert werden."
   },
   "dashboard": {
-    "worldCupBegun": "Die Weltmeisterschaft hat begonnen!!",
-    "worldCupBegunAlt": "WM 2026 Werbebild mit Turnierstars",
     "welcome": "Willkommen zurück, {{name}}!",
     "yourRanking": "Deine Platzierung",
     "points": "{{count}} Punkte",
@@ -272,7 +270,9 @@
     "virtualLegendYellowRed": "Zeile 3 (rot): Dritter, aber nicht unter den besten Dritten",
     "virtualLegendRed": "Zeile 4: üblicherweise ausgeschieden",
     "selectGroupForVirtual": "Tipp: Wähle oben eine Gruppe (A–L), um deine vorhergesagte Tabelle zu sehen. Auf einer Gruppenspielseite erscheint sie automatisch.",
-    "yourTip": "Dein Tipp"
+    "yourTip": "Dein Tipp",
+    "pointsEarned": "{{count}} Pkt.",
+    "noTip": "Kein Tipp"
   },
   "matchDetail": {
     "notFound": "Spiel nicht gefunden",
