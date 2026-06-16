@@ -12,17 +12,41 @@ from app.models.team import Team
 
 logger = logging.getLogger("wkpoule.score_sync")
 
+STATUS_RANK = {
+    "upcoming": 0,
+    "in_progress": 1,
+    "completed": 2,
+}
+
 API_STATUS_MAP = {
     "SCHEDULED": "upcoming",
     "TIMED": "upcoming",
     "IN_PLAY": "in_progress",
     "PAUSED": "in_progress",
+    "EXTRA_TIME": "in_progress",
+    "PENALTY_SHOOTOUT": "in_progress",
     "FINISHED": "completed",
     "SUSPENDED": "in_progress",
     "POSTPONED": "upcoming",
     "CANCELLED": "upcoming",
     "AWARDED": "completed",
 }
+
+
+def resolve_sync_status(api_status: str, current_status: str) -> tuple[str, bool]:
+    """Map football-data.org status to our status without downgrading.
+
+    Returns (status_to_apply, ignored_downgrade).
+    """
+    mapped = API_STATUS_MAP.get(api_status)
+    if mapped is None:
+        return current_status, False
+
+    current_rank = STATUS_RANK.get(current_status, 0)
+    mapped_rank = STATUS_RANK.get(mapped, 0)
+    if mapped_rank < current_rank:
+        return current_status, True
+    return mapped, False
 
 
 async def sync_scores() -> int:
@@ -116,7 +140,17 @@ async def sync_scores() -> int:
                 continue
 
             api_status = am.get("status", "")
-            our_status = API_STATUS_MAP.get(api_status, match.status)
+            our_status, ignored_downgrade = resolve_sync_status(api_status, match.status)
+            if ignored_downgrade:
+                logger.warning(
+                    "Ignoring API status downgrade for match #%d %s vs %s: "
+                    "keeping %s (API=%s)",
+                    match.match_number,
+                    home_tla,
+                    away_tla,
+                    match.status,
+                    api_status,
+                )
             score = am.get("score", {})
             ft = score.get("fullTime", {})
             home_goals = ft.get("home")

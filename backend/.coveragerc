@@ -5,7 +5,6 @@ omit =
     app/data/player_physical.py
     app/data/player_physical_data.py
     app/data/team_squads_data.py
-    app/services/score_sync.py
     app/services/score_poller.py
     app/services/invite_email.py
     app/services/weather.py
