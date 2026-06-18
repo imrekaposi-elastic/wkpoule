@@ -425,6 +425,8 @@
   },
   "rankings": {
     "title": "Teilnehmer-Rangliste",
+    "filterSubleague": "Unterliga",
+    "allParticipants": "Alle Teilnehmer",
     "rank": "#",
     "player": "Spieler",
     "predictions": "Tipps",

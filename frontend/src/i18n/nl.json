@@ -425,6 +425,8 @@
   },
   "rankings": {
     "title": "Deelnemersranglijst",
+    "filterSubleague": "Subgroep",
+    "allParticipants": "Alle deelnemers",
     "rank": "#",
     "player": "Speler",
     "predictions": "Voorspellingen",

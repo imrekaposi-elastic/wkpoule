@@ -425,6 +425,8 @@
   },
   "rankings": {
     "title": "Participant Rankings",
+    "filterSubleague": "Subleague",
+    "allParticipants": "All participants",
     "rank": "#",
     "player": "Player",
     "predictions": "Predictions",

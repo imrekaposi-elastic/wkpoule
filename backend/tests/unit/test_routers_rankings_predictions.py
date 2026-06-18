@@ -50,6 +50,32 @@ def test_rankings_endpoints(client, auth_headers):
     assert isinstance(groups.json(), list)
 
 
+def test_rankings_subgroup_filter(client, auth_headers):
+    created = client.post(
+        "/api/subgroups",
+        headers=auth_headers,
+        json={"name": "Rankings Filter League"},
+    )
+    assert created.status_code == 201
+    subgroup_id = created.json()["id"]
+
+    filtered = client.get(
+        "/api/rankings",
+        headers=auth_headers,
+        params={"subgroup_id": subgroup_id},
+    )
+    assert filtered.status_code == 200
+    assert "items" in filtered.json()
+    assert len(filtered.json()["items"]) >= 1
+
+    missing = client.get(
+        "/api/rankings",
+        headers=auth_headers,
+        params={"subgroup_id": 999999},
+    )
+    assert missing.status_code == 404
+
+
 def test_prediction_milestones_requires_auth(client):
     assert client.get("/api/predictions/milestones").status_code == 401
 

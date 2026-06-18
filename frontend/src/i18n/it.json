@@ -425,6 +425,8 @@
   },
   "rankings": {
     "title": "Classifica partecipanti",
+    "filterSubleague": "Sottolega",
+    "allParticipants": "Tutti i partecipanti",
     "rank": "#",
     "player": "Giocatore",
     "predictions": "Pronostici",

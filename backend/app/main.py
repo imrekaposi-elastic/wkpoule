@@ -70,7 +70,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="WK Poule API",
-    version="2.5.0",
+    version="2.5.1",
     description=(
         "World Cup 2026 prediction game API. "
         "Authenticate with `POST /api/auth/login`, then send `Authorization: Bearer <access_token>` "
@@ -132,7 +132,7 @@ app.include_router(teams.router, prefix="/api", tags=["teams"])
 async def root():
     return {
         "name": "WK Poule API",
-        "version": "2.5.0",
+        "version": "2.5.1",
         "docs": "/docs",
         "openapi": "/openapi.json",
         "health": "/api/health",

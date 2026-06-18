@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.auth import get_current_user
 from app.database import get_db
+from app.models.subgroup import Subgroup, SubgroupMember
 from app.models.user import User
 from app.schemas.pagination import DEFAULT_PAGE_SIZE, PaginatedResponse, paginate_list
 from app.schemas.ranking import GroupTable, ParticipantRanking
@@ -11,6 +12,7 @@ from app.services.rankings_cache import (
     find_participant_ranking,
     get_cached_participant_rankings,
 )
+from app.services.subgroup_rankings import compute_participant_rankings
 
 router = APIRouter()
 
@@ -19,10 +21,23 @@ router = APIRouter()
 async def get_rankings(
     page: int = Query(1, ge=1),
     page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=20),
+    subgroup_id: int | None = Query(None, ge=1),
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    all_rankings = await get_cached_participant_rankings(db)
+    if subgroup_id is None:
+        all_rankings = await get_cached_participant_rankings(db)
+    else:
+        sg = db.query(Subgroup).filter(Subgroup.id == subgroup_id).first()
+        if not sg:
+            raise HTTPException(status_code=404, detail="Subgroup not found")
+        member_ids = [
+            row[0]
+            for row in db.query(SubgroupMember.user_id)
+            .filter(SubgroupMember.subgroup_id == subgroup_id)
+            .all()
+        ]
+        all_rankings = compute_participant_rankings(db, member_ids)
     return paginate_list(all_rankings, page, page_size)
 
 

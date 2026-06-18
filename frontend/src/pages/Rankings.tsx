@@ -3,24 +3,51 @@ import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import Pagination from "../components/Pagination";
 import { useAuth } from "../context/AuthContext";
-import type { PaginatedResponse, ParticipantRanking } from "../types";
+import type { PaginatedResponse, ParticipantRanking, SubgroupDirectory } from "../types";
 import { normalizeRankingsResponse } from "../utils/rankings";
+
+function rankDisplay(rank: number) {
+  if (rank === 1) return "\uD83E\uDD47";
+  if (rank === 2) return "\uD83E\uDD48";
+  if (rank === 3) return "\uD83E\uDD49";
+  return null;
+}
 
 export default function Rankings() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [rankings, setRankings] = useState<ParticipantRanking[]>([]);
+  const [subgroups, setSubgroups] = useState<SubgroupDirectory[]>([]);
+  const [selectedSubgroupId, setSelectedSubgroupId] = useState<number | "">("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback((p: number) => {
-    setLoading(true);
+  useEffect(() => {
     api
-      .get<PaginatedResponse<ParticipantRanking>>("/rankings", {
-        params: { page: p, page_size: 20 },
-      })
+      .get<SubgroupDirectory[]>("/subgroups/directory")
+      .then((r) =>
+        setSubgroups(
+          [...r.data].sort((a, b) =>
+            a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+          ),
+        ),
+      )
+      .catch(() => setSubgroups([]));
+  }, []);
+
+  const load = useCallback((p: number, subgroupId: number | "") => {
+    setLoading(true);
+    const params: { page: number; page_size: number; subgroup_id?: number } = {
+      page: p,
+      page_size: 20,
+    };
+    if (subgroupId !== "") {
+      params.subgroup_id = subgroupId;
+    }
+    api
+      .get<PaginatedResponse<ParticipantRanking>>("/rankings", { params })
       .then((r) => {
         const pageData = normalizeRankingsResponse(r.data);
         setRankings(pageData.items);
@@ -37,8 +64,13 @@ export default function Rankings() {
   }, []);
 
   useEffect(() => {
-    load(page);
-  }, [page, load]);
+    load(page, selectedSubgroupId);
+  }, [page, selectedSubgroupId, load]);
+
+  const handleSubgroupChange = (value: string) => {
+    setSelectedSubgroupId(value === "" ? "" : Number(value));
+    setPage(1);
+  };
 
   if (loading && rankings.length === 0) {
     return (
@@ -51,6 +83,26 @@ export default function Rankings() {
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">{t("rankings.title")}</h1>
+
+      <div className="mb-4">
+        <label htmlFor="rankings-subleague-filter" className="sr-only">
+          {t("rankings.filterSubleague")}
+        </label>
+        <select
+          id="rankings-subleague-filter"
+          value={selectedSubgroupId === "" ? "" : String(selectedSubgroupId)}
+          onChange={(e) => handleSubgroupChange(e.target.value)}
+          className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-pitch-600 outline-none"
+        >
+          <option value="">{t("rankings.allParticipants")}</option>
+          {subgroups.map((sg) => (
+            <option key={sg.id} value={sg.id}>
+              {sg.name}
+              {sg.member_count > 0 ? ` (${sg.member_count})` : ""}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="overflow-x-auto overscroll-x-contain -mx-px">
@@ -73,7 +125,9 @@ export default function Rankings() {
             </tr>
           </thead>
           <tbody>
-            {rankings.map((r) => (
+            {rankings.map((r) => {
+              const medal = rankDisplay(r.rank);
+              return (
               <tr
                 key={r.user_id}
                 className={`border-b last:border-0 transition-colors ${
@@ -83,14 +137,8 @@ export default function Rankings() {
                 }`}
               >
                 <td className="py-3 px-4">
-                  {r.rank <= 3 ? (
-                    <span className="text-lg">
-                      {r.rank === 1
-                        ? "\uD83E\uDD47"
-                        : r.rank === 2
-                        ? "\uD83E\uDD48"
-                        : "\uD83E\uDD49"}
-                    </span>
+                  {medal ? (
+                    <span className="text-lg">{medal}</span>
                   ) : (
                     <span className="text-gray-500">{r.rank}</span>
                   )}
@@ -109,7 +157,8 @@ export default function Rankings() {
                   <span className="text-lg font-bold text-pitch-700">{r.total_points}</span>
                 </td>
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
         </div>
