@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 
 import Rankings from "./Rankings";
 import api from "../api/client";
@@ -73,7 +72,6 @@ describe("Rankings page", () => {
 
   it("loads subgroup-filtered rankings when a subleague is selected", async () => {
     mockRankingsApis();
-    const user = userEvent.setup();
 
     renderWithProviders(<Rankings />);
 
@@ -81,7 +79,7 @@ describe("Rankings page", () => {
       expect(screen.getByRole("combobox")).toBeInTheDocument();
     });
 
-    await user.selectOptions(screen.getByRole("combobox"), "7");
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "7" } });
 
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith("/rankings", {
