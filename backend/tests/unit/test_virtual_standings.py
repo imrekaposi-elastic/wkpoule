@@ -74,6 +74,72 @@ def test_compute_virtual_group_standings_uses_predictions(db):
     assert third_row.points == 0
 
 
+def test_compute_virtual_group_standings_uses_actual_result_when_match_completed(db):
+    user, home, away, third = _seed_predicted_group(db)
+    match = db.query(Match).filter(Match.match_number == 2001).one()
+    match.status = "completed"
+    match.home_score = 0
+    match.away_score = 2
+    db.commit()
+
+    tables = compute_virtual_group_standings(db, user.id)
+    group_b = next(table for table in tables if table.group_letter == "B")
+
+    home_row = next(row for row in group_b.standings if row.team_id == home.id)
+    away_row = next(row for row in group_b.standings if row.team_id == away.id)
+
+    assert home_row.points == 0
+    assert home_row.played == 1
+    assert away_row.points == 3
+    assert away_row.played == 1
+
+
+def test_compute_virtual_group_standings_mixes_completed_and_predicted(db):
+    user, home, away, third = _seed_predicted_group(db)
+    venue = db.query(Venue).one()
+
+    played = db.query(Match).filter(Match.match_number == 2001).one()
+    played.status = "completed"
+    played.home_score = 1
+    played.away_score = 1
+
+    upcoming = Match(
+        match_number=2002,
+        stage="group",
+        group_letter="B",
+        venue_id=venue.id,
+        kickoff_utc=played.kickoff_utc,
+        status="upcoming",
+        home_team_id=home.id,
+        away_team_id=third.id,
+    )
+    db.add(upcoming)
+    db.flush()
+    db.add(
+        Prediction(
+            user_id=user.id,
+            match_id=upcoming.id,
+            home_score=3,
+            away_score=0,
+        )
+    )
+    db.commit()
+
+    tables = compute_virtual_group_standings(db, user.id)
+    group_b = next(table for table in tables if table.group_letter == "B")
+
+    home_row = next(row for row in group_b.standings if row.team_id == home.id)
+    away_row = next(row for row in group_b.standings if row.team_id == away.id)
+    third_row = next(row for row in group_b.standings if row.team_id == third.id)
+
+    assert home_row.played == 2
+    assert home_row.points == 4  # draw + predicted win
+    assert away_row.played == 1
+    assert away_row.points == 1
+    assert third_row.played == 1
+    assert third_row.points == 0
+
+
 def test_best_third_place_team_ids_picks_top_thirds(db):
     user, home, away, third = _seed_predicted_group(db)
     tables = compute_virtual_group_standings(db, user.id)

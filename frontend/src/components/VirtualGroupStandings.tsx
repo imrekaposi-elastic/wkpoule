@@ -21,7 +21,7 @@ type Props = {
   groupLetter: string;
 };
 
-/** Predicted group table from user's tips — same UI on Matches + Match detail */
+/** Virtual group table — same UI on Matches + Match detail */
 export default function VirtualGroupStandings({ virtualGroup, groupLetter }: Props) {
   const { t, i18n } = useTranslation();
 

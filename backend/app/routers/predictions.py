@@ -167,7 +167,7 @@ async def virtual_groups(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Group tables based on this user's predicted scores only (predicted matches count)."""
+    """Group tables from real results (played) plus this user's predicted scores (remaining)."""
     cache_key = CacheKeys.virtual_groups(user.id)
 
     def compute() -> list[VirtualGroupTable]:

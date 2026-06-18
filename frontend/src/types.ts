@@ -242,7 +242,7 @@ export interface GroupTable {
   standings: GroupStanding[];
 }
 
-/** Predicted group table from current user's tips (GET /predictions/virtual-groups) */
+/** Virtual group table: actual results (played) + user predictions (remaining). */
 export interface VirtualGroupTable extends GroupTable {
   third_place_qualifies: boolean | null;
 }

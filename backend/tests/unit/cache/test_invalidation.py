@@ -35,11 +35,13 @@ async def test_invalidate_rankings(cache_service):
 async def test_invalidate_on_score_update(cache_service):
     await cache_service.set(CacheKeys.rankings_all(), "data", ttl=60)
     await cache_service.set(CacheKeys.match_detail(7, False, 0), "match", ttl=60)
+    await cache_service.set(CacheKeys.virtual_groups(1), "vg1", ttl=60)
 
     await invalidate_on_score_update(cache_service)
 
     assert await cache_service.get(CacheKeys.rankings_all()) is None
     assert await cache_service.get(CacheKeys.match_detail(7, False, 0)) is None
+    assert await cache_service.get(CacheKeys.virtual_groups(1)) is None
 
 
 async def test_invalidate_on_prediction_user_scope(cache_service):

@@ -58,10 +58,11 @@ async def invalidate_teams(cache: CacheService | None = None) -> int:
 
 
 async def invalidate_on_score_update(cache: CacheService | None = None) -> None:
-    """Invalidate rankings and matches after a score or match status change."""
+    """Invalidate rankings, matches, and virtual groups after a score or match status change."""
     service = cache or get_cache_service()
     await invalidate_rankings(service)
     await invalidate_matches(service)
+    await invalidate_virtual_groups(service)
 
 
 async def invalidate_on_prediction(

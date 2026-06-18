@@ -1,4 +1,4 @@
-"""Predicted group tables from the current user's scores (upcoming matches only)."""
+"""Virtual group tables: actual results for played matches plus predicted scores for the rest."""
 
 from sqlalchemy.orm import Session
 
@@ -11,8 +11,68 @@ from app.services.group_rankings import _apply_h2h_tiebreaker
 BEST_THIRD_SLOTS = 8  # Top 8 of 12 third-placed teams advance (2026 format)
 
 
+def _apply_match_result(
+    hs: int,
+    aws: int,
+    home_team_id: int,
+    away_team_id: int,
+    team_stats: dict[int, dict],
+) -> None:
+    h = team_stats.get(home_team_id)
+    a = team_stats.get(away_team_id)
+    if h is None or a is None:
+        return
+
+    h["played"] += 1
+    a["played"] += 1
+    h["goals_for"] += hs
+    h["goals_against"] += aws
+    a["goals_for"] += aws
+    a["goals_against"] += hs
+
+    if hs > aws:
+        h["won"] += 1
+        a["lost"] += 1
+        h["points"] += 3
+        h["h2h"].setdefault(away_team_id, 0)
+        h["h2h"][away_team_id] += 3
+        a["h2h"].setdefault(home_team_id, 0)
+    elif hs < aws:
+        a["won"] += 1
+        h["lost"] += 1
+        a["points"] += 3
+        a["h2h"].setdefault(home_team_id, 0)
+        a["h2h"][home_team_id] += 3
+        h["h2h"].setdefault(away_team_id, 0)
+    else:
+        h["drawn"] += 1
+        a["drawn"] += 1
+        h["points"] += 1
+        a["points"] += 1
+        h["h2h"].setdefault(away_team_id, 0)
+        h["h2h"][away_team_id] += 1
+        a["h2h"].setdefault(home_team_id, 0)
+        a["h2h"][home_team_id] += 1
+
+
+def _scores_for_virtual_match(
+    match: Match,
+    pred_by_match: dict[int, Prediction],
+) -> tuple[int, int] | None:
+    """Played matches use the real score; upcoming/live matches use the user's prediction."""
+    if match.status == "completed":
+        if match.home_score is None or match.away_score is None:
+            return None
+        return match.home_score, match.away_score
+
+    pred = pred_by_match.get(match.id)
+    if pred is None:
+        return None
+    return pred.home_score, pred.away_score
+
+
 def compute_virtual_group_standings(db: Session, user_id: int) -> list[GroupTable]:
-    """Build group tables using this user's predicted scores for group-stage matches."""
+    """Build group tables from real results (played) plus this user's predictions (remaining)."""
     preds = (
         db.query(Prediction)
         .filter(Prediction.user_id == user_id)
@@ -48,45 +108,16 @@ def compute_virtual_group_standings(db: Session, user_id: int) -> list[GroupTabl
     for m in group_matches:
         if m.home_team_id is None or m.away_team_id is None:
             continue
-        p = pred_by_match.get(m.id)
-        if p is None:
+        scores = _scores_for_virtual_match(m, pred_by_match)
+        if scores is None:
             continue
-        hs, aws = p.home_score, p.away_score
-        h = team_stats.get(m.home_team_id)
-        a = team_stats.get(m.away_team_id)
-        if h is None or a is None:
-            continue
-
-        h["played"] += 1
-        a["played"] += 1
-        h["goals_for"] += hs
-        h["goals_against"] += aws
-        a["goals_for"] += aws
-        a["goals_against"] += hs
-
-        if hs > aws:
-            h["won"] += 1
-            a["lost"] += 1
-            h["points"] += 3
-            h["h2h"].setdefault(m.away_team_id, 0)
-            h["h2h"][m.away_team_id] += 3
-            a["h2h"].setdefault(m.home_team_id, 0)
-        elif hs < aws:
-            a["won"] += 1
-            h["lost"] += 1
-            a["points"] += 3
-            a["h2h"].setdefault(m.home_team_id, 0)
-            a["h2h"][m.home_team_id] += 3
-            h["h2h"].setdefault(m.away_team_id, 0)
-        else:
-            h["drawn"] += 1
-            a["drawn"] += 1
-            h["points"] += 1
-            a["points"] += 1
-            h["h2h"].setdefault(m.away_team_id, 0)
-            h["h2h"][m.away_team_id] += 1
-            a["h2h"].setdefault(m.home_team_id, 0)
-            a["h2h"][m.home_team_id] += 1
+        _apply_match_result(
+            scores[0],
+            scores[1],
+            m.home_team_id,
+            m.away_team_id,
+            team_stats,
+        )
 
     groups: dict[str, list[dict]] = {}
     for s in team_stats.values():
