@@ -425,7 +425,7 @@
   },
   "rankings": {
     "title": "Classifica partecipanti",
-    "filterSubleague": "Sottolega",
+    "selectLeague": "Seleziona lega:",
     "allParticipants": "Tutti i partecipanti",
     "rank": "#",
     "player": "Giocatore",

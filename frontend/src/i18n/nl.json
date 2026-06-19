@@ -425,7 +425,7 @@
   },
   "rankings": {
     "title": "Deelnemersranglijst",
-    "filterSubleague": "Subgroep",
+    "selectLeague": "Selecteer subgroep:",
     "allParticipants": "Alle deelnemers",
     "rank": "#",
     "player": "Speler",

@@ -76,6 +76,7 @@ describe("Rankings page", () => {
     renderWithProviders(<Rankings />);
 
     await waitFor(() => {
+      expect(screen.getByText("Select league:")).toBeInTheDocument();
       expect(screen.getByRole("combobox")).toBeInTheDocument();
     });
 

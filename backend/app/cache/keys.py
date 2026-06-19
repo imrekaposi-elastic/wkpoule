@@ -64,6 +64,14 @@ class CacheKeys:
         return f"{PREFIX}:subgroups:detail:id={subgroup_id}:*"
 
     @staticmethod
+    def subgroup_directory(user_id: int) -> str:
+        return f"{PREFIX}:subgroups:directory:user={user_id}"
+
+    @staticmethod
+    def subgroup_directory_pattern() -> str:
+        return f"{PREFIX}:subgroups:directory:*"
+
+    @staticmethod
     def subgroups_pattern() -> str:
         return f"{PREFIX}:subgroups:*"
 

@@ -84,24 +84,29 @@ export default function Rankings() {
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">{t("rankings.title")}</h1>
 
-      <div className="mb-4">
-        <label htmlFor="rankings-subleague-filter" className="sr-only">
-          {t("rankings.filterSubleague")}
-        </label>
-        <select
-          id="rankings-subleague-filter"
-          value={selectedSubgroupId === "" ? "" : String(selectedSubgroupId)}
-          onChange={(e) => handleSubgroupChange(e.target.value)}
-          className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-pitch-600 outline-none"
-        >
-          <option value="">{t("rankings.allParticipants")}</option>
-          {subgroups.map((sg) => (
-            <option key={sg.id} value={sg.id}>
-              {sg.name}
-              {sg.member_count > 0 ? ` (${sg.member_count})` : ""}
-            </option>
-          ))}
-        </select>
+      <div className="mb-6 bg-white rounded-xl border border-pitch-100 shadow-sm p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          <label
+            htmlFor="rankings-subleague-filter"
+            className="text-sm font-semibold text-pitch-800 shrink-0"
+          >
+            {t("rankings.selectLeague")}
+          </label>
+          <select
+            id="rankings-subleague-filter"
+            value={selectedSubgroupId === "" ? "" : String(selectedSubgroupId)}
+            onChange={(e) => handleSubgroupChange(e.target.value)}
+            className="w-full sm:flex-1 sm:max-w-md px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-sm text-gray-900 shadow-inner focus:ring-2 focus:ring-pitch-600 focus:border-pitch-600 focus:bg-white outline-none transition-colors"
+          >
+            <option value="">{t("rankings.allParticipants")}</option>
+            {subgroups.map((sg) => (
+              <option key={sg.id} value={sg.id}>
+                {sg.name}
+                {sg.member_count > 0 ? ` (${sg.member_count})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">

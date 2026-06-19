@@ -63,6 +63,7 @@ async def test_invalidate_subgroup_and_match(cache_service):
     await cache_service.set(
         CacheKeys.subgroup_detail(5, 2, 1, 20), "sub2", ttl=60
     )
+    await cache_service.set(CacheKeys.subgroup_directory(1), "dir", ttl=60)
     deleted = await invalidate_subgroup(5, cache_service)
     assert deleted == 2
     assert await cache_service.get(CacheKeys.subgroup_detail(5, 1, 1, 20)) is None
@@ -85,3 +86,13 @@ async def test_invalidate_user_virtual_groups(cache_service):
     await cache_service.set(CacheKeys.virtual_groups(3), "a", ttl=60)
     assert await invalidate_user_virtual_groups(3, cache_service) is True
     assert await cache_service.get(CacheKeys.virtual_groups(3)) is None
+
+
+async def test_invalidate_subgroup_directories(cache_service):
+    await cache_service.set(CacheKeys.subgroup_directory(1), "a", ttl=60)
+    await cache_service.set(CacheKeys.subgroup_directory(2), "b", ttl=60)
+    from app.cache.invalidation import invalidate_subgroup_directories
+
+    deleted = await invalidate_subgroup_directories(cache_service)
+    assert deleted == 2
+    assert await cache_service.get(CacheKeys.subgroup_directory(1)) is None

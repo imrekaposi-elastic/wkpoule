@@ -2,11 +2,22 @@
 
 from unittest.mock import patch
 
+import fakeredis.aioredis
 import pytest
 
+from app.cache.keys import CacheKeys
+from app.cache.service import CacheService
 from app.models.subgroup import SubgroupInvite, SubgroupMember
 from app.models.user import User
 from tests.seed_fixtures import make_admin
+
+
+@pytest.fixture
+def subgroups_cache_service(monkeypatch):
+    fake = fakeredis.aioredis.FakeRedis(decode_responses=True)
+    service = CacheService(fake)
+    monkeypatch.setattr("app.cache.helpers.get_cache_service", lambda: service)
+    return service
 
 
 @pytest.fixture
@@ -64,6 +75,29 @@ def test_subgroup_directory_and_detail(client, auth_headers):
     detail = client.get(f"/api/subgroups/{created['id']}", headers=auth_headers)
     assert detail.status_code == 200
     assert detail.json()["name"] == "Public Pool"
+
+
+def test_subgroup_directory_uses_cache(client, auth_headers, subgroups_cache_service, db):
+    user = db.query(User).filter(User.username == "testuser").one()
+    client.post(
+        "/api/subgroups",
+        headers=auth_headers,
+        json={"name": "Cached Directory"},
+    )
+
+    first = client.get("/api/subgroups/directory", headers=auth_headers)
+    second = client.get("/api/subgroups/directory", headers=auth_headers)
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert first.json() == second.json()
+
+    import asyncio
+
+    cached = asyncio.run(
+        subgroups_cache_service.get(CacheKeys.subgroup_directory(user.id))
+    )
+    assert cached is not None
 
 
 def test_subgroup_messages_flow(client, auth_headers):

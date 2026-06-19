@@ -34,6 +34,10 @@ const STAGE_KEYS: { value: string; labelKey: string }[] = [
 
 const GROUPS = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 
+function shouldShowVirtualTable(stageVal: string, groupVal: string) {
+  return !!groupVal && (!stageVal || stageVal === "group");
+}
+
 export default function Matches() {
   const { t, i18n } = useTranslation();
   const [matches, setMatches] = useState<Match[]>([]);
@@ -42,6 +46,7 @@ export default function Matches() {
   >({});
   const [virtualGroup, setVirtualGroup] = useState<VirtualGroupTable | null>(null);
   const [loading, setLoading] = useState(true);
+  const [virtualLoading, setVirtualLoading] = useState(false);
   const [stage, setStage] = useState("");
   const [group, setGroup] = useState("");
   const [search, setSearch] = useState("");
@@ -71,39 +76,14 @@ export default function Matches() {
       if (groupVal) params.group = groupVal;
       if (searchVal.trim()) params.search = searchVal.trim();
 
-      const showVirtualTable = !!groupVal && (!stageVal || stageVal === "group");
-
       setLoading(true);
-      const requests: [
-        ReturnType<typeof api.get<PaginatedResponse<Match>>>,
-        ReturnType<typeof api.get<VirtualGroupTable[]>> | null,
-      ] = [
-        api.get<PaginatedResponse<Match>>("/matches", { params }),
-        showVirtualTable
-          ? api.get<VirtualGroupTable[]>("/predictions/virtual-groups", {
-              params: { _t: Date.now() },
-            })
-          : null,
-      ];
-
-      Promise.all([
-        requests[0],
-        requests[1] ?? Promise.resolve({ data: [] as VirtualGroupTable[] }),
-      ])
-        .then(([mr, vr]) => {
+      api
+        .get<PaginatedResponse<Match>>("/matches", { params })
+        .then((mr) => {
           setMatches(mr.data.items);
           setPage(mr.data.page);
           setTotalPages(mr.data.total_pages);
           setTotal(mr.data.total);
-          if (showVirtualTable) {
-            const gl = groupVal.trim().toUpperCase();
-            const v =
-              vr.data.find((x) => x.group_letter === gl) ??
-              vr.data.find((x) => x.group_letter?.toUpperCase() === gl);
-            setVirtualGroup(v ?? null);
-          } else {
-            setVirtualGroup(null);
-          }
         })
         .catch(() => {
           setMatches([]);
@@ -115,9 +95,34 @@ export default function Matches() {
     [],
   );
 
+  const loadVirtualGroup = useCallback((stageVal: string, groupVal: string) => {
+    if (!shouldShowVirtualTable(stageVal, groupVal)) {
+      setVirtualGroup(null);
+      setVirtualLoading(false);
+      return;
+    }
+
+    setVirtualLoading(true);
+    api
+      .get<VirtualGroupTable[]>("/predictions/virtual-groups")
+      .then((vr) => {
+        const gl = groupVal.trim().toUpperCase();
+        const v =
+          vr.data.find((x) => x.group_letter === gl) ??
+          vr.data.find((x) => x.group_letter?.toUpperCase() === gl);
+        setVirtualGroup(v ?? null);
+      })
+      .catch(() => setVirtualGroup(null))
+      .finally(() => setVirtualLoading(false));
+  }, []);
+
   useEffect(() => {
     loadMatches(page, stage, group, searchApplied);
   }, [page, stage, group, searchApplied, loadMatches]);
+
+  useEffect(() => {
+    loadVirtualGroup(stage, group);
+  }, [stage, group, loadVirtualGroup]);
 
   useEffect(() => {
     skipCompletedPagesRef.current = true;
@@ -159,6 +164,7 @@ export default function Matches() {
   }
 
   const statusLabel = (s: string) => t(`matches.${s}`, s);
+  const showVirtualTable = shouldShowVirtualTable(stage, group);
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
@@ -220,7 +226,13 @@ export default function Matches() {
         </div>
       )}
 
-      {group && (!stage || stage === "group") && virtualGroup && (
+      {showVirtualTable && virtualLoading && (
+        <div className="mb-8 flex justify-center py-10">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pitch-600" />
+        </div>
+      )}
+
+      {showVirtualTable && !virtualLoading && virtualGroup && (
         <div className="mb-8">
           <VirtualGroupStandings virtualGroup={virtualGroup} groupLetter={group} />
         </div>

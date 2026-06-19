@@ -148,10 +148,9 @@ async def list_matches(
 
         results = []
         for m in paged.items:
-            temp = await get_match_temperature(m.id, m.venue.city, m.kickoff_utc)
             pair = predicted_map.get(m.match_number)
             slots = bracket_map.get(m.match_number)
-            results.append(_match_to_out(m, temp, pair, slots))
+            results.append(_match_to_out(m, None, pair, slots))
         return PaginatedResponse(
             items=results,
             total=paged.total,

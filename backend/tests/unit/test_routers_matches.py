@@ -144,3 +144,15 @@ def test_list_matches_with_predicted_teams(mock_temp, client, db, auth_headers):
     )
     assert response.status_code == 200
     assert response.json()["total"] >= 1
+    mock_temp.assert_not_called()
+    for item in response.json()["items"]:
+        assert item["temperature_celsius"] is None
+
+
+@patch("app.routers.matches.get_match_temperature", return_value=18.0)
+def test_get_match_by_id_still_fetches_weather(mock_temp, client, db, auth_headers):
+    match = seed_group_match(db, match_number=108)
+
+    response = client.get(f"/api/matches/{match.id}", headers=auth_headers)
+    assert response.status_code == 200
+    mock_temp.assert_called_once()

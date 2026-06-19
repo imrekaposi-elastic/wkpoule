@@ -38,6 +38,13 @@ async def invalidate_subgroup(subgroup_id: int, cache: CacheService | None = Non
     return deleted
 
 
+async def invalidate_subgroup_directories(cache: CacheService | None = None) -> int:
+    service = cache or get_cache_service()
+    deleted = await service.delete_pattern(CacheKeys.subgroup_directory_pattern())
+    logger.debug("invalidated subgroup directory cache (%s keys)", deleted)
+    return deleted
+
+
 async def invalidate_virtual_groups(cache: CacheService | None = None) -> int:
     service = cache or get_cache_service()
     deleted = await service.delete_pattern(CacheKeys.virtual_groups_pattern())

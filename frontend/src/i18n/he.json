@@ -424,7 +424,7 @@
   },
   "rankings": {
     "title": "דירוג משתתפים",
-    "filterSubleague": "תת-ליגה",
+    "selectLeague": "בחר ליגה:",
     "allParticipants": "כל המשתתפים",
     "rank": "#",
     "player": "שחקן",

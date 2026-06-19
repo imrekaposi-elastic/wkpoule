@@ -6,7 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.cache.helpers import cached_call, run_cache_task
-from app.cache.invalidation import invalidate_subgroup
+from app.cache.invalidation import invalidate_subgroup, invalidate_subgroup_directories
 from app.cache.keys import CacheKeys
 from app.cache.ttl import SUBGROUPS_TTL
 from app.auth import get_current_user
@@ -49,7 +49,11 @@ SUBGROUP_CHAT_MAX_MESSAGES = 256
 
 
 def _invalidate_subgroup_cache(subgroup_id: int) -> None:
-    run_cache_task(invalidate_subgroup(subgroup_id))
+    async def _run() -> None:
+        await invalidate_subgroup(subgroup_id)
+        await invalidate_subgroup_directories()
+
+    run_cache_task(_run())
 
 def _normalize_email(email: str) -> str:
     return email.strip().lower()
@@ -129,6 +133,7 @@ def create_subgroup(
     )
     db.commit()
     db.refresh(sg)
+    run_cache_task(invalidate_subgroup_directories())
     return SubgroupMineOut(
         id=sg.id,
         name=sg.name,
@@ -175,29 +180,34 @@ def list_my_subgroups(
 
 
 @router.get("/directory", response_model=list[SubgroupDirectoryOut])
-def list_subgroup_directory(
+async def list_subgroup_directory(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """All subgroups with membership status for the current user."""
-    subgroups = db.query(Subgroup).order_by(Subgroup.name).all()
-    out: list[SubgroupDirectoryOut] = []
-    for sg in subgroups:
-        cnt = (
-            db.query(func.count())
-            .select_from(SubgroupMember)
-            .filter(SubgroupMember.subgroup_id == sg.id)
-            .scalar()
-        )
-        out.append(
-            SubgroupDirectoryOut(
-                id=sg.id,
-                name=sg.name,
-                member_count=int(cnt or 0),
-                membership_status=membership_status_for_user(db, sg.id, user.id),
+    cache_key = CacheKeys.subgroup_directory(user.id)
+
+    def compute() -> list[SubgroupDirectoryOut]:
+        subgroups = db.query(Subgroup).order_by(Subgroup.name).all()
+        out: list[SubgroupDirectoryOut] = []
+        for sg in subgroups:
+            cnt = (
+                db.query(func.count())
+                .select_from(SubgroupMember)
+                .filter(SubgroupMember.subgroup_id == sg.id)
+                .scalar()
             )
-        )
-    return out
+            out.append(
+                SubgroupDirectoryOut(
+                    id=sg.id,
+                    name=sg.name,
+                    member_count=int(cnt or 0),
+                    membership_status=membership_status_for_user(db, sg.id, user.id),
+                )
+            )
+        return out
+
+    return await cached_call(cache_key, SUBGROUPS_TTL, list[SubgroupDirectoryOut], compute)
 
 
 @router.get("/join-requests/incoming", response_model=list[SubgroupJoinRequestOut])
