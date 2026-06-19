@@ -269,7 +269,8 @@
     "virtualLegendYellow": "Zeile 3 (gelb): unter den Top-8-Dritten",
     "virtualLegendYellowRed": "Zeile 3 (rot): Dritter, aber nicht unter den besten Dritten",
     "virtualLegendRed": "Zeile 4: üblicherweise ausgeschieden",
-    "selectGroupForVirtual": "Tipp: Wähle oben eine Gruppe (A–L), um deine vorhergesagte Tabelle zu sehen. Auf einer Gruppenspielseite erscheint sie automatisch.",
+    "selectGroupForVirtual": "Gruppe (A–L) wählen für die virtuelle Tabelle unten.",
+    "virtualLearnMore": "Wie wird das berechnet?",
     "yourTip": "Dein Tipp",
     "pointsEarned": "{{count}} Pkt.",
     "noTip": "Kein Tipp"

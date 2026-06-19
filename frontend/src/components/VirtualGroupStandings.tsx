@@ -19,20 +19,70 @@ type Props = {
   virtualGroup: VirtualGroupTable;
   /** Group letter for title (e.g. match.group_letter or filter value) */
   groupLetter: string;
+  /** Less visual noise: softer header, hint/legend tucked in details */
+  compact?: boolean;
 };
 
 /** Virtual group table — same UI on Matches + Match detail */
-export default function VirtualGroupStandings({ virtualGroup, groupLetter }: Props) {
+export default function VirtualGroupStandings({
+  virtualGroup,
+  groupLetter,
+  compact = false,
+}: Props) {
   const { t, i18n } = useTranslation();
 
+  const headerClass = compact
+    ? "border-b border-gray-100 px-4 py-3"
+    : "bg-pitch-800 text-white px-4 py-3";
+  const titleClass = compact
+    ? "font-semibold text-base text-pitch-800"
+    : "font-bold text-lg";
+
+  const legend = (
+    <div className={compact ? "space-y-1 text-xs text-gray-600" : "space-y-1"}>
+      <div>
+        <span className="inline-block w-3 h-3 bg-emerald-200 rounded mr-1 align-middle" />{" "}
+        {t("matches.virtualLegendGreen")}
+      </div>
+      <div>
+        <span className="inline-block w-3 h-3 bg-amber-200 rounded mr-1 align-middle" />{" "}
+        {t("matches.virtualLegendYellow")}
+      </div>
+      <div>
+        <span className="inline-block w-3 h-3 bg-red-200 rounded mr-1 align-middle" />{" "}
+        {t("matches.virtualLegendYellowRed")} · {t("matches.virtualLegendRed")}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-      <div className="bg-pitch-800 text-white px-4 py-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-bold text-lg">
+    <div
+      className={`bg-white rounded-xl overflow-hidden border border-gray-100 ${
+        compact ? "shadow-sm" : "shadow-md"
+      }`}
+    >
+      <div className={headerClass}>
+        <h2 className={titleClass}>
           {t("matches.virtualTitle")} · {t("matches.group", { letter: groupLetter })}
         </h2>
       </div>
-      <p className="text-sm text-gray-600 px-4 pt-3">{t("matches.virtualHint")}</p>
+
+      {compact ? (
+        <details className="border-b border-gray-100 px-4 py-2 text-sm">
+          <summary className="cursor-pointer text-gray-600 hover:text-pitch-700 select-none">
+            {t("matches.virtualLearnMore")}
+          </summary>
+          <div className="mt-2 space-y-3 pb-1">
+            <p className="text-sm text-gray-600">{t("matches.virtualHint")}</p>
+            {legend}
+          </div>
+        </details>
+      ) : (
+        <>
+          <p className="text-sm text-gray-600 px-4 pt-3">{t("matches.virtualHint")}</p>
+        </>
+      )}
+
       <div className="overflow-x-auto px-2 pb-2">
         <table className="w-full text-sm min-w-[32rem] mt-2">
           <thead>
@@ -76,20 +126,10 @@ export default function VirtualGroupStandings({ virtualGroup, groupLetter }: Pro
           </tbody>
         </table>
       </div>
-      <div className="px-4 py-3 text-xs text-gray-600 border-t bg-gray-50 space-y-1">
-        <div>
-          <span className="inline-block w-3 h-3 bg-emerald-200 rounded mr-1 align-middle" />{" "}
-          {t("matches.virtualLegendGreen")}
-        </div>
-        <div>
-          <span className="inline-block w-3 h-3 bg-amber-200 rounded mr-1 align-middle" />{" "}
-          {t("matches.virtualLegendYellow")}
-        </div>
-        <div>
-          <span className="inline-block w-3 h-3 bg-red-200 rounded mr-1 align-middle" />{" "}
-          {t("matches.virtualLegendYellowRed")} · {t("matches.virtualLegendRed")}
-        </div>
-      </div>
+
+      {!compact && (
+        <div className="px-4 py-3 text-xs text-gray-600 border-t bg-gray-50">{legend}</div>
+      )}
     </div>
   );
 }

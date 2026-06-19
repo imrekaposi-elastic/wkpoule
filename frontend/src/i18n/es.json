@@ -269,7 +269,8 @@
     "virtualLegendYellow": "Fila 3 (amarillo): entre los 8 mejores terceros",
     "virtualLegendYellowRed": "Fila 3 (rojo): tercero pero no entre los mejores terceros",
     "virtualLegendRed": "Fila 4: normalmente eliminado",
-    "selectGroupForVirtual": "Consejo: elige un grupo concreto (A–L) en el filtro de arriba para ver aquí tu clasificación prevista. En la página de un partido de grupo, la tabla aparece automáticamente.",
+    "selectGroupForVirtual": "Elige un grupo (A–L) para ver la clasificación virtual abajo.",
+    "virtualLearnMore": "¿Cómo se calcula?",
     "yourTip": "Tu pronóstico",
     "pointsEarned": "{{count}} pts",
     "noTip": "Sin pronóstico"

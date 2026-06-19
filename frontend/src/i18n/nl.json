@@ -269,7 +269,8 @@
     "virtualLegendYellow": "Rij 3 (geel): bij de beste 8 nummers drie",
     "virtualLegendYellowRed": "Rij 3 (rood): derde maar niet bij de beste nummers drie",
     "virtualLegendRed": "Rij 4: meestal uitgeschakeld",
-    "selectGroupForVirtual": "Tip: kies een groep (A–L) in het filter hierboven om je voorspelde stand te zien. Op een groepswedstrijdpagina verschijnt de tabel automatisch.",
+    "selectGroupForVirtual": "Kies een groep (A–L) voor je virtuele stand onderaan.",
+    "virtualLearnMore": "Hoe wordt dit berekend?",
     "yourTip": "Jouw voorspelling",
     "pointsEarned": "{{count}} ptn",
     "noTip": "Geen voorspelling"

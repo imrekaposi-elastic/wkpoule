@@ -269,7 +269,8 @@
     "virtualLegendYellow": "Riga 3 (giallo): tra le 8 migliori terze",
     "virtualLegendYellowRed": "Riga 3 (rosso): terza ma non tra le migliori terze",
     "virtualLegendRed": "Riga 4: di solito eliminata",
-    "selectGroupForVirtual": "Suggerimento: scegli un girone specifico (A–L) nel filtro sopra per vedere qui la tua classifica prevista. Nella pagina di una partita di girone, la tabella appare automaticamente.",
+    "selectGroupForVirtual": "Scegli un girone (A–L) per la classifica virtuale in fondo.",
+    "virtualLearnMore": "Come si calcola?",
     "yourTip": "Il tuo pronostico",
     "pointsEarned": "{{count}} pt",
     "noTip": "Nessun pronostico"

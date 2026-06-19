@@ -268,7 +268,8 @@
     "virtualLegendYellow": "שורה 3 (צהוב): בין שמונה שלישיות הטובות ביותר",
     "virtualLegendYellowRed": "שורה 3 (אדום): שלישית אך לא בין הטובות ביותר",
     "virtualLegendRed": "שורה 4: בדרך כלל נפסלת",
-    "selectGroupForVirtual": "טיפ: בחר בית ספציפי (A–L) בסינון כדי לראות כאן את הטבלה החזויה. בעמוד משחק ביתי הטבלה מוצגת אוטומטית.",
+    "selectGroupForVirtual": "בחר בית (A–L) כדי לראות את הטבלה הווירטואלית למטה.",
+    "virtualLearnMore": "איך זה מחושב?",
     "yourTip": "הניבוי שלך",
     "pointsEarned": "{{count}} נק׳",
     "noTip": "ללא ניבוי"

@@ -268,7 +268,8 @@
     "virtualLegendYellow": "Linha 3 (amarelo): entre os 8 melhores terceiros lugares",
     "virtualLegendYellowRed": "Linha 3 (vermelho): terceiro mas não entre os melhores terceiros",
     "virtualLegendRed": "Linha 4: eliminação habitual",
-    "selectGroupForVirtual": "Dica: escolha um grupo (A–L) no filtro acima para ver sua tabela prevista. Na página de um jogo de grupo, a tabela aparece automaticamente.",
+    "selectGroupForVirtual": "Escolha um grupo (A–L) para ver a classificação virtual abaixo.",
+    "virtualLearnMore": "Como é calculado?",
     "yourTip": "Seu palpite",
     "pointsEarned": "{{count}} pts",
     "noTip": "Sem palpite"
