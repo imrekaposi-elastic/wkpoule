@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import api from "../api/client";
@@ -54,7 +54,8 @@ export default function Matches() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
-  const skipCompletedPagesRef = useRef(true);
+  const loadGenerationRef = useRef(0);
+  const scrollToMatchIdRef = useRef<number | null>(null);
 
   const locale = resolveLocale(i18n.language);
 
@@ -65,8 +66,8 @@ export default function Matches() {
       .catch(() => setMyPredByMatchId({}));
   }, []);
 
-  const loadMatches = useCallback(
-    (p: number, stageVal: string, groupVal: string, searchVal: string) => {
+  const fetchMatchesPage = useCallback(
+    async (p: number, stageVal: string, groupVal: string, searchVal: string) => {
       const params: Record<string, string | number> = {
         predicted_teams: "true",
         page: p,
@@ -76,24 +77,102 @@ export default function Matches() {
       if (groupVal) params.group = groupVal;
       if (searchVal.trim()) params.search = searchVal.trim();
 
-      setLoading(true);
-      api
-        .get<PaginatedResponse<Match>>("/matches", { params })
-        .then((mr) => {
-          setMatches(mr.data.items);
-          setPage(mr.data.page);
-          setTotalPages(mr.data.total_pages);
-          setTotal(mr.data.total);
-        })
-        .catch(() => {
-          setMatches([]);
-          setTotal(0);
-          setTotalPages(1);
-        })
-        .finally(() => setLoading(false));
+      const mr = await api.get<PaginatedResponse<Match>>("/matches", { params });
+      return mr.data;
     },
     [],
   );
+
+  const runLoad = useCallback(
+    async (opts: {
+      page: number;
+      stageVal: string;
+      groupVal: string;
+      searchVal: string;
+      autoFocus: boolean;
+    }) => {
+      const gen = ++loadGenerationRef.current;
+      setLoading(true);
+      scrollToMatchIdRef.current = null;
+
+      try {
+        let currentPage = opts.page;
+        let data = await fetchMatchesPage(
+          currentPage,
+          opts.stageVal,
+          opts.groupVal,
+          opts.searchVal,
+        );
+
+        if (opts.autoFocus) {
+          while (
+            data.items.length > 0 &&
+            data.items.every((m) => m.status === "completed") &&
+            currentPage < data.total_pages
+          ) {
+            currentPage++;
+            data = await fetchMatchesPage(
+              currentPage,
+              opts.stageVal,
+              opts.groupVal,
+              opts.searchVal,
+            );
+          }
+          const firstOpenIdx = data.items.findIndex((m) => m.status !== "completed");
+          if (firstOpenIdx > 0) {
+            scrollToMatchIdRef.current = data.items[firstOpenIdx].id;
+          }
+        }
+
+        if (gen !== loadGenerationRef.current) return;
+
+        setMatches(data.items);
+        setPage(data.page);
+        setTotalPages(data.total_pages);
+        setTotal(data.total);
+      } catch {
+        if (gen !== loadGenerationRef.current) return;
+        setMatches([]);
+        setTotal(0);
+        setTotalPages(1);
+      } finally {
+        if (gen === loadGenerationRef.current) setLoading(false);
+      }
+    },
+    [fetchMatchesPage],
+  );
+
+  const handlePageChange = useCallback(
+    (p: number) => {
+      runLoad({
+        page: p,
+        stageVal: stage,
+        groupVal: group,
+        searchVal: searchApplied,
+        autoFocus: false,
+      });
+    },
+    [stage, group, searchApplied, runLoad],
+  );
+
+  useEffect(() => {
+    runLoad({
+      page: 1,
+      stageVal: stage,
+      groupVal: group,
+      searchVal: searchApplied,
+      autoFocus: true,
+    });
+  }, [stage, group, searchApplied, runLoad]);
+
+  useLayoutEffect(() => {
+    if (loading || scrollToMatchIdRef.current === null) return;
+    const matchId = scrollToMatchIdRef.current;
+    scrollToMatchIdRef.current = null;
+    document
+      .getElementById(`match-row-${matchId}`)
+      ?.scrollIntoView({ behavior: "auto", block: "start" });
+  }, [loading, matches]);
 
   const loadVirtualGroup = useCallback((stageVal: string, groupVal: string) => {
     if (!shouldShowVirtualTable(stageVal, groupVal)) {
@@ -117,40 +196,8 @@ export default function Matches() {
   }, []);
 
   useEffect(() => {
-    loadMatches(page, stage, group, searchApplied);
-  }, [page, stage, group, searchApplied, loadMatches]);
-
-  useEffect(() => {
     loadVirtualGroup(stage, group);
   }, [stage, group, loadVirtualGroup]);
-
-  useEffect(() => {
-    skipCompletedPagesRef.current = true;
-    setPage(1);
-  }, [stage, group, searchApplied]);
-
-  const listScrollKey = `${page}|${stage}|${group}|${searchApplied}`;
-
-  useEffect(() => {
-    if (loading || matches.length === 0) return;
-
-    if (
-      skipCompletedPagesRef.current &&
-      matches.every((m) => m.status === "completed") &&
-      page < totalPages
-    ) {
-      setPage((p) => p + 1);
-      return;
-    }
-    skipCompletedPagesRef.current = false;
-
-    const firstOpenIdx = matches.findIndex((m) => m.status !== "completed");
-    if (firstOpenIdx <= 0) return;
-    const targetId = `match-row-${matches[firstOpenIdx].id}`;
-    requestAnimationFrame(() => {
-      document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }, [loading, matches, listScrollKey, page, totalPages]);
 
   const grouped: Record<string, Match[]> = {};
   for (const m of matches) {
@@ -247,19 +294,18 @@ export default function Matches() {
                   const myTip = myPredByMatchId[m.id];
                   const userTipLocked = !(m.status === "upcoming" && m.prediction_editable);
                   const isCompleted = m.status === "completed";
-                  const showStatusBadge = !isCompleted;
 
                   return (
                     <Link
                       key={m.id}
                       id={`match-row-${m.id}`}
                       to={`/matches/${m.match_number}`}
-                      className="block bg-white rounded-lg border border-gray-100 hover:border-pitch-200 transition-colors p-3 sm:p-4 touch-manipulation scroll-mt-20"
+                      className="block bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-3 sm:p-4 touch-manipulation scroll-mt-20"
                     >
                       <div className="flex flex-col gap-2.5">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500 min-w-0">
-                            <span className="font-medium text-gray-600 whitespace-nowrap">
+                            <span className="font-semibold text-gray-700 whitespace-nowrap">
                               #{m.match_number}
                             </span>
                             <span aria-hidden="true">·</span>
@@ -277,22 +323,35 @@ export default function Matches() {
                             </span>
                           </div>
                           <div className="flex flex-wrap items-center gap-2 shrink-0">
-                            {isCompleted && myTip && myTip.points !== null && myTip.points > 0 && (
-                              <span className="inline-flex px-2 py-0.5 rounded text-xs font-semibold tabular-nums bg-emerald-50 text-emerald-700">
-                                {t("matches.pointsEarned", { count: myTip.points })}
-                              </span>
-                            )}
-                            {showStatusBadge && (
-                              <span
-                                className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
-                                  m.status === "in_progress"
-                                    ? "bg-amber-50 text-amber-800"
-                                    : "bg-sky-50 text-sky-800"
-                                }`}
-                              >
-                                {statusLabel(m.status)}
-                              </span>
-                            )}
+                            {isCompleted &&
+                              (myTip ? (
+                                myTip.points !== null ? (
+                                  <span
+                                    className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold tabular-nums ${
+                                      myTip.points > 0
+                                        ? "bg-emerald-100 text-emerald-800"
+                                        : "bg-gray-100 text-gray-600"
+                                    }`}
+                                  >
+                                    {t("matches.pointsEarned", { count: myTip.points })}
+                                  </span>
+                                ) : null
+                              ) : (
+                                <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                                  {t("matches.noTip")}
+                                </span>
+                              ))}
+                            <span
+                              className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                                m.status === "completed"
+                                  ? "bg-green-100 text-green-700"
+                                  : m.status === "in_progress"
+                                    ? "bg-yellow-100 text-yellow-700"
+                                    : "bg-blue-100 text-blue-700"
+                              }`}
+                            >
+                              {statusLabel(m.status)}
+                            </span>
                           </div>
                         </div>
 
@@ -312,21 +371,41 @@ export default function Matches() {
                             )}
                           </div>
 
-                          <div className="shrink-0 px-1 text-center w-[4.5rem] sm:w-24">
+                          <div className="shrink-0 px-1 text-center w-[4.5rem] sm:w-28">
                             {isCompleted ? (
-                              <span className="font-bold text-base sm:text-lg leading-tight tabular-nums">
-                                {m.home_score} – {m.away_score}
-                              </span>
+                              <div className="flex flex-col items-center gap-0.5">
+                                <span className="font-bold text-base sm:text-lg leading-tight tabular-nums">
+                                  {m.home_score} – {m.away_score}
+                                </span>
+                                {myTip && (
+                                  <span
+                                    className={`text-[10px] sm:text-xs font-medium leading-tight ${
+                                      userTipLocked ? "text-gray-400" : "text-pitch-700"
+                                    }`}
+                                  >
+                                    {t("matches.yourTip")}: {myTip.home}–{myTip.away}
+                                  </span>
+                                )}
+                              </div>
                             ) : myTip ? (
-                              <span
-                                className={`font-semibold text-base sm:text-lg leading-tight tabular-nums ${
-                                  userTipLocked ? "text-gray-400" : "text-pitch-700"
-                                }`}
-                              >
-                                {myTip.home} – {myTip.away}
-                              </span>
+                              <div className="flex flex-col items-center gap-0.5">
+                                <span
+                                  className={`font-semibold text-base sm:text-lg leading-tight tabular-nums ${
+                                    userTipLocked ? "text-gray-400" : "text-pitch-700"
+                                  }`}
+                                >
+                                  {myTip.home} – {myTip.away}
+                                </span>
+                                <span
+                                  className={`text-[10px] leading-tight ${
+                                    userTipLocked ? "text-gray-400" : "text-gray-500"
+                                  }`}
+                                >
+                                  {t("matches.yourTip")}
+                                </span>
+                              </div>
                             ) : (
-                              <span className="text-gray-300 text-sm font-medium">{t("matches.vs")}</span>
+                              <span className="text-gray-400 text-sm">{t("matches.vs")}</span>
                             )}
                           </div>
 
@@ -360,7 +439,7 @@ export default function Matches() {
             page={page}
             totalPages={totalPages}
             total={total}
-            onPageChange={setPage}
+            onPageChange={handlePageChange}
             disabled={loading}
           />
         </>

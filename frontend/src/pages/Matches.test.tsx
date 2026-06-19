@@ -83,6 +83,71 @@ describe("Matches page", () => {
     });
   });
 
+  it("loads the page with the next open match without stepping through completed pages", async () => {
+    const completedMatch = {
+      ...sampleMatch,
+      status: "completed" as const,
+      home_score: 2,
+      away_score: 1,
+    };
+    const upcomingMatch = {
+      ...sampleMatch,
+      id: 99,
+      match_number: 21,
+      away_team: { ...sampleMatch.away_team!, name: "France", fifa_code: "FRA" },
+      status: "upcoming" as const,
+    };
+
+    vi.mocked(api.get).mockImplementation((url: string, config?: { params?: { page?: number } }) => {
+      if (url === "/matches") {
+        const page = config?.params?.page ?? 1;
+        if (page === 1) {
+          return Promise.resolve({
+            data: {
+              items: Array.from({ length: 20 }, (_, i) => ({
+                ...completedMatch,
+                id: i + 1,
+                match_number: i + 1,
+              })),
+              total: 21,
+              page: 1,
+              page_size: 20,
+              total_pages: 2,
+            },
+          });
+        }
+        return Promise.resolve({
+          data: {
+            items: [upcomingMatch],
+            total: 21,
+            page: 2,
+            page_size: 20,
+            total_pages: 2,
+          },
+        });
+      }
+      if (url === "/predictions/mine/brief") {
+        return Promise.resolve({ data: [] });
+      }
+      if (url === "/predictions/virtual-groups") {
+        return Promise.resolve({ data: [] });
+      }
+      return Promise.resolve({ data: [] });
+    });
+
+    renderWithProviders(<Matches />);
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith("/matches", {
+        params: expect.objectContaining({ page: 2 }),
+      });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/France/i)).toBeInTheDocument();
+    });
+  });
+
   it("shows matches before virtual standings finish loading", async () => {
     let resolveVirtual: ((value: { data: typeof virtualGroup[] }) => void) | undefined;
     const virtualPromise = new Promise<{ data: typeof virtualGroup[] }>((resolve) => {

@@ -31,12 +31,8 @@ export default function VirtualGroupStandings({
 }: Props) {
   const { t, i18n } = useTranslation();
 
-  const headerClass = compact
-    ? "border-b border-gray-100 px-4 py-3"
-    : "bg-pitch-800 text-white px-4 py-3";
-  const titleClass = compact
-    ? "font-semibold text-base text-pitch-800"
-    : "font-bold text-lg";
+  const headerClass = "bg-pitch-800 text-white px-4 py-3";
+  const titleClass = "font-bold text-lg";
 
   const legend = (
     <div className={compact ? "space-y-1 text-xs text-gray-600" : "space-y-1"}>
