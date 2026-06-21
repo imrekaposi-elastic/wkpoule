@@ -1,4 +1,9 @@
-"""When users may still create or change score predictions for a match."""
+"""When users may still create or change score predictions for a match.
+
+Applies identically to group stage and knockout fixtures: locked from 30 minutes
+before kickoff (UTC), while the match is in progress, and after it has started or
+finished (non-``upcoming`` status).
+"""
 
 from datetime import datetime, timedelta, timezone
 

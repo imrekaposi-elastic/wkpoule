@@ -38,7 +38,7 @@ from app.services.match_prediction_list import (
     summary_counts,
     to_list_item,
 )
-from app.services.scoring import calculate_points
+from app.services.scoring import calculate_prediction_points
 from app.services.virtual_standings import (
     best_third_place_team_ids,
     compute_virtual_group_standings,
@@ -235,9 +235,7 @@ def my_predictions(
     for p in preds:
         pts = None
         if p.match.status == "completed" and p.match.home_score is not None:
-            pts = calculate_points(
-                p.home_score, p.away_score, p.match.home_score, p.match.away_score
-            )["points"]
+            pts = calculate_prediction_points(p, p.match)["points"]
         results.append(
             MyPredictionOut(
                 match_id=p.match_id,

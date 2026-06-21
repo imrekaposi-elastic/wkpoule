@@ -329,9 +329,11 @@
     "predictionProgressTip": "Ci sono molte partite — non devi pronosticarle tutte in una volta. Inserisci solo quelle che vuoi; la prossima volta riprenderai da dove avevi lasciato.",
     "predictionTipAcknowledge": "Capito, non mostrare più",
     "scoresRequired": "Inserisci i gol di casa e trasferta prima di salvare.",
-    "knockoutAfter90Hint": "Partita eliminatoria: pronostica il risultato dopo 90 minuti. Supplementari e rigori non sono inclusi nel tuo pronostico.",
+    "knockoutAfter90Title": "Eliminatoria: risultato dopo 90 minuti",
+    "knockoutAfter90Hint": "Inserisci il punteggio a fine tempo regolamentare (90 minuti). I gol ai supplementari o ai rigori non contano nel pronostico né per i punti.",
+    "knockoutScoreLabel": "Punteggio dopo 90 min",
     "advanceTeamLegend": "Chi passa?",
-    "advanceTeamHelp": "Hai pronosticato un pareggio. Scegli quale squadra passa al turno successivo.",
+    "advanceTeamHelp": "Hai pronosticato pareggio dopo 90 minuti. Scegli chi passa (per il tabellone). Se la partita è pari anche dopo 90 minuti, indovinare il vincitore vale 3 punti extra.",
     "advanceTeamRequired": "Scegli quale squadra passa dopo un pareggio pronosticato.",
     "advanceTeamReadOnly": "Passa: {{team}}",
     "you": "(tu)"

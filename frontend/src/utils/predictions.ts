@@ -1,4 +1,5 @@
 import type { Match } from "../types";
+import { canEditMatchPrediction } from "./predictionLock";
 
 /** First upcoming editable match (by match number) without a user prediction. */
 export function firstMatchNeedingPrediction(
@@ -7,7 +8,10 @@ export function firstMatchNeedingPrediction(
 ): Match | null {
   return (
     matches
-      .filter((m) => m.status === "upcoming" && m.prediction_editable)
+      .filter(
+        (m) =>
+          canEditMatchPrediction(m.status, m.kickoff_utc, m.prediction_editable),
+      )
       .sort((a, b) => a.match_number - b.match_number)
       .find((m) => !predictedMatchIds.has(m.id)) ?? null
   );

@@ -19,6 +19,10 @@ class Match(Base):
     kickoff_utc: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     home_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     away_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # Knockout only: who advanced when level after 90 minutes (extra time / pens).
+    winner_team_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("teams.id"), nullable=True
+    )
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="upcoming")
 
     home_team: Mapped["Team"] = relationship(foreign_keys=[home_team_id])  # noqa: F821

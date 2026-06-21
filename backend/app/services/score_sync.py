@@ -152,9 +152,11 @@ async def sync_scores() -> int:
                     api_status,
                 )
             score = am.get("score", {})
+            # fullTime = end of regular time (90 min); extra time / pens are separate fields.
             ft = score.get("fullTime", {})
             home_goals = ft.get("home")
             away_goals = ft.get("away")
+            winner_side = score.get("winner")
 
             changed = False
 
@@ -170,16 +172,31 @@ async def sync_scores() -> int:
                 our_status == "completed"
                 and home_goals is not None
                 and away_goals is not None
-                and (match.home_score != home_goals or match.away_score != away_goals)
             ):
-                logger.info(
-                    "Match #%d %s vs %s: score %s-%s -> %d-%d",
-                    match.match_number, home_tla, away_tla,
-                    match.home_score, match.away_score, home_goals, away_goals,
-                )
-                match.home_score = home_goals
-                match.away_score = away_goals
-                changed = True
+                if match.home_score != home_goals or match.away_score != away_goals:
+                    logger.info(
+                        "Match #%d %s vs %s: score %s-%s -> %d-%d",
+                        match.match_number, home_tla, away_tla,
+                        match.home_score, match.away_score, home_goals, away_goals,
+                    )
+                    match.home_score = home_goals
+                    match.away_score = away_goals
+                    changed = True
+
+                if home_goals > away_goals:
+                    winner_team_id = home_id
+                elif away_goals > home_goals:
+                    winner_team_id = away_id
+                elif winner_side == "HOME_TEAM":
+                    winner_team_id = home_id
+                elif winner_side == "AWAY_TEAM":
+                    winner_team_id = away_id
+                else:
+                    winner_team_id = None
+
+                if match.winner_team_id != winner_team_id:
+                    match.winner_team_id = winner_team_id
+                    changed = True
 
             if changed:
                 updates += 1

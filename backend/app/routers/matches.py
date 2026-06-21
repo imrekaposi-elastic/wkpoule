@@ -27,6 +27,7 @@ from app.services.expert import generate_expert_prediction
 from app.services.match_calendar import local_date_for_utc_instant, utc_bounds_for_local_day
 from app.services.next_match_prediction import first_match_needing_prediction
 from app.services.prediction_lock import match_accepts_prediction_updates
+from app.services.match_stages import is_knockout_stage
 from app.services.scoring import recalculate_points
 from app.services.team_names import team_matches_search, team_out_matches_search
 from app.services.weather import get_match_temperature
@@ -333,6 +334,24 @@ async def update_score(
     m.home_score = body.home_score
     m.away_score = body.away_score
     m.status = body.status
+    if body.status == "completed" and is_knockout_stage(m.stage):
+        if body.home_score == body.away_score:
+            if body.winner_team_id is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="winner_team_id required when knockout match is level after 90 minutes",
+                )
+            allowed = {m.home_team_id, m.away_team_id} - {None}
+            if body.winner_team_id not in allowed:
+                raise HTTPException(
+                    status_code=400,
+                    detail="winner_team_id must be the home or away team",
+                )
+            m.winner_team_id = body.winner_team_id
+        else:
+            m.winner_team_id = None
+    else:
+        m.winner_team_id = None
     db.commit()
     db.refresh(m)
     recalculate_points()

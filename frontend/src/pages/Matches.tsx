@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import api from "../api/client";
 import Pagination from "../components/Pagination";
 import { formatStageSlug } from "../utils/formatStage";
+import { canEditMatchPrediction } from "../utils/predictionLock";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
 import { resolveLocale } from "../i18n/languages";
 import { localizedTeam } from "../i18n/teamNames";
@@ -292,7 +293,11 @@ export default function Matches() {
               <div className="space-y-2">
                 {dayMatches.map((m) => {
                   const myTip = myPredByMatchId[m.id];
-                  const userTipLocked = !(m.status === "upcoming" && m.prediction_editable);
+                  const userTipLocked = !canEditMatchPrediction(
+                    m.status,
+                    m.kickoff_utc,
+                    m.prediction_editable,
+                  );
                   const isCompleted = m.status === "completed";
 
                   return (

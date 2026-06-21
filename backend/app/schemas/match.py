@@ -124,3 +124,7 @@ class ScoreUpdate(BaseModel):
     home_score: int = Field(ge=0, le=30)
     away_score: int = Field(ge=0, le=30)
     status: Literal["upcoming", "in_progress", "completed"] = "completed"
+    winner_team_id: int | None = Field(
+        None,
+        description="Required for completed knockout matches level after 90 minutes",
+    )

@@ -1,2 +1,2 @@
 /** Frontend build version (bump when releasing). */
-export const APP_VERSION = "2.5.4";
+export const APP_VERSION = "2.6.0";

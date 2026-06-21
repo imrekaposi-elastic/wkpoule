@@ -329,9 +329,11 @@
     "predictionProgressTip": "Es sind sehr viele Spiele — du musst nicht alles auf einmal tippen. Tippe nur die, die du möchtest; beim nächsten Mal machst du nahtlos weiter.",
     "predictionTipAcknowledge": "Verstanden, nicht mehr anzeigen",
     "scoresRequired": "Bitte Heim- und Auswärtstore eintragen, bevor du speicherst.",
-    "knockoutAfter90Hint": "K.-o.-Spiel: Tippe das Ergebnis nach 90 Minuten. Verlängerung und Elfmeter zählen nicht.",
+    "knockoutAfter90Title": "K.-o.-Spiel: Ergebnis nach 90 Minuten",
+    "knockoutAfter90Hint": "Trage das Ergebnis nach regulärer Spielzeit (90 Minuten) ein. Tore in der Verlängerung oder im Elfmeterschießen zählen weder im Tipp noch für Punkte.",
+    "knockoutScoreLabel": "Stand nach 90 Min.",
     "advanceTeamLegend": "Wer kommt weiter?",
-    "advanceTeamHelp": "Du hast ein Unentschieden getippt. Wähle, welches Team in die nächste Runde geht.",
+    "advanceTeamHelp": "Du hast ein Unentschieden nach 90 Minuten getippt. Wähle, wer weiterkommt (für den K.-o.-Baum). Steht es nach 90 Minuten auch wirklich unentschieden, gibt ein richtiger Sieger 3 Extra-Punkte.",
     "advanceTeamRequired": "Wähle bei einem Unentschieden, welches Team weiterkommt.",
     "advanceTeamReadOnly": "Weiter: {{team}}",
     "you": "(du)"

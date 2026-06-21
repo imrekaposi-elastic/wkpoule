@@ -10,6 +10,7 @@ import { resolveLocale } from "../i18n/languages";
 import { localizedTeam } from "../i18n/teamNames";
 import { formatStageSlug } from "../utils/formatStage";
 import { funCommentText } from "../utils/funCommentText";
+import { canEditMatchPrediction } from "../utils/predictionLock";
 import { isKnockoutStage, isPredictedDraw } from "../utils/predictions";
 import { trackMilestones } from "../utils/trackMilestone";
 import type { Match, MyPredictionBrief, Prediction, VirtualGroupTable } from "../types";
@@ -151,12 +152,20 @@ export default function MatchDetail() {
 
   useEffect(() => {
     if (loading || !match) return;
-    if (match.status !== "upcoming" || !match.prediction_editable) return;
+    if (
+      !canEditMatchPrediction(
+        match.status,
+        match.kickoff_utc,
+        match.prediction_editable,
+      )
+    ) {
+      return;
+    }
     const frame = requestAnimationFrame(() => {
       homeScoreInputRef.current?.focus();
     });
     return () => cancelAnimationFrame(frame);
-  }, [loading, match?.id, match?.status, match?.prediction_editable]);
+  }, [loading, match?.id, match?.status, match?.kickoff_utc, match?.prediction_editable]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -164,6 +173,16 @@ export default function MatchDetail() {
     setMessage("");
     try {
       if (!match) return;
+      if (
+        !canEditMatchPrediction(
+          match.status,
+          match.kickoff_utc,
+          match.prediction_editable,
+        )
+      ) {
+        setMessage(t("matchDetail.lockedBeforeKickoff"));
+        return;
+      }
       if (homeScore === "" || awayScore === "") {
         setMessage(t("matchDetail.scoresRequired"));
         return;
@@ -218,8 +237,11 @@ export default function MatchDetail() {
   if (!match) return <div className="text-center py-20">{t("matchDetail.notFound")}</div>;
 
   const kickoff = new Date(match.kickoff_utc);
-  const canEditPrediction =
-    match.status === "upcoming" && match.prediction_editable;
+  const canEditPrediction = canEditMatchPrediction(
+    match.status,
+    match.kickoff_utc,
+    match.prediction_editable,
+  );
   const hasMyPrediction = homeScore !== "" && awayScore !== "";
   const showKnockoutAfter90Hint = isKnockoutStage(match.stage);
   const showAdvancePicker =
@@ -425,9 +447,15 @@ export default function MatchDetail() {
           {canEditPrediction ? (
             <form onSubmit={handleSubmit}>
               {showKnockoutAfter90Hint && (
-                <p className="mb-4 text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
-                  {t("matchDetail.knockoutAfter90Hint")}
-                </p>
+                <div
+                  className="mb-4 text-sm text-amber-950 bg-amber-50 border-2 border-amber-300 rounded-lg px-4 py-3 leading-relaxed"
+                  role="note"
+                >
+                  <p className="font-semibold text-amber-950 mb-1">
+                    {t("matchDetail.knockoutAfter90Title")}
+                  </p>
+                  <p>{t("matchDetail.knockoutAfter90Hint")}</p>
+                </div>
               )}
               {!predictionTipDismissed && (
                 <div className="mb-4 rounded-lg border border-sky-200 bg-sky-50 px-3 py-3 text-sm text-sky-950">
@@ -450,6 +478,11 @@ export default function MatchDetail() {
                     <span>{t("matchDetail.predictionTipAcknowledge")}</span>
                   </label>
                 </div>
+              )}
+              {showKnockoutAfter90Hint && (
+                <p className="mb-3 text-center text-xs font-semibold uppercase tracking-wide text-amber-900">
+                  {t("matchDetail.knockoutScoreLabel")}
+                </p>
               )}
               <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-4 mb-4 w-full max-w-full min-w-0">
                 <div className="text-center min-w-0">

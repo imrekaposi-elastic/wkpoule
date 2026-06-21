@@ -53,11 +53,51 @@ def _seed_scored_match(db):
         )
     )
     db.commit()
-    return user, match
+    return user, match, home, away
 
 
 def test_recalculate_points_updates_stored_prediction_points(db):
-    user, match = _seed_scored_match(db)
+    user, match, _, _ = _seed_scored_match(db)
+
+    updated = recalculate_points()
+
+    assert updated == 1
+    prediction = (
+        db.query(Prediction)
+        .filter(Prediction.user_id == user.id, Prediction.match_id == match.id)
+        .one()
+    )
+    assert prediction.points == 12
+
+
+def test_recalculate_knockout_draw_awards_winner_bonus(db):
+    user, _, home, away = _seed_scored_match(db)
+    match = Match(
+        match_number=3002,
+        stage="round_of_16",
+        group_letter=None,
+        venue_id=db.query(Venue).one().id,
+        kickoff_utc=datetime(2026, 7, 5, 18, tzinfo=timezone.utc),
+        status="completed",
+        home_team_id=home.id,
+        away_team_id=away.id,
+        home_score=1,
+        away_score=1,
+        winner_team_id=away.id,
+    )
+    db.add(match)
+    db.flush()
+    db.add(
+        Prediction(
+            user_id=user.id,
+            match_id=match.id,
+            home_score=1,
+            away_score=1,
+            advance_team_id=away.id,
+            points=0,
+        )
+    )
+    db.commit()
 
     updated = recalculate_points()
 

@@ -329,9 +329,11 @@
     "predictionProgressTip": "There are many matches — you don't need to predict them all at once. Enter only the tips you want; next time you can pick up where you left off.",
     "predictionTipAcknowledge": "Got it, don't show this again",
     "scoresRequired": "Enter both home and away scores before saving.",
-    "knockoutAfter90Hint": "Knockout match: predict the score after 90 minutes. Extra time and penalties are not included in your tip.",
+    "knockoutAfter90Title": "Knockout: score after 90 minutes",
+    "knockoutAfter90Hint": "Enter the result at the end of regular time (90 minutes). Goals in extra time or a penalty shootout do not count in your tip or for points.",
+    "knockoutScoreLabel": "Score after 90 min",
     "advanceTeamLegend": "Who advances?",
-    "advanceTeamHelp": "You predicted a draw. Choose which team goes through to the next round.",
+    "advanceTeamHelp": "You predicted a draw after 90 minutes. Pick who goes through (for the knockout bracket). If the match is also level after 90 minutes, a correct winner pick earns 3 extra points.",
     "advanceTeamRequired": "Choose which team advances after a predicted draw.",
     "advanceTeamReadOnly": "Advances: {{team}}",
     "you": "(you)"

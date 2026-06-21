@@ -329,9 +329,11 @@
     "predictionProgressTip": "Er zijn veel wedstrijden — je hoeft niet alles in één keer in te vullen. Vul gerust een paar voorspellingen in; een volgende keer ga je verder waar je gebleven was.",
     "predictionTipAcknowledge": "Begrepen, niet meer tonen",
     "scoresRequired": "Vul thuis- en uitscore in voordat je opslaat.",
-    "knockoutAfter90Hint": "Knock-outwedstrijd: voorspel de stand na 90 minuten. Verlenging en strafschoppen tellen niet mee in je tip.",
+    "knockoutAfter90Title": "Knock-out: stand na 90 minuten",
+    "knockoutAfter90Hint": "Vul de stand in na reguliere speeltijd (90 minuten). Doelpunten in verlenging of strafschoppen tellen niet mee in je tip of voor punten.",
+    "knockoutScoreLabel": "Stand na 90 min",
     "advanceTeamLegend": "Wie gaat door?",
-    "advanceTeamHelp": "Je voorspelt gelijk. Kies welk team door is naar de volgende ronde.",
+    "advanceTeamHelp": "Je voorspelt gelijk na 90 minuten. Kies wie doorgaat (voor het schema). Is de wedstrijd ook gelijk na 90 minuten, dan levert een juiste winnaar 3 extra punten op.",
     "advanceTeamRequired": "Kies welk team doorgaat na een gelijkspel.",
     "advanceTeamReadOnly": "Gaat door: {{team}}",
     "you": "(jij)"

@@ -328,9 +328,11 @@
     "predictionProgressTip": "São muitos jogos — não precisa prever todos de uma vez. Faça só os que quiser; na próxima vez você continua de onde parou.",
     "predictionTipAcknowledge": "Entendi, não mostrar de novo",
     "scoresRequired": "Informe os dois placares antes de salvar.",
-    "knockoutAfter90Hint": "Jogo eliminatório: preveja o placar após 90 minutos. Prorrogação e pênaltis não entram no palpite.",
+    "knockoutAfter90Title": "Eliminatória: placar após 90 minutos",
+    "knockoutAfter90Hint": "Informe o placar ao fim do tempo regulamentar (90 minutos). Gols na prorrogação ou nos pênaltis não contam no palpite nem nos pontos.",
+    "knockoutScoreLabel": "Placar após 90 min",
     "advanceTeamLegend": "Quem avança?",
-    "advanceTeamHelp": "Você previu empate. Escolha qual seleção passa para a próxima fase.",
+    "advanceTeamHelp": "Você previu empate após 90 minutos. Escolha quem passa (para o chaveamento). Se o jogo também terminar empatado aos 90 minutos, acertar o vencedor vale 3 pontos extras.",
     "advanceTeamRequired": "Escolha qual seleção avança após um empate previsto.",
     "advanceTeamReadOnly": "Avança: {{team}}",
     "you": "(você)"

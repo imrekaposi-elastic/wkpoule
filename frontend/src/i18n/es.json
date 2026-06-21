@@ -329,9 +329,11 @@
     "predictionProgressTip": "Hay muchos partidos — no tienes que pronosticarlos todos de una vez. Introduce solo los que quieras; la próxima vez puedes continuar donde lo dejaste.",
     "predictionTipAcknowledge": "Entendido, no volver a mostrar",
     "scoresRequired": "Introduce los goles de local y visitante antes de guardar.",
-    "knockoutAfter90Hint": "Partido eliminatorio: pronostica el resultado tras 90 minutos. La prórroga y los penaltis no se incluyen en tu pronóstico.",
+    "knockoutAfter90Title": "Eliminatoria: resultado tras 90 minutos",
+    "knockoutAfter90Hint": "Introduce el marcador al final del tiempo reglamentario (90 minutos). Los goles en la prórroga o la tanda de penaltis no cuentan en tu pronóstico ni para los puntos.",
+    "knockoutScoreLabel": "Marcador tras 90 min",
     "advanceTeamLegend": "¿Quién avanza?",
-    "advanceTeamHelp": "Has pronosticado un empate. Elige qué equipo pasa a la siguiente ronda.",
+    "advanceTeamHelp": "Has pronosticado empate tras 90 minutos. Elige quién pasa (para el cuadro). Si el partido también queda empatado a los 90 minutos, acertar al ganador suma 3 puntos extra.",
     "advanceTeamRequired": "Elige qué equipo avanza tras un empate pronosticado.",
     "advanceTeamReadOnly": "Avanza: {{team}}",
     "you": "(tú)"

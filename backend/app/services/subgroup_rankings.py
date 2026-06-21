@@ -7,7 +7,7 @@ from app.models.match import Match
 from app.models.prediction import Prediction
 from app.models.user import User
 from app.schemas.ranking import ParticipantRanking
-from app.services.scoring import calculate_points
+from app.services.scoring import calculate_prediction_points
 
 
 def compute_participant_rankings(
@@ -29,13 +29,13 @@ def compute_participant_rankings(
         .filter(Match.status == "completed", Match.home_score.isnot(None))
         .all()
     )
-    match_scores = {m.id: (m.home_score, m.away_score) for m in completed_matches}
+    match_by_id = {m.id: m for m in completed_matches}
 
     scored_predictions = (
         db.query(Prediction)
-        .filter(Prediction.match_id.in_(match_scores.keys()))
+        .filter(Prediction.match_id.in_(match_by_id.keys()))
         .all()
-    ) if match_scores else []
+    ) if match_by_id else []
 
     pred_by_user: dict[int, list[Prediction]] = {}
     for p in scored_predictions:
@@ -57,15 +57,14 @@ def compute_participant_rankings(
         correct_scores = 0
         correct_goals = 0
         for p in pred_by_user.get(u.id, []):
+            match = match_by_id[p.match_id]
             if p.points is not None:
                 pts = p.points
             else:
-                actual = match_scores[p.match_id]
-                pts = calculate_points(p.home_score, p.away_score, actual[0], actual[1])["points"]
+                pts = calculate_prediction_points(p, match)["points"]
             total += pts
 
-            actual = match_scores[p.match_id]
-            result = calculate_points(p.home_score, p.away_score, actual[0], actual[1])
+            result = calculate_prediction_points(p, match)
             if result["correct_result"]:
                 correct_results += 1
             if result["correct_score"]:

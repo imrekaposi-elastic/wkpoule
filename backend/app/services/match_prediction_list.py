@@ -10,7 +10,7 @@ from app.models.match import Match
 from app.models.prediction import Prediction
 from app.models.user import User
 from app.schemas.prediction import MatchPredictionListItem
-from app.services.scoring import calculate_points
+from app.services.scoring import calculate_prediction_points
 
 PredictionOutcome = Literal["home_win", "away_win", "draw"]
 
@@ -39,12 +39,7 @@ def non_admin_predictions_for_match(db: Session, match_id: int) -> list[Predicti
 def to_list_item(pred: Prediction, match: Match) -> MatchPredictionListItem:
     pts = None
     if match.status == "completed" and match.home_score is not None:
-        pts = calculate_points(
-            pred.home_score,
-            pred.away_score,
-            match.home_score,
-            match.away_score,
-        )["points"]
+        pts = calculate_prediction_points(pred, match)["points"]
     return MatchPredictionListItem(
         user_id=pred.user_id,
         username=pred.user.username,

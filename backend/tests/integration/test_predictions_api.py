@@ -14,6 +14,8 @@ def _seed_match(
     kickoff_utc: datetime,
     status: str = "upcoming",
     match_number: int = 9100,
+    stage: str = "group",
+    group_letter: str | None = "A",
 ) -> Match:
     venue = Venue(
         name="Arena",
@@ -42,8 +44,8 @@ def _seed_match(
     db.flush()
     match = Match(
         match_number=match_number,
-        stage="group",
-        group_letter="A",
+        stage=stage,
+        group_letter=group_letter,
         home_team_id=home.id,
         away_team_id=away.id,
         venue_id=venue.id,
@@ -143,3 +145,65 @@ def test_upsert_prediction_rejected_after_kickoff(client, db, auth_headers):
 
     assert response.status_code == 400
     assert "30 minutes" in response.json()["detail"]
+
+
+def test_knockout_prediction_locked_within_window(client, db, auth_headers):
+    kickoff = datetime.now(timezone.utc) + timedelta(
+        minutes=PREDICTION_LOCK_MINUTES_BEFORE_KICKOFF - 1
+    )
+    match = _seed_match(
+        db,
+        kickoff_utc=kickoff,
+        match_number=9201,
+        stage="round_of_16",
+        group_letter=None,
+    )
+
+    response = client.put(
+        f"/api/predictions/{match.id}",
+        headers=auth_headers,
+        json={"home_score": 1, "away_score": 1, "advance_team_id": match.home_team_id},
+    )
+
+    assert response.status_code == 400
+    assert "30 minutes" in response.json()["detail"]
+
+
+def test_knockout_prediction_locked_after_kickoff(client, db, auth_headers):
+    match = _seed_match(
+        db,
+        kickoff_utc=datetime.now(timezone.utc) - timedelta(minutes=10),
+        match_number=9202,
+        stage="round_of_16",
+        group_letter=None,
+    )
+
+    response = client.put(
+        f"/api/predictions/{match.id}",
+        headers=auth_headers,
+        json={"home_score": 2, "away_score": 1},
+    )
+
+    assert response.status_code == 400
+    assert "30 minutes" in response.json()["detail"]
+
+
+def test_knockout_prediction_locked_while_in_progress(client, db, auth_headers):
+    kickoff = datetime.now(timezone.utc) + timedelta(days=2)
+    match = _seed_match(
+        db,
+        kickoff_utc=kickoff,
+        status="in_progress",
+        match_number=9203,
+        stage="round_of_16",
+        group_letter=None,
+    )
+
+    response = client.put(
+        f"/api/predictions/{match.id}",
+        headers=auth_headers,
+        json={"home_score": 1, "away_score": 0},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Predictions are locked for this match"

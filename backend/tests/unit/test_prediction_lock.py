@@ -1,5 +1,7 @@
 """Unit tests for match prediction lock window."""
 
+import pytest
+
 from datetime import datetime, timedelta, timezone
 
 from app.models.match import Match
@@ -47,10 +49,39 @@ def test_rejects_non_upcoming_matches():
     assert prediction_lock_reason(match) == "Predictions are locked for this match"
 
 
+def test_rejects_in_progress_matches():
+    kickoff = datetime.now(timezone.utc) + timedelta(hours=1)
+    match = _upcoming_match(kickoff)
+    match.status = "in_progress"
+
+    assert match_accepts_prediction_updates(match) is False
+
+
 def test_rejects_live_matches():
     kickoff = datetime.now(timezone.utc) + timedelta(hours=1)
     match = _upcoming_match(kickoff)
     match.status = "live"
+
+    assert match_accepts_prediction_updates(match) is False
+
+
+@pytest.mark.parametrize(
+    "stage",
+    [
+        "group",
+        "round_of_32",
+        "round_of_16",
+        "quarter_final",
+        "semi_final",
+        "final",
+    ],
+)
+def test_knockout_and_group_share_same_lock_window(stage):
+    kickoff = datetime.now(timezone.utc) + timedelta(
+        minutes=PREDICTION_LOCK_MINUTES_BEFORE_KICKOFF - 1
+    )
+    match = _upcoming_match(kickoff)
+    match.stage = stage
 
     assert match_accepts_prediction_updates(match) is False
 

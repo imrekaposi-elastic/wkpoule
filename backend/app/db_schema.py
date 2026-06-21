@@ -299,6 +299,12 @@ def ensure_schema() -> None:
             )
             conn.execute(
                 text(
+                    "ALTER TABLE matches "
+                    "ADD COLUMN IF NOT EXISTS winner_team_id INTEGER REFERENCES teams(id)"
+                )
+            )
+            conn.execute(
+                text(
                     "ALTER TABLE fun_comments "
                     "ADD COLUMN IF NOT EXISTS comment_text_it TEXT"
                 )
@@ -464,6 +470,14 @@ def ensure_schema() -> None:
                     text(
                         "ALTER TABLE predictions "
                         "ADD COLUMN advance_team_id INTEGER REFERENCES teams(id)"
+                    )
+                )
+            match_cols = {c["name"] for c in insp.get_columns("matches")}
+            if "winner_team_id" not in match_cols:
+                conn.execute(
+                    text(
+                        "ALTER TABLE matches "
+                        "ADD COLUMN winner_team_id INTEGER REFERENCES teams(id)"
                     )
                 )
             fc_cols = {c["name"] for c in insp.get_columns("fun_comments")}

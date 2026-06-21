@@ -16,7 +16,7 @@ function match(
     home_team: null,
     away_team: null,
     venue: { id: 1, name: "V", city: "C", country: "X", capacity: 1 },
-    kickoff_utc: "2026-06-11T15:00:00Z",
+    kickoff_utc: "2099-06-11T15:00:00Z",
     home_score: null,
     away_score: null,
     status: "upcoming",
@@ -42,6 +42,24 @@ describe("firstMatchNeedingPrediction", () => {
   it("returns null when all editable upcoming matches are predicted", () => {
     const matches = [match(1, 1), match(2, 2)];
     expect(firstMatchNeedingPrediction(matches, new Set([1, 2]))).toBeNull();
+  });
+
+  it("skips knockout matches inside the 30-minute lock window", () => {
+    const kickoff = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    const matches = [
+      match(89, 89, {
+        stage: "round_of_16",
+        group_letter: null,
+        kickoff_utc: kickoff,
+      }),
+      match(90, 90, {
+        stage: "round_of_16",
+        group_letter: null,
+        kickoff_utc: "2099-01-01T15:00:00Z",
+      }),
+    ];
+    const result = firstMatchNeedingPrediction(matches, new Set());
+    expect(result?.match_number).toBe(90);
   });
 });
 
