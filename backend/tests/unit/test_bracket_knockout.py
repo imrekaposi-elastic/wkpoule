@@ -133,5 +133,4 @@ def test_compute_predicted_knockout_teams_returns_bracket_labels(db):
 def test_static_bracket_slot_labels_for_r16():
     assert static_bracket_slot_labels(89) == ("W74", "W77")
     assert static_bracket_slot_labels(103) == ("L101", "L102")
-    assert labels[104] == ("W101", "W102")
-    assert teams[73] == (None, None)
+    assert static_bracket_slot_labels(104) == ("W101", "W102")
