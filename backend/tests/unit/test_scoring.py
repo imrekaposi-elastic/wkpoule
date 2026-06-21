@@ -91,6 +91,7 @@ def test_knockout_draw_after_90_exact_score_wrong_winner():
 
 
 def test_knockout_draw_after_90_correct_winner_without_exact_score():
+    """Wrong score but correct winner pick earns only the +3 winner bonus."""
     result = calculate_points(
         2,
         2,
@@ -101,7 +102,7 @@ def test_knockout_draw_after_90_correct_winner_without_exact_score():
         actual_winner_team_id=NED,
     )
 
-    assert result["points"] == 4
+    assert result["points"] == 3
     assert result["correct_result"] is True
     assert result["correct_score"] is False
     assert result["correct_goal_count"] is False

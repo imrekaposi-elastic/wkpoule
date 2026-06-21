@@ -71,7 +71,14 @@ def test_recalculate_points_updates_stored_prediction_points(db):
 
 
 def test_recalculate_knockout_draw_awards_winner_bonus(db):
-    user, _, home, away = _seed_scored_match(db)
+    user, group_match, home, away = _seed_scored_match(db)
+    group_pred = (
+        db.query(Prediction)
+        .filter(Prediction.user_id == user.id, Prediction.match_id == group_match.id)
+        .one()
+    )
+    group_pred.points = 12
+    db.commit()
     match = Match(
         match_number=3002,
         stage="round_of_16",
