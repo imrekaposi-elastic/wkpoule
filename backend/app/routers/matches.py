@@ -11,6 +11,7 @@ from app.cache.keys import CacheKeys
 from app.cache.ttl import MATCHES_TTL
 from app.database import get_db
 from app.models.match import Match
+from app.models.team import Team
 from app.models.user import User
 from app.schemas.match import (
     CalendarMetaOut,
@@ -22,7 +23,7 @@ from app.schemas.match import (
     TeamOut,
 )
 from app.schemas.pagination import DEFAULT_PAGE_SIZE, PaginatedResponse, paginate_list
-from app.services.bracket_resolver import compute_predicted_knockout_teams
+from app.services.bracket_resolver import compute_predicted_knockout_teams, static_bracket_slot_labels
 from app.services.expert import generate_expert_prediction
 from app.services.match_calendar import local_date_for_utc_instant, utc_bounds_for_local_day
 from app.services.next_match_prediction import first_match_needing_prediction
@@ -79,6 +80,8 @@ def _match_to_out(
         )
 
     bh, ba = bracket_slots if bracket_slots else (None, None)
+    if bh is None and ba is None and m.match_number >= 73:
+        bh, ba = static_bracket_slot_labels(m.match_number)
 
     return MatchOut(
         id=m.id,
@@ -93,6 +96,7 @@ def _match_to_out(
         kickoff_utc=m.kickoff_utc,
         home_score=m.home_score,
         away_score=m.away_score,
+        winner_team_id=m.winner_team_id,
         status=m.status,
         fun_comment=FunCommentOut.model_validate(m.fun_comment) if m.fun_comment else None,
         temperature_celsius=temperature,
@@ -331,6 +335,22 @@ async def update_score(
     )
     if not m:
         raise HTTPException(status_code=404, detail="Match not found")
+
+    if body.home_team_id is not None or body.away_team_id is not None:
+        if not is_knockout_stage(m.stage):
+            raise HTTPException(
+                status_code=400,
+                detail="Team assignment only allowed for knockout matches",
+            )
+        if body.home_team_id is not None:
+            if db.query(Team.id).filter(Team.id == body.home_team_id).first() is None:
+                raise HTTPException(status_code=400, detail="Unknown home team")
+            m.home_team_id = body.home_team_id
+        if body.away_team_id is not None:
+            if db.query(Team.id).filter(Team.id == body.away_team_id).first() is None:
+                raise HTTPException(status_code=400, detail="Unknown away team")
+            m.away_team_id = body.away_team_id
+
     m.home_score = body.home_score
     m.away_score = body.away_score
     m.status = body.status
@@ -342,6 +362,11 @@ async def update_score(
                     detail="winner_team_id required when knockout match is level after 90 minutes",
                 )
             allowed = {m.home_team_id, m.away_team_id} - {None}
+            if not allowed:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Assign home and away teams before saving a completed knockout draw",
+                )
             if body.winner_team_id not in allowed:
                 raise HTTPException(
                     status_code=400,
@@ -354,6 +379,14 @@ async def update_score(
         m.winner_team_id = None
     db.commit()
     db.refresh(m)
+    if m.home_team_id is not None and (
+        m.home_team is None or m.home_team.id != m.home_team_id
+    ):
+        m.home_team = db.get(Team, m.home_team_id)
+    if m.away_team_id is not None and (
+        m.away_team is None or m.away_team.id != m.away_team_id
+    ):
+        m.away_team = db.get(Team, m.away_team_id)
     recalculate_points()
     await invalidate_on_score_update()
     temp = await get_match_temperature(m.id, m.venue.city, m.kickoff_utc)

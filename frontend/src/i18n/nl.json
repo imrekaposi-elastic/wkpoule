@@ -86,7 +86,14 @@
     "saving": "Opslaan…",
     "savedRecalc": "Opgeslagen. Punten zijn herberekend op basis van alle voltooide wedstrijden.",
     "saveFailed": "Opslaan mislukt",
-    "footerHint": "Zet status op voltooid als de uitslag definitief is, dan telt hij mee in het klassement. Live = tussentijds; gepland gebruik je voorzichtig."
+    "footerHint": "Zet status op voltooid als de uitslag definitief is, dan telt hij mee in het klassement. Live = tussentijds; gepland gebruik je voorzichtig.",
+    "winner": "Winnaar (gelijk na 90 min)",
+    "selectWinner": "Kies winnaar",
+    "assignHome": "Thuisteam toewijzen",
+    "assignAway": "Uitteam toewijzen",
+    "knockout90Hint": "Score na 90 minuten. Bij gelijkstand: kies wie doorgaat.",
+    "homeGoals": "Doelpunten thuis",
+    "awayGoals": "Doelpunten uit"
   },
   "adminSubgroups": {
     "title": "Admin · Subgroepen",

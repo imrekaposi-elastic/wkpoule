@@ -103,6 +103,7 @@ class MatchOut(BaseModel):
     kickoff_utc: datetime
     home_score: int | None
     away_score: int | None
+    winner_team_id: int | None = None
     status: str
     fun_comment: FunCommentOut | None = None
     temperature_celsius: float | None = None
@@ -124,6 +125,14 @@ class ScoreUpdate(BaseModel):
     home_score: int = Field(ge=0, le=30)
     away_score: int = Field(ge=0, le=30)
     status: Literal["upcoming", "in_progress", "completed"] = "completed"
+    home_team_id: int | None = Field(
+        None,
+        description="Knockout only: assign home participant when still TBD",
+    )
+    away_team_id: int | None = Field(
+        None,
+        description="Knockout only: assign away participant when still TBD",
+    )
     winner_team_id: int | None = Field(
         None,
         description="Required for completed knockout matches level after 90 minutes",

@@ -257,3 +257,32 @@ def compute_predicted_knockout_teams(
             out_teams[mn] = out_pair(*computed[mn])
 
     return out_teams, slot_labels
+
+
+def static_bracket_slot_labels(match_number: int) -> tuple[str | None, str | None]:
+    """FIFA-style slot labels for knockout fixtures (no user predictions required)."""
+
+    def side_label(spec: tuple[str, str]) -> str:
+        kind, letter = spec
+        if kind == "3":
+            return f"3rd·{letter.upper()}"
+        return _slot_label(kind, letter)
+
+    if match_number in R32_STRUCTURE:
+        home_spec, away_spec = R32_STRUCTURE[match_number]
+        return side_label(home_spec), side_label(away_spec)
+    if match_number in R16_SOURCES:
+        hm, am = R16_SOURCES[match_number]
+        return f"W{hm}", f"W{am}"
+    if match_number in QF_SOURCES:
+        hm, am = QF_SOURCES[match_number]
+        return f"W{hm}", f"W{am}"
+    if match_number in SF_SOURCES:
+        hm, am = SF_SOURCES[match_number]
+        return f"W{hm}", f"W{am}"
+    if match_number == 103:
+        return "L101", "L102"
+    if match_number in FINAL_SOURCES:
+        hm, am = FINAL_SOURCES[match_number]
+        return f"W{hm}", f"W{am}"
+    return None, None

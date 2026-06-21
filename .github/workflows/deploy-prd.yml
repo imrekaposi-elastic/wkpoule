@@ -93,8 +93,11 @@ jobs:
 
       - name: Build images on cluster
         run: |
+          # Stagger starts so prd etcd/build load stays manageable (parallel builds overload the cluster).
           oc start-build wkpoule-api -n wkpoule-prd --wait &
           api_pid=$!
+          echo "Waiting 2 minutes before starting frontend build…"
+          sleep 120
           oc start-build wkpoule-frontend -n wkpoule-prd --wait &
           frontend_pid=$!
           wait "$api_pid" "$frontend_pid"

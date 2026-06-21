@@ -86,7 +86,14 @@
     "saving": "Guardando…",
     "savedRecalc": "Guardado. Los puntos se han recalculado a partir de todos los partidos finalizados.",
     "saveFailed": "No se pudo guardar el resultado",
-    "footerHint": "Marca un partido como finalizado cuando el resultado sea definitivo para que cuente en la clasificación. En curso es para un partido en directo; próximo restablece el partido en el calendario público (úsalo con cuidado)."
+    "footerHint": "Marca un partido como finalizado cuando el resultado sea definitivo para que cuente en la clasificación. En curso es para un partido en directo; próximo restablece el partido en el calendario público (úsalo con cuidado).",
+    "winner": "Ganador (empate a los 90 min)",
+    "selectWinner": "Elige el equipo que avanza",
+    "assignHome": "Asignar local",
+    "assignAway": "Asignar visitante",
+    "knockout90Hint": "Marcador tras 90 minutos. En empate, elige quién pasa.",
+    "homeGoals": "Goles local",
+    "awayGoals": "Goles visitante"
   },
   "adminSubgroups": {
     "title": "Admin · Subgrupos",

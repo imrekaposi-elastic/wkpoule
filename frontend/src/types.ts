@@ -160,6 +160,8 @@ export interface Match {
   kickoff_utc: string;
   home_score: number | null;
   away_score: number | null;
+  /** Set when knockout match is level after 90 minutes */
+  winner_team_id?: number | null;
   status: string;
   fun_comment: FunComment | null;
   temperature_celsius: number | null;

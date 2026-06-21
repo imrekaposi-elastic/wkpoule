@@ -86,7 +86,14 @@
     "saving": "Salvando…",
     "savedRecalc": "Salvo. Os pontos foram recalculados com base em todos os jogos finalizados.",
     "saveFailed": "Não foi possível salvar",
-    "footerHint": "Use finalizado quando o resultado for oficial para contar no ranking. Em andamento = jogo ao vivo; agendado altera a lista pública (use com cuidado)."
+    "footerHint": "Use finalizado quando o resultado for oficial para contar no ranking. Em andamento = jogo ao vivo; agendado altera a lista pública (use com cuidado).",
+    "winner": "Vencedor (empate aos 90 min)",
+    "selectWinner": "Escolha quem avança",
+    "assignHome": "Atribuir mandante",
+    "assignAway": "Atribuir visitante",
+    "knockout90Hint": "Placar após 90 minutos. Em empate, escolha quem passa.",
+    "homeGoals": "Gols mandante",
+    "awayGoals": "Gols visitante"
   },
   "adminSubgroups": {
     "title": "Admin · Subgrupos",

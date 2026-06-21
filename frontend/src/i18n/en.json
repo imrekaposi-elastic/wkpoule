@@ -86,7 +86,14 @@
     "saving": "Saving…",
     "savedRecalc": "Saved. Points have been recalculated from all completed matches.",
     "saveFailed": "Could not save score",
-    "footerHint": "Mark a match as completed when the result is final so it counts in the rankings. In progress is for a live game; upcoming resets the fixture on the public schedule (use carefully)."
+    "footerHint": "Mark a match as completed when the result is final so it counts in the rankings. In progress is for a live game; upcoming resets the fixture on the public schedule (use carefully).",
+    "winner": "Winner (90 min draw)",
+    "selectWinner": "Select advancing team",
+    "assignHome": "Assign home team",
+    "assignAway": "Assign away team",
+    "knockout90Hint": "Score after 90 minutes. On a draw, pick who advances.",
+    "homeGoals": "Home goals",
+    "awayGoals": "Away goals"
   },
   "adminSubgroups": {
     "title": "Admin · Subgroups",

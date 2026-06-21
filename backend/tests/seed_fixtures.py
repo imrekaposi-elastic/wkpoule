@@ -76,6 +76,42 @@ def seed_group_match(
     return match
 
 
+def seed_knockout_match(
+    db: Session,
+    *,
+    match_number: int = 89,
+    stage: str = "round_of_16",
+    home_code: str | None = "NED",
+    away_code: str | None = "BEL",
+    kickoff: datetime | None = None,
+    status: str = "upcoming",
+) -> Match:
+    venue = seed_venue(db)
+    home_id = None
+    away_id = None
+    if home_code:
+        home = seed_team(db, fifa_code=home_code, group_letter="A", name=home_code)
+        home_id = home.id
+    if away_code:
+        away = seed_team(db, fifa_code=away_code, group_letter="A", name=away_code)
+        away_id = away.id
+    match = Match(
+        match_number=match_number,
+        stage=stage,
+        group_letter=None,
+        home_team_id=home_id,
+        away_team_id=away_id,
+        venue_id=venue.id,
+        kickoff_utc=kickoff
+        or (datetime.now(timezone.utc) + timedelta(hours=2)),
+        status=status,
+    )
+    db.add(match)
+    db.commit()
+    db.refresh(match)
+    return match
+
+
 def make_admin(db: Session, username: str = "testuser") -> User:
     user = db.query(User).filter(User.username == username).one()
     user.is_admin = True

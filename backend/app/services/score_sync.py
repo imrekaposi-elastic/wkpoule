@@ -9,6 +9,7 @@ from app.config import get_settings
 from app.database import SessionLocal
 from app.models.match import Match
 from app.models.team import Team
+from app.services.match_fixture_sync import find_match_for_api, winner_team_id_from_api_score
 
 logger = logging.getLogger("wkpoule.score_sync")
 
@@ -130,11 +131,16 @@ async def sync_scores() -> int:
                 logger.debug("Unknown team code(s): %s / %s", home_tla, away_tla)
                 continue
 
+            utc_date = am.get("utcDate", "")
             match = (
                 db.query(Match)
                 .filter(Match.home_team_id == home_id, Match.away_team_id == away_id)
                 .first()
             )
+            prev_home_id = match.home_team_id if match else None
+            prev_away_id = match.away_team_id if match else None
+            if not match:
+                match = find_match_for_api(db, home_id, away_id, utc_date)
             if not match:
                 logger.debug("No DB match for %s vs %s", home_tla, away_tla)
                 continue
@@ -159,6 +165,18 @@ async def sync_scores() -> int:
             winner_side = score.get("winner")
 
             changed = False
+
+            if (
+                prev_home_id != match.home_team_id
+                or prev_away_id != match.away_team_id
+            ):
+                logger.info(
+                    "Match #%d: assigned teams %s vs %s",
+                    match.match_number,
+                    home_tla,
+                    away_tla,
+                )
+                changed = True
 
             if our_status != match.status:
                 logger.info(
@@ -187,12 +205,14 @@ async def sync_scores() -> int:
                     winner_team_id = home_id
                 elif away_goals > home_goals:
                     winner_team_id = away_id
-                elif winner_side == "HOME_TEAM":
-                    winner_team_id = home_id
-                elif winner_side == "AWAY_TEAM":
-                    winner_team_id = away_id
                 else:
-                    winner_team_id = None
+                    winner_team_id = winner_team_id_from_api_score(
+                        home_id,
+                        away_id,
+                        home_goals,
+                        away_goals,
+                        winner_side,
+                    )
 
                 if match.winner_team_id != winner_team_id:
                     match.winner_team_id = winner_team_id

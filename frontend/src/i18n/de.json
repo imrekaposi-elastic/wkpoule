@@ -86,7 +86,14 @@
     "saving": "Speichern…",
     "savedRecalc": "Gespeichert. Punkte wurden anhand aller abgeschlossenen Spiele neu berechnet.",
     "saveFailed": "Speichern fehlgeschlagen",
-    "footerHint": "Status „abgeschlossen“, wenn das Ergebnis final ist — dann zählt es in der Rangliste. „Laufend“ für Live; „geplant“ beeinflusst die öffentliche Ansicht (vorsichtig verwenden)."
+    "footerHint": "Status „abgeschlossen“, wenn das Ergebnis final ist — dann zählt es in der Rangliste. „Laufend“ für Live; „geplant“ beeinflusst die öffentliche Ansicht (vorsichtig verwenden).",
+    "winner": "Sieger (Unentschieden nach 90 Min.)",
+    "selectWinner": "Weiterkommendes Team wählen",
+    "assignHome": "Heimteam zuweisen",
+    "assignAway": "Auswärtsteam zuweisen",
+    "knockout90Hint": "Ergebnis nach 90 Minuten. Bei Remis: Sieger wählen.",
+    "homeGoals": "Tore Heim",
+    "awayGoals": "Tore Auswärts"
   },
   "adminSubgroups": {
     "title": "Admin · Untergruppen",

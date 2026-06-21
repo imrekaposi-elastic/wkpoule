@@ -7,7 +7,7 @@ from app.models.match import Match
 from app.models.team import Team
 from app.routers.matches import _match_matches_search, _match_to_out
 from app.schemas.match import TeamOut
-from tests.seed_fixtures import make_admin, seed_group_match, seed_team, seed_venue
+from tests.seed_fixtures import make_admin, seed_group_match, seed_knockout_match, seed_team, seed_venue
 
 
 def test_list_matches_requires_auth(client):
@@ -96,6 +96,58 @@ def test_admin_score_update(client, db, auth_headers):
     )
     assert response.status_code == 200
     assert response.json()["home_score"] == 2
+
+
+def test_admin_knockout_draw_requires_winner(client, db, auth_headers):
+    match = seed_knockout_match(db, match_number=109)
+    make_admin(db)
+
+    response = client.patch(
+        f"/api/matches/{match.id}/score",
+        headers=auth_headers,
+        json={"home_score": 1, "away_score": 1, "status": "completed"},
+    )
+    assert response.status_code == 400
+
+
+def test_admin_knockout_draw_saves_winner(client, db, auth_headers):
+    match = seed_knockout_match(db, match_number=110)
+    make_admin(db)
+    home_id = match.home_team_id
+    away_id = match.away_team_id
+
+    response = client.patch(
+        f"/api/matches/{match.id}/score",
+        headers=auth_headers,
+        json={
+            "home_score": 2,
+            "away_score": 2,
+            "status": "completed",
+            "winner_team_id": away_id,
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["winner_team_id"] == away_id
+    assert body["home_score"] == 2
+
+
+def test_knockout_match_out_includes_bracket_slots(client, db, auth_headers):
+    seed_knockout_match(
+        db,
+        match_number=89,
+        home_code=None,
+        away_code=None,
+        kickoff=datetime(2026, 7, 5, 19, 0, tzinfo=timezone.utc),
+    )
+    make_admin(db)
+
+    response = client.get("/api/matches?stage=round_of_16", headers=auth_headers)
+    assert response.status_code == 200
+    item = next(x for x in response.json()["items"] if x["match_number"] == 89)
+    assert item["bracket_home_slot"] == "W74"
+    assert item["bracket_away_slot"] == "W77"
+    assert item["home_team"] is None
 
 
 def test_match_matches_search_helpers(db):

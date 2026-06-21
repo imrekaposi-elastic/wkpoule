@@ -27,6 +27,11 @@ describe("AdminScores page", () => {
           },
         });
       }
+      if (url === "/teams") {
+        return Promise.resolve({
+          data: [sampleMatch.home_team, sampleMatch.away_team],
+        });
+      }
       return Promise.resolve({ data: [] });
     });
     vi.mocked(api.patch).mockResolvedValue({
@@ -38,7 +43,7 @@ describe("AdminScores page", () => {
     renderWithProviders(<AdminScores />);
 
     await waitFor(() => {
-      expect(screen.getByText(/NED vs BEL/i)).toBeInTheDocument();
+      expect(screen.getByText(/Netherlands vs Belgium/i)).toBeInTheDocument();
     });
 
     const homeInput = screen.getAllByRole("spinbutton")[0];
@@ -58,7 +63,7 @@ describe("AdminScores page", () => {
     renderWithProviders(<AdminScores />);
 
     await waitFor(() => {
-      expect(screen.getByText(/NED vs BEL/i)).toBeInTheDocument();
+      expect(screen.getByText(/Netherlands vs Belgium/i)).toBeInTheDocument();
     });
 
     fireEvent.change(screen.getByPlaceholderText(/search/i), {

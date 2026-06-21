@@ -86,7 +86,14 @@
     "saving": "Salvataggio…",
     "savedRecalc": "Salvato. I punti sono stati ricalcolati in base a tutte le partite completate.",
     "saveFailed": "Impossibile salvare il risultato",
-    "footerHint": "Segna una partita come completata quando il risultato è definitivo, così conterà in classifica. In corso è per una partita live; prossima ripristina la partita nel calendario pubblico (usare con cautela)."
+    "footerHint": "Segna una partita come completata quando il risultato è definitivo, così conterà in classifica. In corso è per una partita live; prossima ripristina la partita nel calendario pubblico (usare con cautela).",
+    "winner": "Vincitore (pareggio dopo 90 min)",
+    "selectWinner": "Scegli chi passa",
+    "assignHome": "Assegna squadra di casa",
+    "assignAway": "Assegna squadra ospite",
+    "knockout90Hint": "Risultato dopo 90 minuti. In caso di pareggio, scegli chi avanza.",
+    "homeGoals": "Gol casa",
+    "awayGoals": "Gol ospiti"
   },
   "adminSubgroups": {
     "title": "Admin · Sottogruppi",
