@@ -7,14 +7,20 @@ from app.models.prediction import Prediction
 from app.services.prediction_lock import match_accepts_prediction_updates
 
 
-def first_match_needing_prediction(db: Session, user_id: int) -> Match | None:
+def first_match_needing_prediction(
+    db: Session,
+    user_id: int,
+    *,
+    stage: str | None = None,
+    after_match_number: int | None = None,
+) -> Match | None:
     predicted_ids = {
         row[0]
         for row in db.query(Prediction.match_id)
         .filter(Prediction.user_id == user_id)
         .all()
     }
-    matches = (
+    q = (
         db.query(Match)
         .options(
             joinedload(Match.home_team),
@@ -23,9 +29,12 @@ def first_match_needing_prediction(db: Session, user_id: int) -> Match | None:
             joinedload(Match.fun_comment),
         )
         .filter(Match.status == "upcoming")
-        .order_by(Match.match_number)
-        .all()
     )
+    if stage:
+        q = q.filter(Match.stage == stage)
+    if after_match_number is not None:
+        q = q.filter(Match.match_number > after_match_number)
+    matches = q.order_by(Match.match_number).all()
     for m in matches:
         if m.id in predicted_ids:
             continue

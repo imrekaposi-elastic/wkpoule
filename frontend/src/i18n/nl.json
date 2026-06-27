@@ -280,7 +280,9 @@
     "virtualLearnMore": "Hoe wordt dit berekend?",
     "yourTip": "Jouw voorspelling",
     "pointsEarned": "{{count}} ptn",
-    "noTip": "Geen voorspelling"
+    "noTip": "Geen voorspelling",
+    "pinStage": "Onthoud deze fasefilter",
+    "unpinStage": "Fasefilter niet meer onthouden"
   },
   "matchDetail": {
     "notFound": "Wedstrijd niet gevonden",
@@ -320,6 +322,7 @@
     "savePrediction": "Voorspelling opslaan",
     "saved": "Voorspelling opgeslagen!",
     "savedAllComplete": "Voorspelling opgeslagen — je bent bij met alle geplande wedstrijden.",
+    "savedStageComplete": "Voorspelling opgeslagen — geen komende wedstrijden meer in deze fase.",
     "saveFailed": "Opslaan van voorspelling mislukt",
     "locked": "Voorspellingen zijn vergrendeld voor deze wedstrijd.",
     "predictionReadOnly": "Deze wedstrijd is live of er staat een uitslag — je tip hieronder is alleen-lezen. Als de wedstrijd weer op ‘aankomend’ wordt gezet, kun je weer aanpassen.",

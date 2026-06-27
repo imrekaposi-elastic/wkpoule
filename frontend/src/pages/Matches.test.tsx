@@ -34,6 +34,7 @@ const virtualGroup = {
 
 describe("Matches page", () => {
   beforeEach(() => {
+    localStorage.clear();
     vi.mocked(api.get).mockImplementation((url: string) => {
       if (url === "/matches") {
         return Promise.resolve({
@@ -145,6 +146,19 @@ describe("Matches page", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/France/i)).toBeInTheDocument();
+    });
+  });
+
+  it("restores a pinned stage filter from localStorage", async () => {
+    localStorage.setItem("wkpoule_matches_stage_pin", "1");
+    localStorage.setItem("wkpoule_matches_stage", "round_of_16");
+
+    renderWithProviders(<Matches />);
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith("/matches", {
+        params: expect.objectContaining({ stage: "round_of_16" }),
+      });
     });
   });
 

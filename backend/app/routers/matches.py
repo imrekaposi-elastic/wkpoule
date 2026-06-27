@@ -191,10 +191,23 @@ def calendar_meta(
 @router.get("/next-needing-prediction", response_model=MatchOut | None)
 async def next_match_needing_prediction(
     predicted_teams: bool = Query(True),
+    stage: str | None = Query(
+        None, description="Limit to a tournament stage (e.g. round_of_16)"
+    ),
+    after_match_number: int | None = Query(
+        None,
+        ge=1,
+        description="Only consider matches after this FIFA match number",
+    ),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    m = first_match_needing_prediction(db, user.id)
+    m = first_match_needing_prediction(
+        db,
+        user.id,
+        stage=stage,
+        after_match_number=after_match_number,
+    )
     if m is None:
         return None
     temp = await get_match_temperature(m.id, m.venue.city, m.kickoff_utc)

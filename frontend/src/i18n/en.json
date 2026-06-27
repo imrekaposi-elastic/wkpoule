@@ -280,7 +280,9 @@
     "virtualLearnMore": "How is this calculated?",
     "yourTip": "Your tip",
     "pointsEarned": "{{count}} pts",
-    "noTip": "No prediction"
+    "noTip": "No prediction",
+    "pinStage": "Remember this stage filter",
+    "unpinStage": "Stop remembering this stage filter"
   },
   "matchDetail": {
     "notFound": "Match not found",
@@ -320,6 +322,7 @@
     "savePrediction": "Save Prediction",
     "saved": "Prediction saved!",
     "savedAllComplete": "Prediction saved — you’re all caught up on upcoming matches.",
+    "savedStageComplete": "Prediction saved — no more upcoming matches to predict in this stage.",
     "saveFailed": "Failed to save prediction",
     "locked": "Predictions are locked for this match.",
     "predictionReadOnly": "This match is live or the result is final — your tip is read-only below. If the match is set back to upcoming, you can edit it again.",

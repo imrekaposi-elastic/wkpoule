@@ -8,6 +8,10 @@ import { canEditMatchPrediction } from "../utils/predictionLock";
 import VirtualGroupStandings from "../components/VirtualGroupStandings";
 import { resolveLocale } from "../i18n/languages";
 import { localizedTeam } from "../i18n/teamNames";
+import {
+  readMatchesStageFilter,
+  writeMatchesStageFilter,
+} from "../utils/matchesStageFilterStorage";
 import type { Match, MyPredictionBrief, PaginatedResponse, VirtualGroupTable } from "../types";
 
 function predictionsByMatchId(mine: MyPredictionBrief[]) {
@@ -41,6 +45,7 @@ function shouldShowVirtualTable(stageVal: string, groupVal: string) {
 
 export default function Matches() {
   const { t, i18n } = useTranslation();
+  const initialFilter = readMatchesStageFilter();
   const [matches, setMatches] = useState<Match[]>([]);
   const [myPredByMatchId, setMyPredByMatchId] = useState<
     Record<number, { home: number; away: number; points: number | null }>
@@ -48,8 +53,9 @@ export default function Matches() {
   const [virtualGroup, setVirtualGroup] = useState<VirtualGroupTable | null>(null);
   const [loading, setLoading] = useState(true);
   const [virtualLoading, setVirtualLoading] = useState(false);
-  const [stage, setStage] = useState("");
-  const [group, setGroup] = useState("");
+  const [stage, setStage] = useState(initialFilter.stage);
+  const [group, setGroup] = useState(initialFilter.group);
+  const [stagePinned, setStagePinned] = useState(initialFilter.pinned);
   const [search, setSearch] = useState("");
   const [searchApplied, setSearchApplied] = useState("");
   const [page, setPage] = useState(1);
@@ -59,6 +65,43 @@ export default function Matches() {
   const scrollToMatchIdRef = useRef<number | null>(null);
 
   const locale = resolveLocale(i18n.language);
+
+  const persistStageFilter = useCallback(
+    (stageVal: string, groupVal: string, pinned: boolean) => {
+      writeMatchesStageFilter(stageVal, groupVal, pinned);
+    },
+    [],
+  );
+
+  const handleStageChange = useCallback(
+    (stageVal: string) => {
+      const nextGroup = stageVal !== "group" && stageVal !== "" ? "" : group;
+      setStage(stageVal);
+      if (stageVal !== "group" && stageVal !== "") {
+        setGroup("");
+      }
+      if (stagePinned) {
+        persistStageFilter(stageVal, nextGroup, true);
+      }
+    },
+    [group, persistStageFilter, stagePinned],
+  );
+
+  const handleGroupChange = useCallback(
+    (groupVal: string) => {
+      setGroup(groupVal);
+      if (stagePinned) {
+        persistStageFilter(stage, groupVal, true);
+      }
+    },
+    [persistStageFilter, stage, stagePinned],
+  );
+
+  const toggleStagePin = useCallback(() => {
+    const nextPinned = !stagePinned;
+    setStagePinned(nextPinned);
+    persistStageFilter(stage, group, nextPinned);
+  }, [group, persistStageFilter, stage, stagePinned]);
 
   useEffect(() => {
     api
@@ -220,13 +263,10 @@ export default function Matches() {
       <h1 className="text-2xl sm:text-3xl font-bold mb-6">{t("matches.title")}</h1>
 
       <div className="mb-6 bg-white rounded-xl border border-gray-100 shadow-sm p-4 space-y-3">
-        <div className="flex flex-wrap gap-2 sm:gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
           <select
             value={stage}
-            onChange={(e) => {
-              setStage(e.target.value);
-              if (e.target.value !== "group") setGroup("");
-            }}
+            onChange={(e) => handleStageChange(e.target.value)}
             className="px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-pitch-600 outline-none"
           >
             {STAGE_KEYS.map((s) => (
@@ -236,10 +276,37 @@ export default function Matches() {
             ))}
           </select>
 
+          <button
+            type="button"
+            onClick={toggleStagePin}
+            aria-pressed={stagePinned}
+            aria-label={stagePinned ? t("matches.unpinStage") : t("matches.pinStage")}
+            title={stagePinned ? t("matches.unpinStage") : t("matches.pinStage")}
+            className={`inline-flex items-center justify-center px-3 py-2 rounded-lg border text-sm transition-colors ${
+              stagePinned
+                ? "border-pitch-600 bg-pitch-50 text-pitch-800"
+                : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
+            }`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-4 h-4"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+
           {showGroupFilter && (
             <select
               value={group}
-              onChange={(e) => setGroup(e.target.value)}
+              onChange={(e) => handleGroupChange(e.target.value)}
               className="px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-pitch-600 outline-none"
             >
               <option value="">{t("matches.allGroups")}</option>

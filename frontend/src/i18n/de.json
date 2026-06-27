@@ -280,7 +280,9 @@
     "virtualLearnMore": "Wie wird das berechnet?",
     "yourTip": "Dein Tipp",
     "pointsEarned": "{{count}} Pkt.",
-    "noTip": "Kein Tipp"
+    "noTip": "Kein Tipp",
+    "pinStage": "Diesen Phasenfilter merken",
+    "unpinStage": "Phasenfilter nicht mehr merken"
   },
   "matchDetail": {
     "notFound": "Spiel nicht gefunden",
@@ -320,6 +322,7 @@
     "savePrediction": "Tipp speichern",
     "saved": "Tipp gespeichert!",
     "savedAllComplete": "Tipp gespeichert — du bist bei allen kommenden Spielen durch.",
+    "savedStageComplete": "Tipp gespeichert — keine weiteren Spiele in dieser Phase zu tippen.",
     "saveFailed": "Speichern fehlgeschlagen",
     "locked": "Tipps sind für dieses Spiel gesperrt.",
     "predictionReadOnly": "Das Spiel läuft oder ist entschieden — dein Tipp unten ist schreibgeschützt. Wird das Spiel wieder auf „bevorstehend“ gesetzt, kannst du ihn erneut ändern.",

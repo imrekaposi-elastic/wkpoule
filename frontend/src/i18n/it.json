@@ -280,7 +280,9 @@
     "virtualLearnMore": "Come si calcola?",
     "yourTip": "Il tuo pronostico",
     "pointsEarned": "{{count}} pt",
-    "noTip": "Nessun pronostico"
+    "noTip": "Nessun pronostico",
+    "pinStage": "Ricorda questo filtro fase",
+    "unpinStage": "Non ricordare più questo filtro fase"
   },
   "matchDetail": {
     "notFound": "Partita non trovata",
@@ -320,6 +322,7 @@
     "savePrediction": "Salva pronostico",
     "saved": "Pronostico salvato!",
     "savedAllComplete": "Pronostico salvato — sei in pari con tutte le partite in programma.",
+    "savedStageComplete": "Pronostico salvato — nessun'altra partita da pronosticare in questa fase.",
     "saveFailed": "Impossibile salvare il pronostico",
     "locked": "I pronostici sono bloccati per questa partita.",
     "predictionReadOnly": "Questa partita è in diretta o il risultato è definitivo — il tuo pronostico sotto è in sola lettura. Se la partita torna in programma, potrai modificarlo di nuovo.",

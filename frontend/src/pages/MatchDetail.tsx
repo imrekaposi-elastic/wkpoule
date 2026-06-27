@@ -208,8 +208,16 @@ export default function MatchDetail() {
         await loadVirtualStandings(match.group_letter);
       }
 
+      const nextParams: Record<string, string | number | boolean> = {
+        predicted_teams: "true",
+      };
+      const advanceWithinStage = isKnockoutStage(match.stage);
+      if (advanceWithinStage) {
+        nextParams.stage = match.stage;
+        nextParams.after_match_number = match.match_number;
+      }
       const nextRes = await api.get<Match | null>("/matches/next-needing-prediction", {
-        params: { predicted_teams: "true" },
+        params: nextParams,
       });
       const nextEmpty = nextRes.data;
 
@@ -218,7 +226,11 @@ export default function MatchDetail() {
         return;
       }
       setMessage(
-        !nextEmpty ? t("matchDetail.savedAllComplete") : t("matchDetail.saved")
+        !nextEmpty
+          ? advanceWithinStage
+            ? t("matchDetail.savedStageComplete")
+            : t("matchDetail.savedAllComplete")
+          : t("matchDetail.saved")
       );
     } catch (err: any) {
       setMessage(err.response?.data?.detail || t("matchDetail.saveFailed"));

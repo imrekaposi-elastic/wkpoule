@@ -279,7 +279,9 @@
     "virtualLearnMore": "Como é calculado?",
     "yourTip": "Seu palpite",
     "pointsEarned": "{{count}} pts",
-    "noTip": "Sem palpite"
+    "noTip": "Sem palpite",
+    "pinStage": "Lembrar este filtro de fase",
+    "unpinStage": "Parar de lembrar este filtro de fase"
   },
   "matchDetail": {
     "notFound": "Jogo não encontrado",
@@ -319,6 +321,7 @@
     "savePrediction": "Salvar previsão",
     "saved": "Previsão salva!",
     "savedAllComplete": "Previsão salva — você está em dia com todos os jogos futuros.",
+    "savedStageComplete": "Previsão salva — não há mais jogos futuros para prever nesta fase.",
     "saveFailed": "Falha ao salvar previsão",
     "locked": "As previsões estão bloqueadas para este jogo.",
     "predictionReadOnly": "O jogo está em andamento ou o resultado está final — seu palpite abaixo é só leitura. Se o jogo voltar para “próximo”, você pode editar de novo.",
