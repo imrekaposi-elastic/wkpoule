@@ -1,0 +1,9 @@
+[
+  {
+    "op": "replace",
+    "path": "/spec/conversion",
+    "value": {
+      "strategy": "None"
+    }
+  }
+]

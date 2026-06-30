@@ -1,6 +1,7 @@
 """Unit tests for football-data.org score sync status handling."""
 
-from app.services.score_sync import resolve_sync_status
+from app.services.score_sync import apply_score_from_api_match, resolve_sync_status
+from tests.seed_fixtures import seed_knockout_match
 
 
 def test_resolve_sync_status_maps_finished_to_completed():
@@ -31,3 +32,53 @@ def test_resolve_sync_status_unknown_api_status_keeps_current():
     status, ignored = resolve_sync_status("WEIRD_STATUS", "completed")
     assert status == "completed"
     assert ignored is False
+
+
+def test_apply_score_from_api_match_uses_regular_time_for_knockout(db):
+    match = seed_knockout_match(db, match_number=201)
+    home_id = match.home_team_id
+    away_id = match.away_team_id
+    score = {
+        "winner": "HOME_TEAM",
+        "duration": "PENALTY_SHOOTOUT",
+        "fullTime": {"home": 7, "away": 6},
+        "regularTime": {"home": 1, "away": 1},
+    }
+
+    changed = apply_score_from_api_match(
+        match, score, home_id, away_id, our_status="completed"
+    )
+
+    assert changed is True
+    assert match.home_score == 1
+    assert match.away_score == 1
+    assert match.winner_team_id == home_id
+
+
+def test_apply_score_from_api_match_skips_admin_override(db):
+    match = seed_knockout_match(db, match_number=202)
+    match.home_score = 2
+    match.away_score = 2
+    match.winner_team_id = match.away_team_id
+    match.score_overridden_by_admin = True
+    db.commit()
+
+    score = {
+        "winner": "HOME_TEAM",
+        "duration": "PENALTY_SHOOTOUT",
+        "fullTime": {"home": 7, "away": 6},
+        "regularTime": {"home": 1, "away": 1},
+    }
+
+    changed = apply_score_from_api_match(
+        match,
+        score,
+        match.home_team_id,
+        match.away_team_id,
+        our_status="completed",
+    )
+
+    assert changed is False
+    assert match.home_score == 2
+    assert match.away_score == 2
+    assert match.winner_team_id == match.away_team_id

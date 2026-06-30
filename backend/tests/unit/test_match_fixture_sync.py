@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from app.models.match import Match
 from app.services.match_fixture_sync import (
     find_match_for_api,
+    goals_at_90_from_api_score,
     parse_api_kickoff,
     winner_team_id_from_api_score,
 )
@@ -20,6 +21,30 @@ def test_winner_team_id_from_api_score_draw_uses_api_side(db):
     home = seed_team(db, fifa_code="NED")
     away = seed_team(db, fifa_code="BEL")
     assert winner_team_id_from_api_score(home.id, away.id, 1, 1, "AWAY_TEAM") == away.id
+
+
+def test_goals_at_90_prefers_regular_time_over_full_time():
+    score = {
+        "duration": "PENALTY_SHOOTOUT",
+        "fullTime": {"home": 7, "away": 6},
+        "regularTime": {"home": 1, "away": 1},
+        "extraTime": {"home": 0, "away": 0},
+        "penalties": {"home": 6, "away": 5},
+    }
+    assert goals_at_90_from_api_score(score) == (1, 1)
+
+
+def test_goals_at_90_falls_back_to_full_time_when_no_regular_time():
+    score = {"fullTime": {"home": 2, "away": 1}}
+    assert goals_at_90_from_api_score(score) == (2, 1)
+
+
+def test_goals_at_90_accepts_home_team_away_team_keys():
+    score = {
+        "fullTime": {"homeTeam": 3, "awayTeam": 2},
+        "regularTime": {"homeTeam": 1, "awayTeam": 1},
+    }
+    assert goals_at_90_from_api_score(score) == (1, 1)
 
 
 def test_find_match_for_api_assigns_teams_on_knockout_kickoff(db):

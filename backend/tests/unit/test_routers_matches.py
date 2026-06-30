@@ -97,6 +97,9 @@ def test_admin_score_update(client, db, auth_headers):
     assert response.status_code == 200
     assert response.json()["home_score"] == 2
 
+    db.refresh(match)
+    assert match.score_overridden_by_admin is True
+
 
 def test_admin_knockout_draw_requires_winner(client, db, auth_headers):
     match = seed_knockout_match(db, match_number=109)

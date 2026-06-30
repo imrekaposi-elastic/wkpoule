@@ -9,7 +9,11 @@ from app.config import get_settings
 from app.database import SessionLocal
 from app.models.match import Match
 from app.models.team import Team
-from app.services.match_fixture_sync import find_match_for_api, winner_team_id_from_api_score
+from app.services.match_fixture_sync import (
+    find_match_for_api,
+    goals_at_90_from_api_score,
+    winner_team_id_from_api_score,
+)
 
 logger = logging.getLogger("wkpoule.score_sync")
 
@@ -48,6 +52,50 @@ def resolve_sync_status(api_status: str, current_status: str) -> tuple[str, bool
     if mapped_rank < current_rank:
         return current_status, True
     return mapped, False
+
+
+def apply_score_from_api_match(
+    match: Match,
+    score: dict,
+    home_id: int,
+    away_id: int,
+    *,
+    our_status: str,
+) -> bool:
+    """Apply 90-minute goals and advancing team from API score. Returns True if changed."""
+    if match.score_overridden_by_admin:
+        return False
+    if our_status != "completed":
+        return False
+
+    home_goals, away_goals = goals_at_90_from_api_score(score)
+    if home_goals is None or away_goals is None:
+        return False
+
+    changed = False
+    if match.home_score != home_goals or match.away_score != away_goals:
+        match.home_score = home_goals
+        match.away_score = away_goals
+        changed = True
+
+    winner_side = score.get("winner")
+    if home_goals > away_goals:
+        winner_team_id = home_id
+    elif away_goals > home_goals:
+        winner_team_id = away_id
+    else:
+        winner_team_id = winner_team_id_from_api_score(
+            home_id,
+            away_id,
+            home_goals,
+            away_goals,
+            winner_side,
+        )
+
+    if match.winner_team_id != winner_team_id:
+        match.winner_team_id = winner_team_id
+        changed = True
+    return changed
 
 
 async def sync_scores() -> int:
@@ -158,12 +206,6 @@ async def sync_scores() -> int:
                     api_status,
                 )
             score = am.get("score", {})
-            # fullTime = end of regular time (90 min); extra time / pens are separate fields.
-            ft = score.get("fullTime", {})
-            home_goals = ft.get("home")
-            away_goals = ft.get("away")
-            winner_side = score.get("winner")
-
             changed = False
 
             if (
@@ -186,37 +228,15 @@ async def sync_scores() -> int:
                 match.status = our_status
                 changed = True
 
-            if (
-                our_status == "completed"
-                and home_goals is not None
-                and away_goals is not None
+            if apply_score_from_api_match(
+                match, score, home_id, away_id, our_status=our_status
             ):
-                if match.home_score != home_goals or match.away_score != away_goals:
-                    logger.info(
-                        "Match #%d %s vs %s: score %s-%s -> %d-%d",
-                        match.match_number, home_tla, away_tla,
-                        match.home_score, match.away_score, home_goals, away_goals,
-                    )
-                    match.home_score = home_goals
-                    match.away_score = away_goals
-                    changed = True
-
-                if home_goals > away_goals:
-                    winner_team_id = home_id
-                elif away_goals > home_goals:
-                    winner_team_id = away_id
-                else:
-                    winner_team_id = winner_team_id_from_api_score(
-                        home_id,
-                        away_id,
-                        home_goals,
-                        away_goals,
-                        winner_side,
-                    )
-
-                if match.winner_team_id != winner_team_id:
-                    match.winner_team_id = winner_team_id
-                    changed = True
+                home_goals, away_goals = goals_at_90_from_api_score(score)
+                logger.info(
+                    "Match #%d %s vs %s: score -> %d-%d (90 min)",
+                    match.match_number, home_tla, away_tla, home_goals, away_goals,
+                )
+                changed = True
 
             if changed:
                 updates += 1

@@ -367,6 +367,7 @@ async def update_score(
     m.home_score = body.home_score
     m.away_score = body.away_score
     m.status = body.status
+    m.score_overridden_by_admin = True
     if body.status == "completed" and is_knockout_stage(m.stage):
         if body.home_score == body.away_score:
             if body.winner_team_id is None:

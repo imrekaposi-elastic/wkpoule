@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -24,6 +24,10 @@ class Match(Base):
         Integer, ForeignKey("teams.id"), nullable=True
     )
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="upcoming")
+    # When True, football-data.org sync must not overwrite scores or winner_team_id.
+    score_overridden_by_admin: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
 
     home_team: Mapped["Team"] = relationship(foreign_keys=[home_team_id])  # noqa: F821
     away_team: Mapped["Team"] = relationship(foreign_keys=[away_team_id])  # noqa: F821

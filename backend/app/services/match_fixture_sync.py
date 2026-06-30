@@ -23,6 +23,31 @@ def parse_api_kickoff(utc_date: str) -> datetime:
     return dt.astimezone(timezone.utc)
 
 
+def _goals_from_api_score_node(node: dict | None) -> tuple[int | None, int | None]:
+    """Read home/away goals from a score sub-node (fullTime, regularTime, etc.)."""
+    if not node:
+        return None, None
+    home = node.get("home")
+    if home is None:
+        home = node.get("homeTeam")
+    away = node.get("away")
+    if away is None:
+        away = node.get("awayTeam")
+    return home, away
+
+
+def goals_at_90_from_api_score(score: dict) -> tuple[int | None, int | None]:
+    """Goals after 90 minutes for tip scoring (not extra time or penalties).
+
+    football-data.org v4 uses score/regularTime when a knockout match goes to
+    extra time or penalties; score/fullTime is the running total (may include ET/pens).
+    """
+    home, away = _goals_from_api_score_node(score.get("regularTime"))
+    if home is not None and away is not None:
+        return home, away
+    return _goals_from_api_score_node(score.get("fullTime"))
+
+
 def winner_team_id_from_api_score(
     home_team_id: int,
     away_team_id: int,

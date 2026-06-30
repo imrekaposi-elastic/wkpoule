@@ -1,0 +1,5 @@
+{
+  "spec": {
+    "upstream": "https://amd64.origin.releases.ci.openshift.org/graph"
+  }
+}
