@@ -3,6 +3,7 @@
 Round of 32 third-place matchups follow FIFA 2026 Annex C (495 combinations, loaded from data file).
 Slot labels follow FIFA notation: 1st = winner (e.g. E1), 2nd = runner-up (e.g. A2), 3rd (e.g. F3).
 
+Completed knockout matches use actual results to feed later rounds; unfinished matches use predictions.
 Knockout draws on tied predicted scores: lower world_ranking wins (better FIFA rank).
 """
 
@@ -17,6 +18,7 @@ from app.schemas.match import TeamOut
 from app.services.annex_c import annex_lookup
 from app.schemas.ranking import GroupTable
 from app.services.knockout_winner import predicted_winner_team_id
+from app.services.scoring import resolve_winner_team_id
 from app.services.virtual_standings import best_third_place_team_ids, compute_virtual_group_standings
 
 R16_SOURCES: dict[int, tuple[int, int]] = {
@@ -180,12 +182,40 @@ def compute_predicted_knockout_teams(
     winners: dict[int, int | None] = {}
     slot_labels: dict[int, tuple[str | None, str | None]] = dict(r32_labels)
 
-    def win_from_pred(mn: int, home_id: int | None, away_id: int | None) -> int | None:
+    def fixture_pair(
+        mn: int,
+        bracket_home_id: int | None,
+        bracket_away_id: int | None,
+    ) -> tuple[int | None, int | None]:
+        m = by_num.get(mn)
+        if m and m.home_team_id is not None and m.away_team_id is not None:
+            return m.home_team_id, m.away_team_id
+        return bracket_home_id, bracket_away_id
+
+    def winner_for_fixture(
+        mn: int,
+        home_id: int | None,
+        away_id: int | None,
+    ) -> int | None:
         if home_id is None or away_id is None:
             return None
         m = by_num.get(mn)
         if not m:
             return None
+        if (
+            m.status == "completed"
+            and m.home_score is not None
+            and m.away_score is not None
+        ):
+            act_home = m.home_team_id or home_id
+            act_away = m.away_team_id or away_id
+            return resolve_winner_team_id(
+                act_home,
+                act_away,
+                m.home_score,
+                m.away_score,
+                m.winner_team_id,
+            )
         p = pred_by_mid.get(m.id)
         if p is None:
             return None
@@ -199,43 +229,36 @@ def compute_predicted_knockout_teams(
         )
 
     for mn in range(73, 89):
-        computed[mn] = r32_pairs.get(mn, (None, None))
-        winners[mn] = win_from_pred(mn, computed[mn][0], computed[mn][1])
+        bracket_pair = r32_pairs.get(mn, (None, None))
+        computed[mn] = fixture_pair(mn, *bracket_pair)
+        winners[mn] = winner_for_fixture(mn, *computed[mn])
 
     for mn in range(89, 97):
         hm, am = R16_SOURCES[mn]
         h, a = winners.get(hm), winners.get(am)
-        computed[mn] = (h, a)
-        winners[mn] = win_from_pred(mn, h, a)
+        computed[mn] = fixture_pair(mn, h, a)
+        winners[mn] = winner_for_fixture(mn, *computed[mn])
         slot_labels[mn] = (f"W{hm}", f"W{am}")
 
     for mn in range(97, 101):
         hm, am = QF_SOURCES[mn]
         h, a = winners.get(hm), winners.get(am)
-        computed[mn] = (h, a)
-        winners[mn] = win_from_pred(mn, h, a)
+        computed[mn] = fixture_pair(mn, h, a)
+        winners[mn] = winner_for_fixture(mn, *computed[mn])
         slot_labels[mn] = (f"W{hm}", f"W{am}")
 
     for mn in range(101, 103):
         hm, am = SF_SOURCES[mn]
         h, a = winners.get(hm), winners.get(am)
-        computed[mn] = (h, a)
-        winners[mn] = win_from_pred(mn, h, a)
+        computed[mn] = fixture_pair(mn, h, a)
+        winners[mn] = winner_for_fixture(mn, *computed[mn])
         slot_labels[mn] = (f"W{hm}", f"W{am}")
 
     def loser_from(mn: int) -> int | None:
         hid, aid = computed[mn]
-        if hid is None or aid is None:
+        w = winner_for_fixture(mn, hid, aid)
+        if w is None:
             return None
-        m = by_num.get(mn)
-        if not m:
-            return None
-        p = pred_by_mid.get(m.id)
-        if p is None:
-            return None
-        w = predicted_winner_team_id(
-            hid, aid, p.home_score, p.away_score, teams_by_id, p.advance_team_id
-        )
         return aid if w == hid else hid
 
     computed[103] = (loser_from(101), loser_from(102))

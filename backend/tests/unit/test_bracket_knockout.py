@@ -1,5 +1,9 @@
 """Unit tests for knockout bracket resolution."""
 
+from datetime import datetime, timezone
+
+from app.models.match import Match
+from app.models.prediction import Prediction
 from app.models.user import User
 from app.schemas.ranking import GroupStanding, GroupTable
 from app.services.annex_c import annex_lookup
@@ -10,6 +14,7 @@ from app.services.bracket_resolver import (
     compute_predicted_knockout_teams,
     static_bracket_slot_labels,
 )
+from tests.seed_fixtures import seed_team, seed_venue
 
 # FIFA 2026 regulations / Wikipedia knockout stage — Round of 32 match numbers 73–88.
 OFFICIAL_R32_STRUCTURE: dict[int, tuple[tuple[str, str], tuple[str, str]]] = {
@@ -134,3 +139,58 @@ def test_static_bracket_slot_labels_for_r16():
     assert static_bracket_slot_labels(89) == ("W74", "W77")
     assert static_bracket_slot_labels(103) == ("L101", "L102")
     assert static_bracket_slot_labels(104) == ("W101", "W102")
+
+
+def test_completed_knockout_uses_actual_winner_for_next_round(db):
+    user = User(
+        username="bracket-actual",
+        email="bracket-actual@example.com",
+        password_hash="x",
+        preferred_language="en",
+    )
+    db.add(user)
+    db.flush()
+
+    venue = seed_venue(db)
+    ned = seed_team(db, fifa_code="NED", world_ranking=5)
+    mar = seed_team(db, fifa_code="MAR", world_ranking=20)
+    kickoff = datetime(2026, 7, 5, 19, 0, tzinfo=timezone.utc)
+
+    r32 = Match(
+        match_number=73,
+        stage="round_of_32",
+        home_team_id=ned.id,
+        away_team_id=mar.id,
+        venue_id=venue.id,
+        kickoff_utc=kickoff,
+        status="completed",
+        home_score=0,
+        away_score=1,
+    )
+    r16 = Match(
+        match_number=90,
+        stage="round_of_16",
+        home_team_id=None,
+        away_team_id=None,
+        venue_id=venue.id,
+        kickoff_utc=kickoff,
+        status="upcoming",
+    )
+    db.add_all([r32, r16])
+    db.flush()
+
+    db.add(
+        Prediction(
+            user_id=user.id,
+            match_id=r32.id,
+            home_score=2,
+            away_score=0,
+        )
+    )
+    db.commit()
+
+    teams, _ = compute_predicted_knockout_teams(db, user.id)
+    home, _away = teams[90]
+
+    assert home is not None
+    assert home.fifa_code == "MAR"
