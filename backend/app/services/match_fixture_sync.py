@@ -48,15 +48,72 @@ def goals_at_90_from_api_score(score: dict) -> tuple[int | None, int | None]:
     return _goals_from_api_score_node(score.get("fullTime"))
 
 
+def map_api_goals_to_match_orientation(
+    match: Match,
+    api_home_id: int,
+    api_away_id: int,
+    api_home_goals: int,
+    api_away_goals: int,
+) -> tuple[int, int]:
+    """Map API home/away goals onto this match's home_team_id / away_team_id slots."""
+    if match.home_team_id == api_home_id and match.away_team_id == api_away_id:
+        return api_home_goals, api_away_goals
+    if match.home_team_id == api_away_id and match.away_team_id == api_home_id:
+        return api_away_goals, api_home_goals
+    return api_home_goals, api_away_goals
+
+
+def goals_at_90_for_match(
+    match: Match,
+    api_home_id: int,
+    api_away_id: int,
+    score: dict,
+) -> tuple[int | None, int | None]:
+    """90-minute goals aligned to the match's home/away team slots."""
+    api_home_goals, api_away_goals = goals_at_90_from_api_score(score)
+    if api_home_goals is None or api_away_goals is None:
+        return None, None
+    home_goals, away_goals = map_api_goals_to_match_orientation(
+        match,
+        api_home_id,
+        api_away_id,
+        api_home_goals,
+        api_away_goals,
+    )
+    return home_goals, away_goals
+
+
+def advancing_team_id_from_api_winner(
+    winner_side: str | None,
+    api_home_id: int,
+    api_away_id: int,
+) -> int | None:
+    """Team id that advanced, from API winner relative to API home/away."""
+    if winner_side == "HOME_TEAM":
+        return api_home_id
+    if winner_side == "AWAY_TEAM":
+        return api_away_id
+    return None
+
+
 def winner_team_id_from_api_score(
     home_team_id: int,
     away_team_id: int,
     home_goals: int,
     away_goals: int,
     winner_side: str | None,
+    *,
+    api_home_id: int | None = None,
+    api_away_id: int | None = None,
 ) -> int | None:
     """Map 90-minute goals + API winner field to the advancing team id."""
-    if winner_side == "HOME_TEAM":
+    if home_goals > away_goals:
+        return home_team_id
+    if away_goals > home_goals:
+        return away_team_id
+    if api_home_id is not None and api_away_id is not None:
+        stored = advancing_team_id_from_api_winner(winner_side, api_home_id, api_away_id)
+    elif winner_side == "HOME_TEAM":
         stored = home_team_id
     elif winner_side == "AWAY_TEAM":
         stored = away_team_id
@@ -71,6 +128,16 @@ def winner_team_id_from_api_score(
     )
 
 
+def _participants_match(
+    match: Match,
+    team_a_id: int,
+    team_b_id: int,
+) -> bool:
+    if match.home_team_id is None or match.away_team_id is None:
+        return False
+    return {match.home_team_id, match.away_team_id} == {team_a_id, team_b_id}
+
+
 def find_match_for_api(
     db: Session,
     home_team_id: int,
@@ -81,6 +148,14 @@ def find_match_for_api(
     match = (
         db.query(Match)
         .filter(Match.home_team_id == home_team_id, Match.away_team_id == away_team_id)
+        .first()
+    )
+    if match:
+        return match
+
+    match = (
+        db.query(Match)
+        .filter(Match.home_team_id == away_team_id, Match.away_team_id == home_team_id)
         .first()
     )
     if match:
@@ -103,7 +178,7 @@ def find_match_for_api(
     if match.away_team_id is None:
         match.away_team_id = away_team_id
 
-    if match.home_team_id != home_team_id or match.away_team_id != away_team_id:
+    if not _participants_match(match, home_team_id, away_team_id):
         logger.warning(
             "Kickoff match #%d teams %s/%s do not match API participants",
             match.match_number,

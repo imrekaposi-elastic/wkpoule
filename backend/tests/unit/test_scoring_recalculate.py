@@ -117,5 +117,56 @@ def test_recalculate_knockout_draw_awards_winner_bonus(db):
     assert prediction.points == 12
 
 
+def test_recalculate_knockout_draw_missing_winner_scores_nine_until_set(db):
+    user, group_match, home, away = _seed_scored_match(db)
+    group_pred = (
+        db.query(Prediction)
+        .filter(Prediction.user_id == user.id, Prediction.match_id == group_match.id)
+        .one()
+    )
+    group_pred.points = 12
+    db.commit()
+    match = Match(
+        match_number=3003,
+        stage="round_of_32",
+        group_letter=None,
+        venue_id=db.query(Venue).one().id,
+        kickoff_utc=datetime(2026, 7, 7, 18, tzinfo=timezone.utc),
+        status="completed",
+        home_team_id=home.id,
+        away_team_id=away.id,
+        home_score=1,
+        away_score=1,
+        winner_team_id=None,
+    )
+    db.add(match)
+    db.flush()
+    db.add(
+        Prediction(
+            user_id=user.id,
+            match_id=match.id,
+            home_score=1,
+            away_score=1,
+            advance_team_id=away.id,
+            points=9,
+        )
+    )
+    db.commit()
+
+    assert recalculate_points() == 0
+    prediction = (
+        db.query(Prediction)
+        .filter(Prediction.user_id == user.id, Prediction.match_id == match.id)
+        .one()
+    )
+    assert prediction.points == 9
+
+    match.winner_team_id = away.id
+    db.commit()
+    assert recalculate_points() == 1
+    db.refresh(prediction)
+    assert prediction.points == 12
+
+
 def test_recalculate_points_returns_zero_without_completed_matches(db):
     assert recalculate_points() == 0

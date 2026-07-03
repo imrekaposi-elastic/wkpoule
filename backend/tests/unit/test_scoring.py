@@ -2,10 +2,14 @@
 
 import pytest
 
-from app.services.scoring import calculate_points
+from app.models.match import Match
+from app.models.prediction import Prediction
+from app.services.scoring import calculate_points, calculate_prediction_points
 
 NED = 1
 BRA = 2
+EGY = 10
+AUS = 20
 
 
 @pytest.mark.parametrize(
@@ -120,3 +124,33 @@ def test_knockout_predicted_win_actual_draw_gets_nothing():
     )
 
     assert result["points"] == 0
+
+
+def test_knockout_draw_awards_12_when_winner_id_matches_advance_pick():
+    match = Match(
+        match_number=501,
+        stage="round_of_32",
+        group_letter=None,
+        home_team_id=EGY,
+        away_team_id=AUS,
+        venue_id=1,
+        kickoff_utc=__import__("datetime").datetime(
+            2026, 7, 7, 19, tzinfo=__import__("datetime").timezone.utc
+        ),
+        status="completed",
+        home_score=1,
+        away_score=1,
+        winner_team_id=EGY,
+    )
+    pred = Prediction(
+        user_id=1,
+        match_id=1,
+        home_score=1,
+        away_score=1,
+        advance_team_id=EGY,
+        points=9,
+    )
+
+    result = calculate_prediction_points(pred, match)
+
+    assert result["points"] == 12

@@ -4,8 +4,11 @@ from datetime import datetime, timezone
 
 from app.models.match import Match
 from app.services.match_fixture_sync import (
+    advancing_team_id_from_api_winner,
     find_match_for_api,
+    goals_at_90_for_match,
     goals_at_90_from_api_score,
+    map_api_goals_to_match_orientation,
     parse_api_kickoff,
     winner_team_id_from_api_score,
 )
@@ -45,6 +48,40 @@ def test_goals_at_90_accepts_home_team_away_team_keys():
         "regularTime": {"homeTeam": 1, "awayTeam": 1},
     }
     assert goals_at_90_from_api_score(score) == (1, 1)
+
+
+def test_map_api_goals_swapped_when_db_home_away_opposite_api():
+    from app.models.match import Match
+
+    match = Match(
+        match_number=99,
+        stage="round_of_32",
+        home_team_id=20,
+        away_team_id=10,
+        venue_id=1,
+        kickoff_utc=datetime(2026, 7, 5, 19, 0, tzinfo=timezone.utc),
+        status="upcoming",
+    )
+    assert map_api_goals_to_match_orientation(match, 10, 20, 1, 1) == (1, 1)
+    assert map_api_goals_to_match_orientation(match, 10, 20, 2, 0) == (0, 2)
+
+
+def test_advancing_team_id_from_api_winner_uses_api_participant_ids():
+    assert advancing_team_id_from_api_winner("HOME_TEAM", 10, 20) == 10
+    assert advancing_team_id_from_api_winner("AWAY_TEAM", 10, 20) == 20
+    assert advancing_team_id_from_api_winner("DRAW", 10, 20) is None
+
+
+def test_winner_team_id_from_api_score_draw_uses_api_participant_ids():
+    assert winner_team_id_from_api_score(
+        20,
+        10,
+        1,
+        1,
+        "AWAY_TEAM",
+        api_home_id=10,
+        api_away_id=20,
+    ) == 20
 
 
 def test_find_match_for_api_assigns_teams_on_knockout_kickoff(db):
@@ -93,6 +130,27 @@ def test_find_match_for_api_prefers_existing_team_pair(db):
         home,
         away,
         "2026-07-06T19:00:00Z",
+    )
+    assert found is not None
+    assert found.id == match.id
+
+
+def test_find_match_for_api_accepts_swapped_home_away(db):
+    match = seed_knockout_match(
+        db,
+        match_number=91,
+        home_code="EGY",
+        away_code="AUS",
+        kickoff=datetime(2026, 7, 7, 19, 0, tzinfo=timezone.utc),
+    )
+    home = match.home_team_id
+    away = match.away_team_id
+
+    found = find_match_for_api(
+        db,
+        away,
+        home,
+        "2026-07-07T19:00:00Z",
     )
     assert found is not None
     assert found.id == match.id
