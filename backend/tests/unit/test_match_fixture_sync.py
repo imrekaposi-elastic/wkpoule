@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 from app.models.match import Match
 from app.services.match_fixture_sync import (
+    advancing_team_id_from_api_score,
     advancing_team_id_from_api_winner,
     find_match_for_api,
     goals_at_90_for_match,
@@ -70,6 +71,32 @@ def test_advancing_team_id_from_api_winner_uses_api_participant_ids():
     assert advancing_team_id_from_api_winner("HOME_TEAM", 10, 20) == 10
     assert advancing_team_id_from_api_winner("AWAY_TEAM", 10, 20) == 20
     assert advancing_team_id_from_api_winner("DRAW", 10, 20) is None
+
+
+def test_advancing_team_id_from_api_score_egy_aus_null_winner_uses_full_time():
+    """Real football-data.org payload: winner null, pens tied, fullTime shows Egypt through."""
+    aus_id = 15
+    egy_id = 26
+    score = {
+        "winner": None,
+        "duration": "PENALTY_SHOOTOUT",
+        "fullTime": {"home": 3, "away": 5},
+        "regularTime": {"home": 1, "away": 1},
+        "extraTime": {"home": 0, "away": 0},
+        "penalties": {"home": 4, "away": 4},
+    }
+    assert advancing_team_id_from_api_score(score, aus_id, egy_id) == egy_id
+
+
+def test_advancing_team_id_from_api_score_prefers_penalties_when_decisive():
+    score = {
+        "winner": None,
+        "duration": "PENALTY_SHOOTOUT",
+        "fullTime": {"home": 7, "away": 6},
+        "regularTime": {"home": 1, "away": 1},
+        "penalties": {"home": 6, "away": 5},
+    }
+    assert advancing_team_id_from_api_score(score, 10, 20) == 10
 
 
 def test_winner_team_id_from_api_score_draw_uses_api_participant_ids():

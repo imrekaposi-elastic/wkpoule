@@ -96,6 +96,45 @@ def advancing_team_id_from_api_winner(
     return None
 
 
+def advancing_team_id_from_api_score(
+    score: dict,
+    api_home_id: int,
+    api_away_id: int,
+) -> int | None:
+    """Resolve the advancing team when 90-minute scores are level.
+
+    football-data.org sometimes omits score.winner after a shootout (e.g. AUS vs EGY
+    with penalties 4-4 but fullTime 3-5). Fall back to penalties, then fullTime.
+    """
+    stored = advancing_team_id_from_api_winner(score.get("winner"), api_home_id, api_away_id)
+    if stored is not None:
+        return stored
+
+    pen_home, pen_away = _goals_from_api_score_node(score.get("penalties"))
+    if pen_home is not None and pen_away is not None and pen_home != pen_away:
+        return api_home_id if pen_home > pen_away else api_away_id
+
+    reg_home, reg_away = _goals_from_api_score_node(score.get("regularTime"))
+    if reg_home is None or reg_away is None:
+        return None
+
+    et_home, et_away = _goals_from_api_score_node(score.get("extraTime"))
+    level_home = reg_home + (et_home or 0)
+    level_away = reg_away + (et_away or 0)
+    if level_home != level_away:
+        return None
+
+    ft_home, ft_away = _goals_from_api_score_node(score.get("fullTime"))
+    if ft_home is None or ft_away is None or ft_home == ft_away:
+        return None
+
+    duration = score.get("duration")
+    if duration in ("PENALTY_SHOOTOUT", "EXTRA_TIME") or score.get("penalties"):
+        return api_home_id if ft_home > ft_away else api_away_id
+
+    return None
+
+
 def winner_team_id_from_api_score(
     home_team_id: int,
     away_team_id: int,

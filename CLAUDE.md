@@ -3,7 +3,7 @@
 Read this before changing knockout scoring, bracket resolution, or football-data.org sync.
 For API auth and prediction workflows, use `docs/AGENTS.md`. For OpenAPI, use `/openapi.json`.
 
-**Current app version:** `2.7.3` (`frontend/src/version.ts`, `backend/app/main.py`).
+**Current app version:** `2.7.4` (`frontend/src/version.ts`, `backend/app/main.py`).
 
 ---
 
@@ -254,20 +254,19 @@ Group-stage feeders use `compute_virtual_group_standings()`: completed group mat
 
 ---
 
-### 4. Knockout pen shootout progressor points wrong (v2.7.3)
+### 4. Knockout pen shootout progressor points wrong (v2.7.3 → v2.7.4)
 
 **Symptom:** User tipped 1-1 with correct progressor (e.g. Egypt after pens vs Australia) but received **9** points instead of **12**.
 
-**Cause:** Scoring logic was correct (`scoring.py` awards +3 when `advance_team_id == winner_team_id`), but score sync stored the wrong `winner_team_id` when API home/away order differed from the DB fixture, or failed to match swapped participants. Missing/wrong winner → no +3 bonus.
+**Cause (two parts):**
+1. Score sync mapped API home/away incorrectly when DB fixture order differed (v2.7.3).
+2. football-data.org can return `score.winner: null` after a shootout even when `duration` is `PENALTY_SHOOTOUT` (AUS vs EGY: pens 4-4, `fullTime` 3-5). Sync never set `winner_team_id` → no +3 bonus.
 
-**Fix:**
-- `find_match_for_api()` accepts swapped home/away participants.
-- `map_api_goals_to_match_orientation()` / `goals_at_90_for_match()` align 90-min goals to DB slots.
-- `advancing_team_id_from_api_winner()` maps API `winner` to team id via API participant ids.
-- Admin-locked draws: backfill missing `winner_team_id` without changing scores.
-- Next score sync re-processes `FINISHED` matches and runs `recalculate_points()`.
+**Fix (v2.7.3):** orientation-aware match lookup and goal/winner mapping.
 
-**Tests:** `test_apply_score_swapped_db_teams_sets_api_winner_team_id`, `test_knockout_draw_awards_12_when_winner_id_matches_advance_pick`, `test_recalculate_knockout_draw_missing_winner_scores_nine_until_set`.
+**Fix (v2.7.4):** `advancing_team_id_from_api_score()` — when `winner` is null after a level 90+ET score, infer progressor from decisive `penalties`, else from `fullTime` when duration is `PENALTY_SHOOTOUT` / `EXTRA_TIME`.
+
+**Tests:** `test_advancing_team_id_from_api_score_egy_aus_null_winner_uses_full_time`, `test_apply_score_null_api_winner_infers_progressor_from_full_time`.
 
 ---
 

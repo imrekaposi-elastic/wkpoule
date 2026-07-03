@@ -10,7 +10,7 @@ from app.database import SessionLocal
 from app.models.match import Match
 from app.models.team import Team
 from app.services.match_fixture_sync import (
-    advancing_team_id_from_api_winner,
+    advancing_team_id_from_api_score,
     find_match_for_api,
     goals_at_90_for_match,
 )
@@ -60,13 +60,13 @@ def _resolve_winner_team_id_for_match(
     api_away_id: int,
     home_goals: int,
     away_goals: int,
-    winner_side: str | None,
+    score: dict,
 ) -> int | None:
     if home_goals > away_goals:
         return match.home_team_id or api_home_id
     if away_goals > home_goals:
         return match.away_team_id or api_away_id
-    return advancing_team_id_from_api_winner(winner_side, api_home_id, api_away_id)
+    return advancing_team_id_from_api_score(score, api_home_id, api_away_id)
 
 
 def _apply_winner_only_when_admin_overridden(
@@ -102,7 +102,7 @@ def _apply_winner_only_when_admin_overridden(
         api_away_id,
         home_goals,
         away_goals,
-        score.get("winner"),
+        score,
     )
     if winner_team_id is None:
         return False
@@ -145,7 +145,7 @@ def apply_score_from_api_match(
         api_away_id,
         home_goals,
         away_goals,
-        score.get("winner"),
+        score,
     )
 
     if winner_team_id is not None and match.winner_team_id != winner_team_id:

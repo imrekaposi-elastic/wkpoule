@@ -134,3 +134,30 @@ def test_apply_score_swapped_db_teams_sets_api_winner_team_id(db):
     assert match.home_score == 1
     assert match.away_score == 1
     assert match.winner_team_id == egypt_id
+
+
+def test_apply_score_null_api_winner_infers_progressor_from_full_time(db):
+    match = seed_knockout_match(db, match_number=205, home_code="AUS", away_code="EGY")
+    australia_id = match.home_team_id
+    egypt_id = match.away_team_id
+    score = {
+        "winner": None,
+        "duration": "PENALTY_SHOOTOUT",
+        "fullTime": {"home": 3, "away": 5},
+        "regularTime": {"home": 1, "away": 1},
+        "extraTime": {"home": 0, "away": 0},
+        "penalties": {"home": 4, "away": 4},
+    }
+
+    changed = apply_score_from_api_match(
+        match,
+        score,
+        australia_id,
+        egypt_id,
+        our_status="completed",
+    )
+
+    assert changed is True
+    assert match.home_score == 1
+    assert match.away_score == 1
+    assert match.winner_team_id == egypt_id
