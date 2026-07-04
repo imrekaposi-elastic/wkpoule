@@ -41,11 +41,26 @@ def goals_at_90_from_api_score(score: dict) -> tuple[int | None, int | None]:
 
     football-data.org v4 uses score/regularTime when a knockout match goes to
     extra time or penalties; score/fullTime is the running total (may include ET/pens).
+    When regularTime is missing after extra time, derive it as fullTime minus extraTime.
     """
     home, away = _goals_from_api_score_node(score.get("regularTime"))
     if home is not None and away is not None:
         return home, away
-    return _goals_from_api_score_node(score.get("fullTime"))
+
+    ft_home, ft_away = _goals_from_api_score_node(score.get("fullTime"))
+    et_home, et_away = _goals_from_api_score_node(score.get("extraTime"))
+    duration = score.get("duration")
+
+    if (
+        duration == "EXTRA_TIME"
+        and ft_home is not None
+        and ft_away is not None
+        and et_home is not None
+        and et_away is not None
+    ):
+        return ft_home - et_home, ft_away - et_away
+
+    return ft_home, ft_away
 
 
 def map_api_goals_to_match_orientation(
@@ -115,6 +130,8 @@ def advancing_team_id_from_api_score(
         return api_home_id if pen_home > pen_away else api_away_id
 
     reg_home, reg_away = _goals_from_api_score_node(score.get("regularTime"))
+    if reg_home is None or reg_away is None:
+        reg_home, reg_away = goals_at_90_from_api_score(score)
     if reg_home is None or reg_away is None:
         return None
 

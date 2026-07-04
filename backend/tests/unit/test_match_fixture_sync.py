@@ -43,6 +43,19 @@ def test_goals_at_90_falls_back_to_full_time_when_no_regular_time():
     assert goals_at_90_from_api_score(score) == (2, 1)
 
 
+def test_goals_at_90_derives_from_full_time_minus_extra_time_when_regular_time_null():
+    """ARG vs CPV: API regularTime null, fullTime 3-2 after extraTime 2-1."""
+    score = {
+        "winner": "HOME_TEAM",
+        "duration": "EXTRA_TIME",
+        "fullTime": {"home": 3, "away": 2},
+        "regularTime": {"home": None, "away": None},
+        "extraTime": {"home": 2, "away": 1},
+        "halfTime": {"home": 1, "away": 0},
+    }
+    assert goals_at_90_from_api_score(score) == (1, 1)
+
+
 def test_goals_at_90_accepts_home_team_away_team_keys():
     score = {
         "fullTime": {"homeTeam": 3, "awayTeam": 2},

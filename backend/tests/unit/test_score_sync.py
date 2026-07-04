@@ -161,3 +161,29 @@ def test_apply_score_null_api_winner_infers_progressor_from_full_time(db):
     assert match.home_score == 1
     assert match.away_score == 1
     assert match.winner_team_id == egypt_id
+
+
+def test_apply_score_extra_time_null_regular_time_uses_ninety_minute_score(db):
+    match = seed_knockout_match(db, match_number=206, home_code="ARG", away_code="CPV")
+    arg_id = match.home_team_id
+    cpv_id = match.away_team_id
+    score = {
+        "winner": "HOME_TEAM",
+        "duration": "EXTRA_TIME",
+        "fullTime": {"home": 3, "away": 2},
+        "regularTime": {"home": None, "away": None},
+        "extraTime": {"home": 2, "away": 1},
+    }
+
+    changed = apply_score_from_api_match(
+        match,
+        score,
+        arg_id,
+        cpv_id,
+        our_status="completed",
+    )
+
+    assert changed is True
+    assert match.home_score == 1
+    assert match.away_score == 1
+    assert match.winner_team_id == arg_id

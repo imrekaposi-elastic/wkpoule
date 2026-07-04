@@ -3,7 +3,7 @@
 Read this before changing knockout scoring, bracket resolution, or football-data.org sync.
 For API auth and prediction workflows, use `docs/AGENTS.md`. For OpenAPI, use `/openapi.json`.
 
-**Current app version:** `2.7.4` (`frontend/src/version.ts`, `backend/app/main.py`).
+**Current app version:** `2.7.5` (`frontend/src/version.ts`, `backend/app/main.py`).
 
 ---
 
@@ -270,7 +270,19 @@ Group-stage feeders use `compute_virtual_group_standings()`: completed group mat
 
 ---
 
-### 5. Rankings `.slice is not a function` (earlier session, ~v1.7.0 → fixed before v2.5)
+### 5. Extra-time score stored as fullTime when regularTime null (v2.7.5)
+
+**Symptom:** ARG vs CPV ended 1-1 after 90 min, Argentina won 3-2 in ET. Users tipping 1-1 + Argentina got 0 instead of 12; others got 3 pts for a "home win" based on 3-2.
+
+**Cause:** football-data.org returned `regularTime: {home: null, away: null}` with `duration: EXTRA_TIME`. Sync fell back to `fullTime` (3-2) instead of deriving 90-min score as `fullTime − extraTime` (1-1).
+
+**Fix:** `goals_at_90_from_api_score()` — when `duration == EXTRA_TIME` and `regularTime` missing, use `fullTime − extraTime`.
+
+**Tests:** `test_goals_at_90_derives_from_full_time_minus_extra_time_when_regular_time_null`, `test_apply_score_extra_time_null_regular_time_uses_ninety_minute_score`.
+
+---
+
+### 6. Rankings `.slice is not a function` (earlier session, ~v1.7.0 → fixed before v2.5)
 
 **Symptom:** `Uncaught TypeError: rankings.slice is not a function` on Dashboard (production APM).
 
@@ -289,6 +301,7 @@ Group-stage feeders use `compute_virtual_group_standings()`: completed group mat
 When touching knockout, sync, or cache code, verify:
 
 - [ ] ET/pens fixture: API payload with `regularTime: 1-1`, `fullTime: 7-6` → DB stores `1-1`, `winner_team_id` from API `winner`.
+- [ ] ET with null `regularTime`: API `fullTime` 3-2 + `extraTime` 2-1 + `duration: EXTRA_TIME` → DB stores `1-1`, progressor from `winner`.
 - [ ] Swapped API/DB home-away: same fixture still gets correct 90-min scores and `winner_team_id`; knockout draw tip with correct progressor → **12** points after recalc.
 - [ ] Regular-time finish: no `regularTime` → `fullTime` used.
 - [ ] Admin override: flag set on PATCH; sync does not change scores/winner.
