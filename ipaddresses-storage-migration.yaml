@@ -1,9 +1,0 @@
-apiVersion: migration.k8s.io/v1alpha1
-kind: StorageVersionMigration
-metadata:
-  name: ipaddresses-storage-version-migration-v1beta2
-spec:
-  resource:
-    group: ipam.cluster.x-k8s.io
-    resource: ipaddresses
-    version: v1beta2

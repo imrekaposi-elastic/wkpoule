@@ -51,6 +51,24 @@ async def test_cached_call_skips_caching_none(monkeypatch, cache_service):
     assert calls["count"] == 2
 
 
+async def test_run_cache_task_from_running_loop_logs_failure(caplog):
+    """Regression test: the in-loop branch of run_cache_task used to schedule the
+    task with no done-callback, so a failing invalidation never went through the
+    same structured wkpoule.cache warning log as every other cache failure."""
+
+    async def boom() -> None:
+        raise ValueError("nope")
+
+    with caplog.at_level("WARNING", logger="wkpoule.cache"):
+        run_cache_task(boom())
+        for _ in range(50):
+            if "cache task failed" in caplog.text:
+                break
+            await asyncio.sleep(0.01)
+
+    assert "cache task failed" in caplog.text
+
+
 async def test_run_cache_task_from_sync_thread_uses_main_loop():
     set_main_event_loop(asyncio.get_running_loop())
     done = threading.Event()

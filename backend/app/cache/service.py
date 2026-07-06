@@ -86,15 +86,29 @@ class CacheService:
             return False
         async with TimedCacheOperation("set_json", key):
             try:
-                if isinstance(value, BaseModel):
-                    payload = value.model_dump_json()
-                else:
-                    payload = json.dumps(value, default=str)
+                payload = self._encode_json(value)
                 await self._redis.set(key, payload, ex=ttl)
                 return True
             except Exception as exc:
                 logger.warning("cache set_json failed for %s: %s", key, exc)
                 return False
+
+    @staticmethod
+    def _encode_json(value: Any) -> str:
+        """Serialize a value for storage, using Pydantic's own encoder whenever possible.
+
+        `json.dumps(value, default=str)` silently stringifies Pydantic models it
+        doesn't know how to encode (e.g. a plain ``list[SomeModel]``), producing
+        `repr()`-like text instead of JSON objects. That round-trips as garbage on
+        the read side, so route anything that isn't already a `BaseModel` through
+        a `TypeAdapter` built from its own runtime type first.
+        """
+        if isinstance(value, BaseModel):
+            return value.model_dump_json()
+        try:
+            return TypeAdapter(type(value)).dump_json(value).decode("utf-8")
+        except Exception:
+            return json.dumps(value, default=str)
 
 
 def get_cache_service() -> CacheService:
