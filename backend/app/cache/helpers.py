@@ -87,7 +87,8 @@ def run_cache_task(coro: Awaitable[Any]) -> None:
 
     if loop is not None:
         try:
-            loop.create_task(coro)
+            task = loop.create_task(coro)
+            task.add_done_callback(_log_cache_task_result)
         except Exception as exc:
             logger.warning("cache task failed: %s", exc)
         return

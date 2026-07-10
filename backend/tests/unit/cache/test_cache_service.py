@@ -40,6 +40,20 @@ async def test_set_json_and_get_json(cache_service):
     assert loaded == model
 
 
+async def test_set_json_round_trips_bare_list_of_models(cache_service):
+    """Regression test: a plain list[BaseModel] (not itself a BaseModel) used to be
+    serialized with json.dumps(default=str), which stringifies each model via repr()
+    instead of emitting JSON objects, so every subsequent read failed validation."""
+    items = [SampleModel(name="a", count=1), SampleModel(name="b", count=2)]
+    assert await cache_service.set_json("list-key", items, ttl=60) is True
+
+    raw = await cache_service.get("list-key")
+    assert raw == '[{"name":"a","count":1},{"name":"b","count":2}]'
+
+    loaded = await cache_service.get_json("list-key", list[SampleModel])
+    assert loaded == items
+
+
 async def test_fail_open_when_redis_unavailable():
     service = CacheService(None)
     assert await service.get("key") is None

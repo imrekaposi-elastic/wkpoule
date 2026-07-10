@@ -1,9 +1,0 @@
-{
-  "spec": {
-    "desiredUpdate": {
-      "version": "4.22.0-okd-scos.5",
-      "image": "registry.ci.openshift.org/origin/release-scos@sha256:8ea47e23f3de5475aa1161881ccb961d6a084895ecb940d6defb8c24267322ff",
-      "force": false
-    }
-  }
-}
