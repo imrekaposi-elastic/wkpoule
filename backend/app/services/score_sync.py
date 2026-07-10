@@ -9,6 +9,7 @@ from app.config import get_settings
 from app.database import SessionLocal
 from app.models.match import Match
 from app.models.team import Team
+from app.services.bracket_resolver import apply_actual_knockout_teams
 from app.services.match_fixture_sync import (
     advancing_team_id_from_api_score,
     find_match_for_api,
@@ -261,6 +262,14 @@ async def sync_scores() -> int:
     db: Session = SessionLocal()
     updates = 0
     try:
+        bracket_assignments = apply_actual_knockout_teams(db)
+        if bracket_assignments:
+            logger.info(
+                "Knockout bracket: assigned teams on %d match(es)",
+                bracket_assignments,
+            )
+            updates += bracket_assignments
+
         team_by_code: dict[str, int] = {
             t.fifa_code: t.id for t in db.query(Team).all()
         }

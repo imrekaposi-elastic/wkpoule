@@ -282,6 +282,105 @@ def compute_predicted_knockout_teams(
     return out_teams, slot_labels
 
 
+def _actual_winner_for_completed_match(match: Match | None) -> int | None:
+    if match is None:
+        return None
+    if match.status != "completed":
+        return None
+    if match.home_score is None or match.away_score is None:
+        return None
+    if match.home_team_id is None or match.away_team_id is None:
+        return None
+    return resolve_winner_team_id(
+        match.home_team_id,
+        match.away_team_id,
+        match.home_score,
+        match.away_score,
+        match.winner_team_id,
+    )
+
+
+def _loser_team_id(match: Match | None, winner_id: int | None) -> int | None:
+    if match is None or winner_id is None:
+        return None
+    if match.home_team_id == winner_id:
+        return match.away_team_id
+    if match.away_team_id == winner_id:
+        return match.home_team_id
+    return None
+
+
+def apply_actual_knockout_teams(db: Session) -> int:
+    """Persist home/away from completed feeder winners onto later knockout slots."""
+    matches = (
+        db.query(Match)
+        .filter(Match.match_number >= 73, Match.match_number <= 104)
+        .all()
+    )
+    by_num = {match.match_number: match for match in matches}
+    winners: dict[int, int | None] = {}
+
+    for match_number in range(73, 89):
+        winners[match_number] = _actual_winner_for_completed_match(by_num.get(match_number))
+
+    updated = 0
+
+    def assign_from_feeders(
+        match_number: int,
+        home_feeder: int,
+        away_feeder: int,
+    ) -> None:
+        nonlocal updated
+        match = by_num.get(match_number)
+        if match is None:
+            return
+        home_id = winners.get(home_feeder)
+        away_id = winners.get(away_feeder)
+        if home_id is None or away_id is None:
+            return
+        changed = False
+        if match.home_team_id != home_id:
+            match.home_team_id = home_id
+            changed = True
+        if match.away_team_id != away_id:
+            match.away_team_id = away_id
+            changed = True
+        if changed:
+            updated += 1
+
+    for match_number, (home_feeder, away_feeder) in R16_SOURCES.items():
+        assign_from_feeders(match_number, home_feeder, away_feeder)
+        winners[match_number] = _actual_winner_for_completed_match(by_num.get(match_number))
+
+    for match_number, (home_feeder, away_feeder) in QF_SOURCES.items():
+        assign_from_feeders(match_number, home_feeder, away_feeder)
+        winners[match_number] = _actual_winner_for_completed_match(by_num.get(match_number))
+
+    for match_number, (home_feeder, away_feeder) in SF_SOURCES.items():
+        assign_from_feeders(match_number, home_feeder, away_feeder)
+        winners[match_number] = _actual_winner_for_completed_match(by_num.get(match_number))
+
+    third_place = by_num.get(103)
+    if third_place is not None:
+        home_id = _loser_team_id(by_num.get(101), winners.get(101))
+        away_id = _loser_team_id(by_num.get(102), winners.get(102))
+        if home_id is not None and away_id is not None:
+            changed = False
+            if third_place.home_team_id != home_id:
+                third_place.home_team_id = home_id
+                changed = True
+            if third_place.away_team_id != away_id:
+                third_place.away_team_id = away_id
+                changed = True
+            if changed:
+                updated += 1
+
+    for match_number, (home_feeder, away_feeder) in FINAL_SOURCES.items():
+        assign_from_feeders(match_number, home_feeder, away_feeder)
+
+    return updated
+
+
 def static_bracket_slot_labels(match_number: int) -> tuple[str | None, str | None]:
     """FIFA-style slot labels for knockout fixtures (no user predictions required)."""
 

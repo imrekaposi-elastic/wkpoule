@@ -12,6 +12,7 @@ from app.services.match_fixture_sync import (
     map_api_goals_to_match_orientation,
     parse_api_kickoff,
     winner_team_id_from_api_score,
+    _kickoff_utc,
 )
 from tests.seed_fixtures import seed_knockout_match, seed_team, seed_venue
 
@@ -194,3 +195,34 @@ def test_find_match_for_api_accepts_swapped_home_away(db):
     )
     assert found is not None
     assert found.id == match.id
+
+
+def test_find_match_for_api_fuzzy_knockout_kickoff(db):
+    venue = seed_venue(db)
+    home = seed_team(db, fifa_code="BRA")
+    away = seed_team(db, fifa_code="NOR")
+    match = Match(
+        match_number=91,
+        stage="round_of_16",
+        group_letter=None,
+        home_team_id=None,
+        away_team_id=None,
+        venue_id=venue.id,
+        kickoff_utc=datetime(2026, 7, 5, 21, 0, tzinfo=timezone.utc),
+        status="upcoming",
+    )
+    db.add(match)
+    db.commit()
+
+    found = find_match_for_api(
+        db,
+        home.id,
+        away.id,
+        "2026-07-05T20:00:00Z",
+    )
+    assert found is not None
+    assert found.id == match.id
+    assert found.home_team_id == home.id
+    assert found.away_team_id == away.id
+    assert found.kickoff_utc is not None
+    assert _kickoff_utc(found.kickoff_utc) == datetime(2026, 7, 5, 20, 0, tzinfo=timezone.utc)

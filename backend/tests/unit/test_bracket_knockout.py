@@ -10,6 +10,7 @@ from app.services.annex_c import annex_lookup
 from app.services.bracket_resolver import (
     R16_SOURCES,
     R32_STRUCTURE,
+    apply_actual_knockout_teams,
     build_r32_from_annex,
     compute_predicted_knockout_teams,
     static_bracket_slot_labels,
@@ -194,3 +195,55 @@ def test_completed_knockout_uses_actual_winner_for_next_round(db):
 
     assert home is not None
     assert home.fifa_code == "MAR"
+
+
+def test_apply_actual_knockout_teams_assigns_r16_from_completed_r32(db):
+    venue = seed_venue(db)
+    bra = seed_team(db, fifa_code="BRA")
+    nor = seed_team(db, fifa_code="NOR")
+    jpn = seed_team(db, fifa_code="JPN")
+    civ = seed_team(db, fifa_code="CIV")
+    kickoff = datetime(2026, 7, 1, 19, 0, tzinfo=timezone.utc)
+
+    r32_home = Match(
+        match_number=76,
+        stage="round_of_32",
+        home_team_id=bra.id,
+        away_team_id=jpn.id,
+        venue_id=venue.id,
+        kickoff_utc=kickoff,
+        status="completed",
+        home_score=2,
+        away_score=1,
+        winner_team_id=bra.id,
+    )
+    r32_away = Match(
+        match_number=78,
+        stage="round_of_32",
+        home_team_id=civ.id,
+        away_team_id=nor.id,
+        venue_id=venue.id,
+        kickoff_utc=kickoff,
+        status="completed",
+        home_score=1,
+        away_score=2,
+        winner_team_id=nor.id,
+    )
+    r16 = Match(
+        match_number=91,
+        stage="round_of_16",
+        home_team_id=None,
+        away_team_id=None,
+        venue_id=venue.id,
+        kickoff_utc=datetime(2026, 7, 5, 21, 0, tzinfo=timezone.utc),
+        status="upcoming",
+    )
+    db.add_all([r32_home, r32_away, r16])
+    db.commit()
+
+    updated = apply_actual_knockout_teams(db)
+    db.commit()
+
+    assert updated == 1
+    assert r16.home_team_id == bra.id
+    assert r16.away_team_id == nor.id

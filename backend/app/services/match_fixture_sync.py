@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
@@ -12,12 +12,21 @@ from app.services.scoring import resolve_winner_team_id
 
 logger = logging.getLogger("wkpoule.match_fixture_sync")
 
+# football-data.org kickoffs can differ from seeded fixture times by a few hours.
+KICKOFF_FUZZY_TOLERANCE = timedelta(hours=6)
+
 
 def parse_api_kickoff(utc_date: str) -> datetime:
     """Parse football-data.org utcDate (ISO-8601 with Z suffix)."""
     if utc_date.endswith("Z"):
         utc_date = utc_date[:-1] + "+00:00"
     dt = datetime.fromisoformat(utc_date)
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def _kickoff_utc(dt: datetime) -> datetime:
     if dt.tzinfo is None:
         return dt.replace(tzinfo=timezone.utc)
     return dt.astimezone(timezone.utc)
@@ -194,6 +203,69 @@ def _participants_match(
     return {match.home_team_id, match.away_team_id} == {team_a_id, team_b_id}
 
 
+def _can_assign_participants(
+    match: Match,
+    home_team_id: int,
+    away_team_id: int,
+) -> bool:
+    if match.home_team_id is None and match.away_team_id is None:
+        return True
+    return _participants_match(match, home_team_id, away_team_id)
+
+
+def _assign_api_participants(
+    match: Match,
+    home_team_id: int,
+    away_team_id: int,
+    kickoff: datetime,
+) -> None:
+    if match.home_team_id is None:
+        match.home_team_id = home_team_id
+    if match.away_team_id is None:
+        match.away_team_id = away_team_id
+    if _kickoff_utc(match.kickoff_utc) != kickoff:
+        match.kickoff_utc = (
+            kickoff.replace(tzinfo=None)
+            if match.kickoff_utc.tzinfo is None
+            else kickoff
+        )
+
+
+def _find_knockout_by_fuzzy_kickoff(
+    db: Session,
+    kickoff: datetime,
+    home_team_id: int,
+    away_team_id: int,
+) -> Match | None:
+    window_start = kickoff - KICKOFF_FUZZY_TOLERANCE
+    window_end = kickoff + KICKOFF_FUZZY_TOLERANCE
+    candidates = [
+        candidate
+        for candidate in db.query(Match).filter(Match.match_number >= 73).all()
+        if window_start <= _kickoff_utc(candidate.kickoff_utc) <= window_end
+    ]
+    valid = [
+        candidate
+        for candidate in candidates
+        if _can_assign_participants(candidate, home_team_id, away_team_id)
+    ]
+    if not valid:
+        return None
+
+    unassigned = [
+        candidate
+        for candidate in valid
+        if candidate.home_team_id is None and candidate.away_team_id is None
+    ]
+    pool = unassigned if unassigned else valid
+    return min(
+        pool,
+        key=lambda candidate: abs(
+            (_kickoff_utc(candidate.kickoff_utc) - kickoff).total_seconds()
+        ),
+    )
+
+
 def find_match_for_api(
     db: Session,
     home_team_id: int,
@@ -220,21 +292,23 @@ def find_match_for_api(
     kickoff = parse_api_kickoff(utc_date)
     match = db.query(Match).filter(Match.kickoff_utc == kickoff).first()
     if match is None:
-        return None
-
-    if match.match_number < 73:
+        match = _find_knockout_by_fuzzy_kickoff(db, kickoff, home_team_id, away_team_id)
+        if match is None:
+            return None
+        logger.info(
+            "Match #%d: fuzzy kickoff match for API %s (DB %s)",
+            match.match_number,
+            kickoff.isoformat(),
+            match.kickoff_utc.isoformat(),
+        )
+    elif match.match_number < 73:
         logger.debug(
             "Kickoff match #%d is group stage but team ids differ from API",
             match.match_number,
         )
         return None
 
-    if match.home_team_id is None:
-        match.home_team_id = home_team_id
-    if match.away_team_id is None:
-        match.away_team_id = away_team_id
-
-    if not _participants_match(match, home_team_id, away_team_id):
+    if not _can_assign_participants(match, home_team_id, away_team_id):
         logger.warning(
             "Kickoff match #%d teams %s/%s do not match API participants",
             match.match_number,
@@ -243,4 +317,5 @@ def find_match_for_api(
         )
         return None
 
+    _assign_api_participants(match, home_team_id, away_team_id, kickoff)
     return match
