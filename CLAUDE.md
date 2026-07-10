@@ -3,7 +3,7 @@
 Read this before changing knockout scoring, bracket resolution, or football-data.org sync.
 For API auth and prediction workflows, use `docs/AGENTS.md`. For OpenAPI, use `/openapi.json`.
 
-**Current app version:** `2.7.5` (`frontend/src/version.ts`, `backend/app/main.py`).
+**Current app version:** `2.7.6` (`frontend/src/version.ts`, `backend/app/main.py`).
 
 ---
 
@@ -63,7 +63,7 @@ For API auth and prediction workflows, use `docs/AGENTS.md`. For OpenAPI, use `/
 | 5 | Coverage 70% → 80%, load test script | **Partial / pending** | Cache unit tests exist; CI gate & `scripts/load-test.ts` not done |
 | — | `asyncio.to_thread` for sync `compute()` in cache miss | **Not done** | Top-5 item #2 |
 | — | HPA + 4–6 API pods | **Not done** | Top-5 item #3; discussed, YAML not committed |
-| — | `SCORE_POLLER_ENABLED` (single poller pod) | **Not done** | Needed before scaling API replicas |
+| — | `SCORE_POLLER_ENABLED` (single poller pod) | **Done (v2.7.6)** | Redis lock `wkpoule:score_sync_lock` — only one replica syncs |
 | — | Shared match cache (strip `user_id` from key) | **Not done** | Top-5 item #4 |
 | — | SQL rankings + Redis stampede lock | **Not done** | Top-5 item #5 |
 
@@ -282,7 +282,22 @@ Group-stage feeders use `compute_virtual_group_standings()`: completed group mat
 
 ---
 
-### 6. Rankings `.slice is not a function` (earlier session, ~v1.7.0 → fixed before v2.5)
+### 6. Automatic score sync stopped (v2.7.6)
+
+**Symptom:** Finished match scores no longer appear automatically; manual DB fixes were needed.
+
+**Cause:** Two API replicas each ran the score poller (every 15 min) → duplicate football-data.org calls → **HTTP 429** rate limits. Sync returned 0 updates silently after 429.
+
+**Fix:**
+- Redis distributed lock (`wkpoule:score_sync_lock`) so only one replica syncs per interval.
+- On 429, parse `Retry-After` / `"Wait N seconds"` and back off before retry.
+- Fetch all competition matches (no `status` filter) so EXTRA_TIME / PENALTY_SHOOTOUT rows are not skipped mid-match.
+- `POST /api/admin/sync-scores` for manual recovery.
+- Optional `SCORE_POLLER_ENABLED=false` on extra replicas.
+
+---
+
+### 7. Rankings `.slice is not a function` (earlier session, ~v1.7.0 → fixed before v2.5)
 
 **Symptom:** `Uncaught TypeError: rankings.slice is not a function` on Dashboard (production APM).
 

@@ -12,6 +12,8 @@ logger = logging.getLogger("wkpoule.score_poller")
 
 MIN_SYNC_INTERVAL = timedelta(minutes=15)
 MAX_SYNCS_PER_DAY = 256
+SCORE_SYNC_LOCK_KEY = "wkpoule:score_sync_lock"
+SCORE_SYNC_LOCK_TTL_SECONDS = 14 * 60
 
 _task: asyncio.Task | None = None
 _last_sync_at: datetime | None = None
@@ -22,6 +24,9 @@ _sync_count_today = 0
 def start_polling() -> None:
     global _task
     settings = get_settings()
+    if not settings.score_poller_enabled:
+        logger.info("Score poller disabled (SCORE_POLLER_ENABLED=false)")
+        return
     if not settings.football_data_api_key:
         logger.warning("FOOTBALL_DATA_API_KEY not set — score poller disabled")
         return
@@ -88,8 +93,34 @@ def seconds_until_next_sync(
     return max(0, int(remaining.total_seconds()))
 
 
+async def acquire_score_sync_lock() -> bool:
+    """Try to become the sole score-sync runner. Fail-open when Redis is unavailable."""
+    import os
+
+    from app.cache.redis_client import get_redis
+
+    redis = get_redis()
+    if redis is None:
+        return True
+
+    holder = os.environ.get("HOSTNAME", "local")
+    try:
+        acquired = await redis.set(
+            SCORE_SYNC_LOCK_KEY,
+            holder,
+            nx=True,
+            ex=SCORE_SYNC_LOCK_TTL_SECONDS,
+        )
+        if acquired:
+            logger.debug("Acquired score sync lock as %s", holder)
+        return bool(acquired)
+    except Exception as exc:
+        logger.warning("Score sync lock unavailable (fail-open): %s", exc)
+        return True
+
+
 async def _poll_loop() -> None:
-    from app.services.score_sync import sync_scores
+    from app.services.score_sync import FootballDataRateLimited, sync_scores
 
     global _last_sync_at, _syncs_on_date, _sync_count_today
 
@@ -108,15 +139,34 @@ async def _poll_loop() -> None:
         now = _utc_now()
         if _daily_limit_reached(now):
             logger.info("Daily score sync limit reached (%d/%d)", _sync_count_today, MAX_SYNCS_PER_DAY)
+            await asyncio.sleep(
+                seconds_until_next_sync(
+                    now,
+                    last_sync_at=_last_sync_at,
+                    syncs_on_date=_syncs_on_date,
+                    sync_count_today=_sync_count_today,
+                )
+            )
+            continue
+
+        if not await acquire_score_sync_lock():
+            logger.info("Score sync skipped: another API replica holds the lock")
+            await asyncio.sleep(int(MIN_SYNC_INTERVAL.total_seconds()))
             continue
 
         try:
             updated = await sync_scores()
-            _record_sync(now)
+            _record_sync(_utc_now())
             if updated:
                 logger.info("Synced %d score update(s)", updated)
             else:
-                logger.debug("Score sync complete: no changes")
+                logger.info("Score sync complete: no changes")
+        except FootballDataRateLimited as exc:
+            logger.warning(
+                "Score sync rate-limited; backing off %ds before retry",
+                exc.retry_after_seconds,
+            )
+            await asyncio.sleep(exc.retry_after_seconds)
         except asyncio.CancelledError:
             raise
         except Exception:

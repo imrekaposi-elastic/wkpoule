@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     weather_api_url: str = "https://api.weatherapi.com/v1"
     football_data_api_key: str = ""
     football_data_api_url: str = "https://api.football-data.org/v4"
+    # When false, this process does not run the background score poller (use on extra API replicas).
+    score_poller_enabled: bool = True
 
     redis_url: str = "redis://redis:6379/0"
     redis_max_connections: int = 20

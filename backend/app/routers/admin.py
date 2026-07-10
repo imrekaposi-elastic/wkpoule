@@ -165,3 +165,21 @@ def admin_delete_empty_subgroup(
     db.delete(sg)
     db.commit()
     return None
+
+
+@router.post("/sync-scores")
+async def admin_sync_scores(
+    _admin: User = Depends(get_admin_user),
+):
+    """Manually pull scores from football-data.org (same path as the background poller)."""
+    from app.services.score_sync import FootballDataRateLimited, sync_scores
+
+    try:
+        updates = await sync_scores()
+    except FootballDataRateLimited as exc:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"football-data.org rate limit; retry in {exc.retry_after_seconds}s",
+        ) from exc
+
+    return {"updates": updates}

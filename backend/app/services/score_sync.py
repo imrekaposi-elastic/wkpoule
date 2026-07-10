@@ -17,6 +17,32 @@ from app.services.match_fixture_sync import (
 
 logger = logging.getLogger("wkpoule.score_sync")
 
+
+class FootballDataRateLimited(Exception):
+    """football-data.org rejected the request due to rate limiting."""
+
+    def __init__(self, retry_after_seconds: int):
+        self.retry_after_seconds = retry_after_seconds
+        super().__init__(f"rate limited; retry after {retry_after_seconds}s")
+
+
+def _retry_after_seconds_from_429(response: httpx.Response) -> int:
+    retry_after = response.headers.get("Retry-After")
+    if retry_after and retry_after.isdigit():
+        return max(1, int(retry_after))
+
+    try:
+        body = response.json()
+        message = body.get("message", "")
+        if "Wait " in message and " seconds" in message:
+            fragment = message.split("Wait ", 1)[1].split(" seconds", 1)[0].strip()
+            if fragment.isdigit():
+                return max(1, int(fragment))
+    except Exception:
+        pass
+
+    return 60
+
 STATUS_RANK = {
     "upcoming": 0,
     "in_progress": 1,
@@ -164,12 +190,12 @@ async def sync_scores() -> int:
 
     url = f"{settings.football_data_api_url}/competitions/WC/matches"
     headers = {"X-Auth-Token": settings.football_data_api_key}
-    # AWARDED is a match status in responses but not a valid ?status= filter value on v4.
-    params = {"status": "LIVE,IN_PLAY,PAUSED,FINISHED"}
+    # Fetch all fixtures in one call. Status filters omit EXTRA_TIME / PENALTY_SHOOTOUT
+    # rows while a knockout match is still in progress.
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            resp = await client.get(url, headers=headers, params=params)
+            resp = await client.get(url, headers=headers)
             resp.raise_for_status()
             data = resp.json()
         logger.info(
@@ -185,6 +211,21 @@ async def sync_scores() -> int:
             },
         )
     except httpx.HTTPStatusError as e:
+        if e.response.status_code == 429:
+            retry_after = _retry_after_seconds_from_429(e.response)
+            logger.warning(
+                "football-data.org rate limited (429); retry after %ss",
+                retry_after,
+                extra={
+                    "event.action": "external_api_request",
+                    "event.outcome": "failure",
+                    "integration.name": "football-data",
+                    "url.domain": "api.football-data.org",
+                    "http.request.method": "GET",
+                    "http.response.status_code": 429,
+                },
+            )
+            raise FootballDataRateLimited(retry_after) from e
         logger.error(
             "football-data.org returned %s: %s",
             e.response.status_code,
